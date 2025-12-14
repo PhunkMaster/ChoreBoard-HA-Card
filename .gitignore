@@ -3,11 +3,10 @@ node_modules/
 package-lock.json
 yarn.lock
 
-# Build output
-dist/
-*.js.map
-*.d.ts
-*.d.ts.map
+# Build output (keep .js files for HACS, ignore maps and declarations)
+dist/*.js.map
+dist/*.d.ts
+dist/*.d.ts.map
 
 # Development
 .hass-dev/.storage/
