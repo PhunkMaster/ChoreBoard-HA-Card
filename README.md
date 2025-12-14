@@ -1,14 +1,40 @@
 # ChoreBoard Card for Home Assistant
 
-A custom Lovelace card for Home Assistant to manage and track household chores.
+A custom Lovelace card for Home Assistant to display and manage chores from the [ChoreBoard Integration](https://github.com/PhunkMaster/ChoreBoard-HA-Integration).
+
+## Prerequisites
+
+**⚠️ IMPORTANT**: This card requires the [ChoreBoard Home Assistant Integration](https://github.com/PhunkMaster/ChoreBoard-HA-Integration) to be installed and configured first.
+
+The card displays chore data from ChoreBoard sensor entities created by the integration. Without the integration, this card will not function.
+
+### Install ChoreBoard Integration
+
+1. Install via HACS (recommended):
+   - Go to HACS → Integrations
+   - Search for "ChoreBoard"
+   - Click Install
+
+2. Or install manually:
+   - Download the integration from the [repository](https://github.com/PhunkMaster/ChoreBoard-HA-Integration)
+   - Copy to `custom_components/choreboard/`
+
+3. Configure the integration:
+   - Go to Settings → Devices & Services
+   - Click "Add Integration"
+   - Search for "ChoreBoard"
+   - Enter your API Key and API URL
+
+For detailed integration setup instructions, see the [ChoreBoard Integration documentation](https://github.com/PhunkMaster/ChoreBoard-HA-Integration).
 
 ## Features
 
-- Display a list of chores with assignees and due dates
-- Interactive checkboxes to mark chores as complete
-- Customizable title and header visibility
-- Clean, modern UI that matches Home Assistant's design language
-- Visual configuration editor
+- Display chores from ChoreBoard integration with status indicators
+- Mark chores as complete directly from the card
+- Show assignee, due date, points, and descriptions
+- Color-coded status (pending, completed, overdue)
+- Visual configuration editor for easy setup
+- Customizable display options
 - HACS compatible
 
 ## Installation
@@ -41,23 +67,26 @@ lovelace:
 
 ### Visual Editor
 
-The card includes a visual editor accessible through the Home Assistant UI. Click "Edit" on your dashboard, then add a new card and search for "ChoreBoard Card".
+The card includes a visual editor accessible through the Home Assistant UI:
+
+1. Edit your dashboard
+2. Click "Add Card"
+3. Search for "ChoreBoard Card"
+4. Select which ChoreBoard entities to display
+5. Configure display options
 
 ### YAML Configuration
 
 ```yaml
 type: custom:choreboard-card
 title: Weekly Chores
+entities:
+  - sensor.choreboard_wash_dishes
+  - sensor.choreboard_take_out_trash
+  - sensor.choreboard_vacuum_living_room
 show_header: true
-chores:
-  - name: Take out trash
-    assignee: John
-    due_date: Monday
-    completed: false
-  - name: Wash dishes
-    assignee: Jane
-    due_date: Every day
-    completed: false
+show_points: true
+show_description: false
 ```
 
 ### Configuration Options
@@ -66,19 +95,26 @@ chores:
 |--------|------|---------|-------------|
 | `type` | string | **Required** | Must be `custom:choreboard-card` |
 | `title` | string | `"Chores"` | Card title |
+| `entities` | list | **Required** | List of ChoreBoard sensor entity IDs |
 | `show_header` | boolean | `true` | Show/hide the card header |
-| `entity` | string | optional | Home Assistant entity to sync with (future feature) |
-| `chores` | list | `[]` | List of chore items |
+| `show_points` | boolean | `true` | Show/hide point values |
+| `show_description` | boolean | `false` | Show/hide chore descriptions |
 
-### Chore Item Options
+### Entity Format
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `name` | string | **Required** - Chore name |
-| `assignee` | string | Person assigned to the chore |
-| `due_date` | string | When the chore is due |
-| `completed` | boolean | Completion status |
-| `entity` | string | Home Assistant entity (future feature) |
+Entities must be ChoreBoard sensors created by the integration. They follow the format:
+- `sensor.choreboard_[chore_name]`
+
+Each entity includes these attributes:
+- `assignee`: Person assigned to the chore
+- `due_date`: When the chore is due
+- `points`: Point value of the chore
+- `description`: Chore description
+
+Entity states:
+- `pending`: Chore needs to be done
+- `completed`: Chore is finished
+- `overdue`: Chore is past due date
 
 ## Examples
 
@@ -86,40 +122,87 @@ chores:
 
 ```yaml
 type: custom:choreboard-card
-title: Daily Chores
-chores:
-  - name: Water plants
-    completed: false
-  - name: Check mail
-    completed: true
+title: Chores
+entities:
+  - sensor.choreboard_wash_dishes
+  - sensor.choreboard_take_out_trash
 ```
 
-### With Assignees and Due Dates
+### Show All Details
 
 ```yaml
 type: custom:choreboard-card
-title: Weekend Chores
-chores:
-  - name: Mow the lawn
-    assignee: Dad
-    due_date: Saturday
-    completed: false
-  - name: Grocery shopping
-    assignee: Mom
-    due_date: Sunday morning
-    completed: false
+title: Weekly Chores
+entities:
+  - sensor.choreboard_wash_dishes
+  - sensor.choreboard_take_out_trash
+  - sensor.choreboard_vacuum_living_room
+  - sensor.choreboard_clean_bathroom
+show_header: true
+show_points: true
+show_description: true
 ```
 
-### Without Header
+### Minimal Display
 
 ```yaml
 type: custom:choreboard-card
+title: Quick Chores
+entities:
+  - sensor.choreboard_water_plants
+  - sensor.choreboard_check_mail
 show_header: false
-chores:
-  - name: Feed the dog
-    assignee: Kids
-    completed: false
+show_points: false
+show_description: false
 ```
+
+## Usage
+
+### Marking Chores Complete
+
+Click the "Complete" button on any pending or overdue chore to mark it as complete. This calls the `choreboard.mark_complete` service from the integration.
+
+Completed chores are indicated with:
+- Green checkmark icon
+- "✓ Done" badge
+- Reduced opacity
+- Strike-through name
+
+### Status Indicators
+
+The card uses color-coding to show chore status:
+- **Blue border**: Pending chores
+- **Green border**: Completed chores
+- **Red border**: Overdue chores
+
+## Troubleshooting
+
+### "No ChoreBoard entities found" Warning
+
+This means the ChoreBoard integration is not installed or configured. To resolve:
+
+1. Verify the integration is installed in HACS or `custom_components/`
+2. Configure the integration in Settings → Devices & Services
+3. Check that chore entities exist in Developer Tools → States
+4. Look for entities starting with `sensor.choreboard_`
+
+### Entities Not Showing
+
+If specific entities don't appear:
+
+1. Check entity IDs in Developer Tools → States
+2. Verify entities start with `sensor.choreboard_`
+3. Ensure the integration has successfully fetched chore data
+4. Check integration logs for errors
+
+### "Complete" Button Not Working
+
+If marking chores complete fails:
+
+1. Check Home Assistant logs for errors
+2. Verify the `choreboard.mark_complete` service exists
+3. Test the service in Developer Tools → Services
+4. Ensure the integration API connection is working
 
 ## Development
 
@@ -127,10 +210,14 @@ See [CLAUDE.md](./CLAUDE.md) for development instructions.
 
 ## Support
 
-If you have issues or questions, please:
-1. Check the [documentation](https://github.com/yourusername/choreboard-ha-card)
+If you have issues or questions:
+1. Check the [ChoreBoard Integration documentation](https://github.com/PhunkMaster/ChoreBoard-HA-Integration)
 2. Search existing [issues](https://github.com/yourusername/choreboard-ha-card/issues)
 3. Create a new issue if needed
+
+## Related Projects
+
+- [ChoreBoard Integration](https://github.com/PhunkMaster/ChoreBoard-HA-Integration) - Required Home Assistant integration
 
 ## License
 
@@ -141,3 +228,4 @@ MIT License - see LICENSE file for details
 Built with:
 - [Lit](https://lit.dev/) - Web Components library
 - [custom-card-helpers](https://github.com/custom-cards/custom-card-helpers) - Helper library for custom cards
+- [ChoreBoard Integration](https://github.com/PhunkMaster/ChoreBoard-HA-Integration) - Data source

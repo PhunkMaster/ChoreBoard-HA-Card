@@ -6,6 +6,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ChoreBoard-HA-Card is a Home Assistant custom card for managing and tracking household chores. It's built as a custom Lovelace card using TypeScript, Lit web components, and Rollup for bundling.
 
+**IMPORTANT**: This card requires the [ChoreBoard Home Assistant Integration](https://github.com/PhunkMaster/ChoreBoard-HA-Integration) to be installed and configured. The card displays data from ChoreBoard sensor entities created by that integration.
+
+## ChoreBoard Integration
+
+### Overview
+
+The card works exclusively with the ChoreBoard integration, which creates sensor entities for each chore:
+- Entity format: `sensor.choreboard_[chore_name]`
+- States: `pending`, `completed`, `overdue`
+- Attributes: `assignee`, `due_date`, `points`, `description`
+
+### Integration Setup
+
+Users must install and configure the ChoreBoard integration before using this card:
+
+1. Install integration via HACS or manually
+2. Configure with API key and URL in Settings → Devices & Services
+3. Integration creates sensor entities automatically
+4. Card displays and manages these entities
+
+### Service Calls
+
+The card uses the `choreboard.mark_complete` service to mark chores as complete:
+
+```typescript
+await this.hass.callService('choreboard', 'mark_complete', {
+  entity_id: 'sensor.choreboard_wash_dishes',
+});
+```
+
+### Data Flow
+
+1. Integration fetches chore data from ChoreBoard API
+2. Creates/updates sensor entities in Home Assistant
+3. Card reads entity states and attributes from `this.hass.states`
+4. Card calls integration services to update chores
+5. Integration syncs changes back to ChoreBoard API
+
 ## Build Commands
 
 ### Development

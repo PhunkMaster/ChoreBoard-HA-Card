@@ -7,17 +7,25 @@ export const ELEMENT_NAME = 'choreboard-card';
 export interface ChoreboardCardConfig {
   type: string;
   title?: string;
-  entity?: string;
+  entities?: string[]; // List of ChoreBoard sensor entity IDs
   show_header?: boolean;
-  chores?: ChoreItem[];
+  show_points?: boolean;
+  show_description?: boolean;
 }
 
-export interface ChoreItem {
-  name: string;
-  assignee?: string;
-  due_date?: string;
-  completed?: boolean;
-  entity?: string;
+export interface ChoreboardEntityAttributes {
+  assignee: string;
+  due_date: string;
+  points: number;
+  description: string;
+  friendly_name?: string;
+}
+
+export interface ChoreboardEntity {
+  entity_id: string;
+  state: 'pending' | 'completed' | 'overdue';
+  attributes: ChoreboardEntityAttributes;
+  last_changed?: string;
 }
 
 export interface HomeAssistantExtended extends HomeAssistant {
