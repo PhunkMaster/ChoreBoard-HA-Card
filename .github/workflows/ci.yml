@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - '**'
+      - '!main'
+
+jobs:
+  build:
+    name: Build and Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting
+        run: npm run format -- --check
+
+      - name: Build development
+        run: npm run build
+
+      - name: Build production
+        run: npm run build:prod
+
+      - name: Check build output exists
+        run: |
+          if [ ! -f "dist/choreboard-card.js" ]; then
+            echo "Build failed: dist/choreboard-card.js not found"
+            exit 1
+          fi
+          echo "Build output size: $(ls -lh dist/choreboard-card.js | awk '{print $5}')"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 7
+
+  validate:
+    name: Validate Configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate hacs.json
+        run: |
+          if ! jq empty hacs.json 2>/dev/null; then
+            echo "Invalid JSON in hacs.json"
+            exit 1
+          fi
+          echo "hacs.json is valid JSON"
+
+      - name: Validate package.json
+        run: |
+          if ! jq empty package.json 2>/dev/null; then
+            echo "Invalid JSON in package.json"
+            exit 1
+          fi
+          echo "package.json is valid JSON"
+
+      - name: Check required files
+        run: |
+          required_files=("README.md" "hacs.json" "package.json" "tsconfig.json" "rollup.config.mjs")
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "Required file missing: $file"
+              exit 1
+            fi
+          done
+          echo "All required files present"

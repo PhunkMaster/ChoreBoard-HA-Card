@@ -1,0 +1,52 @@
+# ChoreBoard Card Development Dashboard
+# This dashboard showcases different configurations of the ChoreBoard Card
+
+title: ChoreBoard Card Preview
+views:
+  - title: Examples
+    path: examples
+    icon: mdi:clipboard-check
+    cards:
+      # Basic Example
+      - type: custom:choreboard-card
+        title: "Weekly Chores"
+        show_header: true
+        chores:
+          - name: "Take out trash"
+            assignee: "John"
+            due_date: "Monday"
+            completed: false
+          - name: "Wash dishes"
+            assignee: "Jane"
+            due_date: "Every day"
+            completed: false
+          - name: "Vacuum living room"
+            assignee: "John"
+            due_date: "Wednesday"
+            completed: true
+          - name: "Clean bathroom"
+            assignee: "Jane"
+            due_date: "Saturday"
+            completed: false
+
+      # Minimal Example
+      - type: custom:choreboard-card
+        title: "Quick Chores"
+        chores:
+          - name: "Water plants"
+            completed: false
+          - name: "Check mail"
+            completed: true
+
+      # No Header Example
+      - type: custom:choreboard-card
+        show_header: false
+        chores:
+          - name: "Feed the dog"
+            assignee: "Kids"
+            completed: false
+
+      # Empty State Example
+      - type: custom:choreboard-card
+        title: "No Chores"
+        chores: []

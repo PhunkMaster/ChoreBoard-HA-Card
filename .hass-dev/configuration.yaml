@@ -1,0 +1,48 @@
+# Development Home Assistant Configuration
+# This configuration is used for testing the ChoreBoard Card
+
+# Configure frontend to load the custom card from development server
+frontend:
+  extra_module_url:
+    - http://localhost:4000/choreboard-card.js
+
+# Basic configuration
+default_config:
+
+# Enable the logger for debugging
+logger:
+  default: info
+  logs:
+    homeassistant.components.frontend: debug
+
+# Example sensors for testing
+sensor:
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
+
+# Example input_boolean for chore completion tracking
+input_boolean:
+  chore_trash:
+    name: Take out trash
+    icon: mdi:delete
+
+  chore_dishes:
+    name: Wash dishes
+    icon: mdi:silverware-clean
+
+  chore_vacuum:
+    name: Vacuum living room
+    icon: mdi:robot-vacuum
+
+# Lovelace dashboards
+lovelace:
+  mode: storage
+  dashboards:
+    lovelace-choreboard:
+      mode: yaml
+      title: ChoreBoard Dev
+      icon: mdi:clipboard-check
+      show_in_sidebar: true
+      filename: views/choreboard-card-preview.yaml

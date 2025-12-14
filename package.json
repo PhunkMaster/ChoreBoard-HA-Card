@@ -1,0 +1,38 @@
+{
+  "name": "choreboard-ha-card",
+  "version": "0.1.0",
+  "description": "A Home Assistant custom card for managing and tracking chores",
+  "main": "dist/choreboard-card.js",
+  "scripts": {
+    "watch": "rollup -c --watch --bundleConfigAsCjs",
+    "build": "rollup -c --bundleConfigAsCjs",
+    "build:prod": "rollup -c --environment BUILD:production --bundleConfigAsCjs",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start:hass": "docker run -d --name hass-dev -p 8123:8123 -v $(pwd)/.hass-dev:/config homeassistant/home-assistant:latest"
+  },
+  "keywords": [
+    "home-assistant",
+    "custom-card",
+    "chores",
+    "choreboard",
+    "lovelace"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "custom-card-helpers": "^1.9.0",
+    "lit": "^3.1.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "prettier": "^3.2.4",
+    "rollup": "^4.9.6",
+    "rollup-plugin-serve": "^2.0.2",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3"
+  }
+}
