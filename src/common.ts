@@ -1,8 +1,8 @@
-import { HomeAssistant } from 'custom-card-helpers';
+import { HomeAssistant } from "custom-card-helpers";
 
-export const CARD_VERSION = '0.1.0';
-export const CARD_NAME = 'ChoreBoard Card';
-export const ELEMENT_NAME = 'choreboard-card';
+export const CARD_VERSION = "0.1.0";
+export const CARD_NAME = "ChoreBoard Card";
+export const ELEMENT_NAME = "choreboard-card";
 
 export interface ChoreboardCardConfig {
   type: string;
@@ -23,7 +23,7 @@ export interface ChoreboardEntityAttributes {
 
 export interface ChoreboardEntity {
   entity_id: string;
-  state: 'pending' | 'completed' | 'overdue';
+  state: "pending" | "completed" | "overdue";
   attributes: ChoreboardEntityAttributes;
   last_changed?: string;
 }

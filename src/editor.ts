@@ -1,9 +1,9 @@
-import { LitElement, html, css, TemplateResult, CSSResultGroup } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { HomeAssistant } from 'custom-card-helpers';
-import { ChoreboardCardConfig } from './common';
+import { LitElement, html, css, TemplateResult, CSSResultGroup } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
+import { HomeAssistant } from "custom-card-helpers";
+import { ChoreboardCardConfig } from "./common";
 
-@customElement('choreboard-card-editor')
+@customElement("choreboard-card-editor")
 export class ChoreboardCardEditor extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private config!: ChoreboardCardConfig;
@@ -19,7 +19,7 @@ export class ChoreboardCardEditor extends LitElement {
     if (!this.hass) return [];
 
     return Object.keys(this.hass.states).filter((entityId) =>
-      entityId.startsWith('sensor.choreboard_')
+      entityId.startsWith("sensor.choreboard_"),
     );
   }
 
@@ -52,14 +52,14 @@ export class ChoreboardCardEditor extends LitElement {
                 </div>
               </div>
             `
-          : ''}
+          : ""}
 
         <div class="option">
           <label for="title">Title:</label>
           <input
             id="title"
             type="text"
-            .value=${this.config.title || ''}
+            .value=${this.config.title || ""}
             @input=${this.titleChanged}
             placeholder="Chores"
           />
@@ -80,7 +80,7 @@ export class ChoreboardCardEditor extends LitElement {
                       <span>${this.getEntityDisplayName(entityId)}</span>
                       <span class="entity-id">${entityId}</span>
                     </label>
-                  `
+                  `,
                 )
               : html`<p class="hint">No ChoreBoard entities available</p>`}
           </div>
@@ -124,11 +124,12 @@ export class ChoreboardCardEditor extends LitElement {
           <div>
             <strong>About ChoreBoard Card</strong>
             <p>
-              This card displays chores from the ChoreBoard integration. Select which chore entities
-              you want to display above.
+              This card displays chores from the ChoreBoard integration. Select
+              which chore entities you want to display above.
             </p>
             <p>
-              You can mark chores as complete directly from the card using the "Complete" button.
+              You can mark chores as complete directly from the card using the
+              "Complete" button.
             </p>
           </div>
         </div>
@@ -143,9 +144,9 @@ export class ChoreboardCardEditor extends LitElement {
     }
 
     // Extract from entity_id
-    const parts = entityId.split('.');
-    if (parts.length === 2 && parts[1].startsWith('choreboard_')) {
-      const name = parts[1].replace('choreboard_', '').replace(/_/g, ' ');
+    const parts = entityId.split(".");
+    if (parts.length === 2 && parts[1].startsWith("choreboard_")) {
+      const name = parts[1].replace("choreboard_", "").replace(/_/g, " ");
       return name.charAt(0).toUpperCase() + name.slice(1);
     }
 
@@ -212,7 +213,7 @@ export class ChoreboardCardEditor extends LitElement {
   }
 
   private configChanged(): void {
-    const event = new CustomEvent('config-changed', {
+    const event = new CustomEvent("config-changed", {
       detail: { config: this.config },
       bubbles: true,
       composed: true,
@@ -239,7 +240,7 @@ export class ChoreboardCardEditor extends LitElement {
         font-size: 14px;
       }
 
-      .option input[type='text'] {
+      .option input[type="text"] {
         padding: 8px;
         border: 1px solid var(--divider-color);
         border-radius: 4px;
@@ -248,7 +249,7 @@ export class ChoreboardCardEditor extends LitElement {
         color: var(--primary-text-color);
       }
 
-      .option input[type='checkbox'] {
+      .option input[type="checkbox"] {
         margin-right: 8px;
       }
 
@@ -283,7 +284,7 @@ export class ChoreboardCardEditor extends LitElement {
         background: var(--secondary-background-color);
       }
 
-      .entity-item input[type='checkbox'] {
+      .entity-item input[type="checkbox"] {
         margin: 0;
       }
 
