@@ -99,30 +99,30 @@ jobs:
           # Create changelog
           CHANGELOG="## What's Changed
 
-  $COMMITS
+          $COMMITS
 
-  **Full Changelog**: https://github.com/${{ github.repository }}/compare/${LAST_TAG}...v${{ steps.new_version.outputs.version }}"
-  
-  # Save to file for use in release
-           echo "$CHANGELOG" > CHANGELOG.md
-           echo "Generated changelog"
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${LAST_TAG}...v${{ steps.new_version.outputs.version }}"
 
-           - name: Create GitHub Release
-             uses: softprops/action-gh-release@v1
-             with:
-               tag_name: v${{ steps.new_version.outputs.version }}
-               name: Release v${{ steps.new_version.outputs.version }}
-               body_path: CHANGELOG.md
-               files: |
-                 dist/choreboard-card.js
-                 dist/choreboard-card.js.map
-               draft: false
-               prerelease: false
-             env:
-               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Save to file for use in release
+          echo "$CHANGELOG" > CHANGELOG.md
+          echo "Generated changelog"
 
-           - name: Notify release created
-             run: |
-               echo "✅ Release v${{ steps.new_version.outputs.version }} created successfully!"
-               echo "📦 Build artifacts attached to release"
-               echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.new_version.outputs.version }}"
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.new_version.outputs.version }}
+          name: Release v${{ steps.new_version.outputs.version }}
+          body_path: CHANGELOG.md
+          files: |
+            dist/choreboard-card.js
+            dist/choreboard-card.js.map
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify release created
+        run: |
+          echo "✅ Release v${{ steps.new_version.outputs.version }} created successfully!"
+          echo "📦 Build artifacts attached to release"
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.new_version.outputs.version }}"
