@@ -50,6 +50,10 @@ export class ChoreboardCard extends LitElement {
     };
   }
 
+  public static getConfigElement(): HTMLElement {
+    return document.createElement("choreboard-card-editor");
+  }
+
   private getChores(): Chore[] {
     if (!this.hass || !this.config.entity) {
       return [];
@@ -211,7 +215,7 @@ export class ChoreboardCard extends LitElement {
                       <div class="chore-name">${chore.name}</div>
                       ${this.config.show_points && chore.points
                         ? html`<div class="chore-points">
-                            ${chore.points} pts
+                            ${typeof chore.points === "string" ? parseFloat(chore.points) : chore.points} pts
                           </div>`
                         : ""}
                     </div>

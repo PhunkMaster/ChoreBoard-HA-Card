@@ -16,10 +16,13 @@ export class ChoreboardCardEditor extends LitElement {
     if (!this.hass) return [];
 
     // Get sensors that follow the my_chores pattern
+    // Supports both sensor.choreboard_my_chores_* and sensor.*_my_chores patterns
     return Object.keys(this.hass.states).filter(
       (entityId) =>
         entityId.startsWith("sensor.choreboard_my_chores_") ||
-        entityId.startsWith("sensor.choreboard_my_immediate_chores_"),
+        entityId.startsWith("sensor.choreboard_my_immediate_chores_") ||
+        (entityId.startsWith("sensor.") && entityId.endsWith("_my_chores")) ||
+        (entityId.startsWith("sensor.") && entityId.endsWith("_my_immediate_chores")),
     );
   }
 

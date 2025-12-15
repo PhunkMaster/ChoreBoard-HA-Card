@@ -19,9 +19,9 @@ export interface Chore {
   id: number; // Instance ID for API calls
   name: string;
   due_date: string;
-  points: number;
+  points: string | number; // Integration may return string or number
   is_overdue: boolean;
-  status: string; // "pending", "completed", etc.
+  status: string; // "pending", "completed", "assigned", etc.
   complete_later?: boolean; // Available in my_immediate_chores sensor
 }
 
