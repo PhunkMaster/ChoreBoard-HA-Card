@@ -35,6 +35,19 @@ export interface MyChoresSensorAttributes {
   complete_later_chores?: number; // For immediate_chores sensor
 }
 
+// User object from ChoreBoard integration
+export interface User {
+  id: number;
+  username: string;
+  display_name: string;
+  first_name: string;
+  can_be_assigned: boolean;
+  eligible_for_points: boolean;
+  weekly_points: string | number;
+  all_time_points: string | number;
+  claims_today?: number;
+}
+
 export interface HomeAssistantExtended extends HomeAssistant {
   [key: string]: any;
 }

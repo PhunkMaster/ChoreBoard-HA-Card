@@ -5,6 +5,7 @@ import {
   ChoreboardCardConfig,
   Chore,
   MyChoresSensorAttributes,
+  User,
   CARD_NAME,
   CARD_VERSION,
 } from "./common";
@@ -149,6 +150,126 @@ export class ChoreboardCard extends LitElement {
     return attributes.username || "";
   }
 
+  private isPoolChore(chore: Chore): boolean {
+    // Pool chores have status "pool" or the entity is a pool sensor
+    return (
+      chore.status === "pool" ||
+      (this.config.entity.endsWith("_chores") &&
+        !this.config.entity.includes("_my_chores"))
+    );
+  }
+
+  private getUsers(): User[] {
+    if (!this.hass) {
+      return [];
+    }
+
+    // Try to get users from any ChoreBoard entity attributes
+    // The coordinator stores users in the entity attributes
+    for (const entityId of Object.keys(this.hass.states)) {
+      if (entityId.startsWith("sensor.choreboard_")) {
+        const state = this.hass.states[entityId];
+        if (state.attributes.users && Array.isArray(state.attributes.users)) {
+          return state.attributes.users as User[];
+        }
+      }
+    }
+
+    return [];
+  }
+
+  private async claimChore(chore: Chore): Promise<void> {
+    if (!this.hass) return;
+
+    const users = this.getUsers();
+    if (users.length === 0) {
+      this.showToast("Unable to load users list", true);
+      return;
+    }
+
+    // Dynamically import and create dialog
+    await import("./claim-dialog");
+    const dialog = document.createElement(
+      "claim-chore-dialog",
+    ) as HTMLElement & {
+      users: User[];
+      chore: Chore;
+    };
+    dialog.users = users;
+    dialog.chore = chore;
+
+    dialog.addEventListener("dialog-confirmed", async (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const userId = customEvent.detail.userId;
+
+      try {
+        await this.hass.callService("choreboard", "claim_chore", {
+          chore_id: chore.id,
+          assign_to_user_id: userId,
+        });
+        this.showToast(`Chore claimed successfully`);
+      } catch (error) {
+        console.error("Error claiming chore:", error);
+        this.showToast("Failed to claim chore", true);
+      } finally {
+        dialog.remove();
+      }
+    });
+
+    dialog.addEventListener("dialog-closed", () => {
+      dialog.remove();
+    });
+
+    document.body.appendChild(dialog);
+  }
+
+  private async completePoolChore(chore: Chore): Promise<void> {
+    if (!this.hass) return;
+
+    const users = this.getUsers();
+    if (users.length === 0) {
+      this.showToast("Unable to load users list", true);
+      return;
+    }
+
+    // Dynamically import and create dialog
+    await import("./complete-dialog");
+    const dialog = document.createElement(
+      "complete-chore-dialog",
+    ) as HTMLElement & {
+      users: User[];
+      chore: Chore;
+    };
+    dialog.users = users;
+    dialog.chore = chore;
+
+    dialog.addEventListener("dialog-confirmed", async (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const completedByUserId = customEvent.detail.userId;
+      const helperIds = customEvent.detail.helperIds || [];
+
+      try {
+        await this.hass.callService("choreboard", "mark_complete", {
+          chore_id: chore.id,
+          completed_by_user_id: completedByUserId,
+          helpers: helperIds,
+        });
+        this.showToast(`Chore marked as complete`);
+      } catch (error) {
+        console.error("Error completing chore:", error);
+        this.showToast("Failed to complete chore", true);
+      } finally {
+        dialog.remove();
+      }
+    });
+
+    dialog.addEventListener("dialog-closed", () => {
+      dialog.remove();
+    });
+
+    document.body.appendChild(dialog);
+  }
+
   protected render(): TemplateResult {
     if (!this.config || !this.hass) {
       return html``;
@@ -236,13 +357,26 @@ export class ChoreboardCard extends LitElement {
                     </div>
                   </div>
                   <div class="chore-action">
-                    ${chore.status !== "completed"
-                      ? html`
-                          <mwc-button @click=${() => this.completeChore(chore)}>
-                            Complete
-                          </mwc-button>
-                        `
-                      : html`<div class="completed-badge">✓ Done</div>`}
+                    ${chore.status === "completed"
+                      ? html`<div class="completed-badge">✓ Done</div>`
+                      : this.isPoolChore(chore)
+                        ? html`
+                            <div class="pool-actions">
+                              <mwc-button @click=${() => this.claimChore(chore)}>
+                                Claim
+                              </mwc-button>
+                              <mwc-button
+                                @click=${() => this.completePoolChore(chore)}
+                              >
+                                Complete
+                              </mwc-button>
+                            </div>
+                          `
+                        : html`
+                            <mwc-button @click=${() => this.completeChore(chore)}>
+                              Complete
+                            </mwc-button>
+                          `}
                   </div>
                 </div>
               `,
@@ -440,6 +574,12 @@ export class ChoreboardCard extends LitElement {
 
       .chore-action {
         flex-shrink: 0;
+      }
+
+      .pool-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
 
       mwc-button {
