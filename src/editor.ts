@@ -9,34 +9,18 @@ export class ChoreboardCardEditor extends LitElement {
   @state() private config!: ChoreboardCardConfig;
 
   public setConfig(config: ChoreboardCardConfig): void {
-    this.config = {
-      entities: [],
-      ...config,
-    };
+    this.config = config;
   }
 
-  private getChoreboardEntities(): string[] {
+  private getMyChoresSensors(): string[] {
     if (!this.hass) return [];
 
-    return Object.keys(this.hass.states).filter((entityId) =>
-      entityId.startsWith("sensor.choreboard_"),
+    // Get sensors that follow the my_chores pattern
+    return Object.keys(this.hass.states).filter(
+      (entityId) =>
+        entityId.startsWith("sensor.choreboard_my_chores_") ||
+        entityId.startsWith("sensor.choreboard_my_immediate_chores_"),
     );
-  }
-
-  private getAvailableAssignees(): string[] {
-    if (!this.hass) return [];
-
-    const assignees = new Set<string>();
-    const entities = this.getChoreboardEntities();
-
-    entities.forEach((entityId) => {
-      const stateObj = this.hass.states[entityId];
-      if (stateObj?.attributes?.assignee) {
-        assignees.add(stateObj.attributes.assignee);
-      }
-    });
-
-    return Array.from(assignees).sort();
   }
 
   protected render(): TemplateResult {
@@ -44,18 +28,16 @@ export class ChoreboardCardEditor extends LitElement {
       return html``;
     }
 
-    const choreboardEntities = this.getChoreboardEntities();
-    const selectedEntities = this.config.entities || [];
-    const availableAssignees = this.getAvailableAssignees();
+    const myChoresSensors = this.getMyChoresSensors();
 
     return html`
       <div class="card-config">
-        ${choreboardEntities.length === 0
+        ${myChoresSensors.length === 0
           ? html`
               <div class="warning">
                 <ha-icon icon="mdi:alert"></ha-icon>
                 <div>
-                  <strong>No ChoreBoard entities found</strong>
+                  <strong>No ChoreBoard sensors found</strong>
                   <p>
                     Please install and configure the
                     <a
@@ -78,61 +60,34 @@ export class ChoreboardCardEditor extends LitElement {
             type="text"
             .value=${this.config.title || ""}
             @input=${this.titleChanged}
-            placeholder="Chores"
+            placeholder="My Chores"
           />
         </div>
 
         <div class="option">
-          <label for="filter-assignee">Filter by Assignee:</label>
+          <label for="entity">ChoreBoard Sensor:</label>
           <select
-            id="filter-assignee"
-            .value=${this.config.filter_assignee || ""}
-            @change=${this.filterAssigneeChanged}
+            id="entity"
+            .value=${this.config.entity || ""}
+            @change=${this.entityChanged}
           >
-            <option value="">All (manual selection below)</option>
-            ${availableAssignees.map(
-              (assignee) => html`
+            <option value="">Select a sensor...</option>
+            ${myChoresSensors.map(
+              (entityId) => html`
                 <option
-                  value=${assignee}
-                  ?selected=${this.config.filter_assignee === assignee}
+                  value=${entityId}
+                  ?selected=${this.config.entity === entityId}
                 >
-                  ${assignee}
+                  ${this.getEntityDisplayName(entityId)}
                 </option>
               `,
             )}
           </select>
           <p class="hint">
-            Select an assignee to automatically show all their chores, or leave
-            as "All" to manually select entities below.
+            Select the "My Chores" sensor for the user you want to display. The
+            card will show all chores from that sensor.
           </p>
         </div>
-
-        ${!this.config.filter_assignee
-          ? html`
-              <div class="option">
-                <label>Entities:</label>
-                <div class="entity-list">
-                  ${choreboardEntities.length > 0
-                    ? choreboardEntities.map(
-                        (entityId) => html`
-                          <label class="entity-item">
-                            <input
-                              type="checkbox"
-                              .checked=${selectedEntities.includes(entityId)}
-                              @change=${() => this.toggleEntity(entityId)}
-                            />
-                            <span>${this.getEntityDisplayName(entityId)}</span>
-                            <span class="entity-id">${entityId}</span>
-                          </label>
-                        `,
-                      )
-                    : html`<p class="hint">
-                        No ChoreBoard entities available
-                      </p>`}
-                </div>
-              </div>
-            `
-          : ""}
 
         <div class="option">
           <label>
@@ -160,10 +115,10 @@ export class ChoreboardCardEditor extends LitElement {
           <label>
             <input
               type="checkbox"
-              ?checked=${this.config.show_description === true}
-              @change=${this.showDescriptionChanged}
+              ?checked=${this.config.show_completed !== false}
+              @change=${this.showCompletedChanged}
             />
-            Show Description
+            Show Completed Chores
           </label>
         </div>
 
@@ -171,10 +126,10 @@ export class ChoreboardCardEditor extends LitElement {
           <label>
             <input
               type="checkbox"
-              ?checked=${this.config.show_completed !== false}
-              @change=${this.showCompletedChanged}
+              ?checked=${this.config.show_overdue_only === true}
+              @change=${this.showOverdueOnlyChanged}
             />
-            Show Completed Chores
+            Show Only Overdue Chores
           </label>
         </div>
 
@@ -183,19 +138,10 @@ export class ChoreboardCardEditor extends LitElement {
           <div>
             <strong>About ChoreBoard Card</strong>
             <p>
-              This card displays chores from the ChoreBoard integration. You can
-              either:
+              This card displays chores from the ChoreBoard integration's "My
+              Chores" sensors. Each user has their own sensor containing their
+              assigned chores.
             </p>
-            <ul>
-              <li>
-                <strong>Filter by assignee:</strong> Automatically show all
-                chores for a specific person
-              </li>
-              <li>
-                <strong>Manual selection:</strong> Choose specific chore
-                entities to display
-              </li>
-            </ul>
             <p>
               Mark chores as complete directly from the card using the
               "Complete" button.
@@ -222,26 +168,12 @@ export class ChoreboardCardEditor extends LitElement {
     return entityId;
   }
 
-  private toggleEntity(entityId: string): void {
-    if (!this.config) return;
-
-    const entities = this.config.entities || [];
-    const index = entities.indexOf(entityId);
-
-    if (index >= 0) {
-      // Remove entity
-      this.config = {
-        ...this.config,
-        entities: entities.filter((e) => e !== entityId),
-      };
-    } else {
-      // Add entity
-      this.config = {
-        ...this.config,
-        entities: [...entities, entityId],
-      };
+  private entityChanged(ev: Event): void {
+    const target = ev.target as HTMLSelectElement;
+    if (!this.config || !this.hass) {
+      return;
     }
-
+    this.config = { ...this.config, entity: target.value };
     this.configChanged();
   }
 
@@ -272,15 +204,6 @@ export class ChoreboardCardEditor extends LitElement {
     this.configChanged();
   }
 
-  private showDescriptionChanged(ev: Event): void {
-    const target = ev.target as HTMLInputElement;
-    if (!this.config || !this.hass) {
-      return;
-    }
-    this.config = { ...this.config, show_description: target.checked };
-    this.configChanged();
-  }
-
   private showCompletedChanged(ev: Event): void {
     const target = ev.target as HTMLInputElement;
     if (!this.config || !this.hass) {
@@ -290,19 +213,12 @@ export class ChoreboardCardEditor extends LitElement {
     this.configChanged();
   }
 
-  private filterAssigneeChanged(ev: Event): void {
-    const target = ev.target as HTMLSelectElement;
+  private showOverdueOnlyChanged(ev: Event): void {
+    const target = ev.target as HTMLInputElement;
     if (!this.config || !this.hass) {
       return;
     }
-    const value = target.value;
-    if (value) {
-      // When filtering by assignee, clear manual entity selection
-      this.config = { ...this.config, filter_assignee: value, entities: [] };
-    } else {
-      // When switching back to manual, remove filter
-      this.config = { ...this.config, filter_assignee: undefined };
-    }
+    this.config = { ...this.config, show_overdue_only: target.checked };
     this.configChanged();
   }
 
@@ -359,51 +275,11 @@ export class ChoreboardCardEditor extends LitElement {
         cursor: pointer;
       }
 
-      .entity-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        max-height: 300px;
-        overflow-y: auto;
-        padding: 8px;
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-        background: var(--card-background-color);
-      }
-
-      .entity-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px;
-        border-radius: 4px;
-        transition: background 0.2s;
-      }
-
-      .entity-item:hover {
-        background: var(--secondary-background-color);
-      }
-
-      .entity-item input[type="checkbox"] {
-        margin: 0;
-      }
-
-      .entity-item span:first-of-type {
-        flex: 1;
-        font-weight: 500;
-      }
-
-      .entity-id {
-        font-size: 12px;
-        color: var(--secondary-text-color);
-        font-family: monospace;
-      }
-
       .hint {
         color: var(--secondary-text-color);
-        font-size: 14px;
-        margin: 8px;
-        text-align: center;
+        font-size: 13px;
+        margin: 4px 0 0 0;
+        line-height: 1.4;
       }
 
       .info {

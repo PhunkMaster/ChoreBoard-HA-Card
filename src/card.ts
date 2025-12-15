@@ -3,8 +3,8 @@ import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant } from "custom-card-helpers";
 import {
   ChoreboardCardConfig,
-  ChoreboardEntity,
-  ChoreboardEntityAttributes,
+  Chore,
+  MyChoresSensorAttributes,
   CARD_NAME,
   CARD_VERSION,
 } from "./common";
@@ -19,123 +19,79 @@ export class ChoreboardCard extends LitElement {
       throw new Error("Invalid configuration");
     }
 
-    // Require either entities or filter_assignee
-    if (
-      !config.filter_assignee &&
-      (!config.entities || config.entities.length === 0)
-    ) {
+    if (!config.entity) {
       throw new Error(
-        'You must specify either "entities" or "filter_assignee". Please configure the ChoreBoard integration first.',
+        'You must specify an "entity" (e.g., sensor.choreboard_my_chores_ash). Please configure the ChoreBoard integration first.',
       );
     }
 
     this.config = {
       show_header: true,
       show_points: true,
-      show_description: false,
       show_completed: true,
+      show_overdue_only: false,
       ...config,
     };
   }
 
   public getCardSize(): number {
-    const entityCount = this.config?.entities?.length || 0;
-    return Math.max(2, Math.ceil(entityCount / 2) + 1);
+    const chores = this.getChores();
+    return Math.max(2, Math.ceil(chores.length / 2) + 1);
   }
 
   public static getStubConfig(): ChoreboardCardConfig {
     return {
       type: "custom:choreboard-card",
-      title: "Chores",
-      entities: [
-        "sensor.choreboard_wash_dishes",
-        "sensor.choreboard_take_out_trash",
-      ],
+      title: "My Chores",
+      entity: "sensor.choreboard_my_chores_ash",
       show_header: true,
       show_points: true,
-      show_description: false,
+      show_completed: true,
     };
   }
 
-  private getAllChoreboardEntities(): string[] {
-    if (!this.hass) {
+  private getChores(): Chore[] {
+    if (!this.hass || !this.config.entity) {
       return [];
     }
 
-    // Get all entities that start with sensor.choreboard_
-    return Object.keys(this.hass.states).filter((entityId) =>
-      entityId.startsWith("sensor.choreboard_"),
-    );
-  }
-
-  private getChoreEntities(): ChoreboardEntity[] {
-    if (!this.hass) {
+    const stateObj = this.hass.states[this.config.entity];
+    if (!stateObj) {
+      console.warn(`ChoreBoard entity not found: ${this.config.entity}`);
       return [];
     }
 
-    let entityIds: string[];
+    const attributes = stateObj.attributes as MyChoresSensorAttributes;
+    const chores = attributes.chores || [];
 
-    // If filter_assignee is set, discover all ChoreBoard entities
-    if (this.config.filter_assignee) {
-      entityIds = this.getAllChoreboardEntities();
-    } else if (this.config.entities) {
-      entityIds = this.config.entities;
-    } else {
-      return [];
-    }
-
-    const entities: ChoreboardEntity[] = [];
-
-    for (const entityId of entityIds) {
-      const stateObj = this.hass.states[entityId];
-      if (!stateObj) {
-        console.warn(`ChoreBoard entity not found: ${entityId}`);
-        continue;
-      }
-
-      const entity: ChoreboardEntity = {
-        entity_id: entityId,
-        state: stateObj.state as "pending" | "completed" | "overdue",
-        attributes: stateObj.attributes as ChoreboardEntityAttributes,
-        last_changed: stateObj.last_changed,
-      };
-
-      // Filter by assignee if configured
-      if (
-        this.config.filter_assignee &&
-        entity.attributes.assignee?.toLowerCase() !==
-          this.config.filter_assignee.toLowerCase()
-      ) {
-        continue;
-      }
-
+    return chores.filter((chore) => {
       // Filter out completed chores if show_completed is false
-      if (!this.config.show_completed && entity.state === "completed") {
-        continue;
+      if (!this.config.show_completed && chore.status === "completed") {
+        return false;
       }
 
-      entities.push(entity);
-    }
+      // Filter to only overdue if show_overdue_only is true
+      if (this.config.show_overdue_only && !chore.is_overdue) {
+        return false;
+      }
 
-    return entities;
+      return true;
+    });
   }
 
-  private async toggleChore(entity: ChoreboardEntity): Promise<void> {
+  private async completeChore(chore: Chore): Promise<void> {
     if (!this.hass) return;
 
-    if (entity.state === "completed") {
-      // If already completed, show info message
+    if (chore.status === "completed") {
       this.showToast("This chore is already marked as completed");
       return;
     }
 
     try {
-      await this.hass.callService("choreboard", "mark_complete", {
-        entity_id: entity.entity_id,
+      await this.hass.callService("choreboard", "complete_chore", {
+        instance_id: chore.id,
       });
-      this.showToast(
-        `Marked "${this.getChoreDisplayName(entity)}" as complete`,
-      );
+      this.showToast(`Marked "${chore.name}" as complete`);
     } catch (error) {
       console.error("Error marking chore as complete:", error);
       this.showToast("Failed to mark chore as complete", true);
@@ -154,44 +110,38 @@ export class ChoreboardCard extends LitElement {
     this.dispatchEvent(event);
   }
 
-  private getChoreDisplayName(entity: ChoreboardEntity): string {
-    // Use friendly_name if available, otherwise extract from entity_id
-    if (entity.attributes.friendly_name) {
-      return entity.attributes.friendly_name;
+  private getChoreStateClass(chore: Chore): string {
+    if (chore.status === "completed") {
+      return "state-completed";
     }
-
-    // Extract chore name from entity_id (e.g., sensor.choreboard_wash_dishes -> Wash Dishes)
-    const parts = entity.entity_id.split(".");
-    if (parts.length === 2 && parts[1].startsWith("choreboard_")) {
-      const name = parts[1].replace("choreboard_", "").replace(/_/g, " ");
-      return name.charAt(0).toUpperCase() + name.slice(1);
+    if (chore.is_overdue) {
+      return "state-overdue";
     }
-
-    return entity.entity_id;
+    return "state-pending";
   }
 
-  private getStateClass(state: string): string {
-    switch (state) {
-      case "completed":
-        return "state-completed";
-      case "overdue":
-        return "state-overdue";
-      case "pending":
-      default:
-        return "state-pending";
+  private getChoreStateIcon(chore: Chore): string {
+    if (chore.status === "completed") {
+      return "mdi:check-circle";
     }
+    if (chore.is_overdue) {
+      return "mdi:alert-circle";
+    }
+    return "mdi:circle-outline";
   }
 
-  private getStateIcon(state: string): string {
-    switch (state) {
-      case "completed":
-        return "mdi:check-circle";
-      case "overdue":
-        return "mdi:alert-circle";
-      case "pending":
-      default:
-        return "mdi:circle-outline";
+  private getUsername(): string {
+    if (!this.hass || !this.config.entity) {
+      return "";
     }
+
+    const stateObj = this.hass.states[this.config.entity];
+    if (!stateObj) {
+      return "";
+    }
+
+    const attributes = stateObj.attributes as MyChoresSensorAttributes;
+    return attributes.username || "";
   }
 
   protected render(): TemplateResult {
@@ -199,8 +149,9 @@ export class ChoreboardCard extends LitElement {
       return html``;
     }
 
-    const title = this.config.title || "Chores";
-    const chores = this.getChoreEntities();
+    const username = this.getUsername();
+    const title = this.config.title || `${username}'s Chores` || "Chores";
+    const chores = this.getChores();
 
     if (chores.length === 0) {
       return html`
@@ -216,10 +167,12 @@ export class ChoreboardCard extends LitElement {
             <div class="warning">
               <ha-icon icon="mdi:alert"></ha-icon>
               <div>
-                <strong>No ChoreBoard entities found</strong>
+                <strong>No chores found</strong>
                 <p>
-                  Please ensure the ChoreBoard integration is installed and
-                  configured. Visit the
+                  ${username
+                    ? `${username} has no chores matching the current filters.`
+                    : "Please ensure the ChoreBoard integration is installed and configured."}
+                  Visit the
                   <a
                     href="https://github.com/PhunkMaster/ChoreBoard-HA-Integration"
                     target="_blank"
@@ -249,46 +202,38 @@ export class ChoreboardCard extends LitElement {
           <div class="chore-list">
             ${chores.map(
               (chore) => html`
-                <div class="chore-item ${this.getStateClass(chore.state)}">
+                <div class="chore-item ${this.getChoreStateClass(chore)}">
                   <div class="chore-status">
-                    <ha-icon icon="${this.getStateIcon(chore.state)}"></ha-icon>
+                    <ha-icon icon="${this.getChoreStateIcon(chore)}"></ha-icon>
                   </div>
                   <div class="chore-details">
                     <div class="chore-header">
-                      <div class="chore-name">
-                        ${this.getChoreDisplayName(chore)}
-                      </div>
-                      ${this.config.show_points && chore.attributes.points
+                      <div class="chore-name">${chore.name}</div>
+                      ${this.config.show_points && chore.points
                         ? html`<div class="chore-points">
-                            ${chore.attributes.points} pts
+                            ${chore.points} pts
                           </div>`
                         : ""}
                     </div>
-                    ${this.config.show_description &&
-                    chore.attributes.description
-                      ? html`<div class="chore-description">
-                          ${chore.attributes.description}
-                        </div>`
-                      : ""}
                     <div class="chore-meta">
-                      ${chore.attributes.assignee
+                      ${chore.due_date
                         ? html`<span class="meta-item"
-                            ><ha-icon icon="mdi:account"></ha-icon>${chore
-                              .attributes.assignee}</span
+                            ><ha-icon icon="mdi:calendar"></ha-icon
+                            >${chore.due_date}</span
                           >`
                         : ""}
-                      ${chore.attributes.due_date
-                        ? html`<span class="meta-item"
-                            ><ha-icon icon="mdi:calendar"></ha-icon>${chore
-                              .attributes.due_date}</span
+                      ${chore.is_overdue
+                        ? html`<span class="meta-item overdue"
+                            ><ha-icon icon="mdi:clock-alert"></ha-icon
+                            >Overdue</span
                           >`
                         : ""}
                     </div>
                   </div>
                   <div class="chore-action">
-                    ${chore.state !== "completed"
+                    ${chore.status !== "completed"
                       ? html`
-                          <mwc-button @click=${() => this.toggleChore(chore)}>
+                          <mwc-button @click=${() => this.completeChore(chore)}>
                             Complete
                           </mwc-button>
                         `
@@ -481,6 +426,11 @@ export class ChoreboardCard extends LitElement {
 
       .meta-item ha-icon {
         --mdc-icon-size: 16px;
+      }
+
+      .meta-item.overdue {
+        color: var(--error-color, #f44336);
+        font-weight: 600;
       }
 
       .chore-action {
