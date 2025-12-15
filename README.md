@@ -33,12 +33,14 @@ For detailed integration setup instructions, see the [ChoreBoard Integration doc
 
 ## Features
 
-- Display chores from ChoreBoard integration with status indicators
-- Mark chores as complete directly from the card
-- Show assignee, due date, points, and descriptions
-- Color-coded status (pending, completed, overdue)
+- Display chores from ChoreBoard integration's "My Chores" sensors
+- Automatically shows all chores for a specific user
+- Mark chores as complete directly from the card with one click
+- Color-coded status indicators (pending, completed, overdue)
+- Show/hide completed chores
+- Filter to show only overdue chores
 - Visual configuration editor for easy setup
-- Customizable display options
+- Real-time updates from the ChoreBoard integration
 - HACS compatible
 
 ## Screenshots
@@ -48,9 +50,10 @@ For detailed integration setup instructions, see the [ChoreBoard Integration doc
 > **Note**: This is a pre-release version. Screenshots of the card in action will be added once the first version is deployed and tested in a live Home Assistant environment.
 
 The card displays:
-- Chore name and status badge (pending, completed, overdue)
-- Assignee and due date information
-- Optional point values and descriptions
+- Chore name and status indicator (pending, completed, overdue)
+- Due date information
+- Point values (optional)
+- Overdue indicators with alert icons
 - Complete button for pending/overdue chores
 - Color-coded borders based on status
 
@@ -89,21 +92,33 @@ The card includes a visual editor accessible through the Home Assistant UI:
 1. Edit your dashboard
 2. Click "Add Card"
 3. Search for "ChoreBoard Card"
-4. Select which ChoreBoard entities to display
-5. Configure display options
+4. Select the "My Chores" sensor for the user you want to display
+5. Configure display options (show completed, show only overdue, etc.)
 
 ### YAML Configuration
 
+**Basic Example - Show Ash's Chores:**
 ```yaml
 type: custom:choreboard-card
-title: Weekly Chores
-entities:
-  - sensor.choreboard_wash_dishes
-  - sensor.choreboard_take_out_trash
-  - sensor.choreboard_vacuum_living_room
-show_header: true
-show_points: true
-show_description: false
+title: "Ash's Chores"
+entity: sensor.choreboard_my_chores_ash
+```
+
+**Hide Completed Chores:**
+```yaml
+type: custom:choreboard-card
+title: "My Active Chores"
+entity: sensor.choreboard_my_chores_ash
+show_completed: false
+```
+
+**Show Only Overdue:**
+```yaml
+type: custom:choreboard-card
+title: "Overdue Chores"
+entity: sensor.choreboard_my_chores_ash
+show_overdue_only: true
+show_completed: false
 ```
 
 ### Configuration Options
@@ -111,73 +126,89 @@ show_description: false
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `type` | string | **Required** | Must be `custom:choreboard-card` |
-| `title` | string | `"Chores"` | Card title |
-| `entities` | list | **Required** | List of ChoreBoard sensor entity IDs |
+| `entity` | string | **Required** | ChoreBoard "My Chores" sensor entity ID (e.g., `sensor.choreboard_my_chores_ash`) |
+| `title` | string | `"{username}'s Chores"` | Card title (auto-generated from username if not specified) |
 | `show_header` | boolean | `true` | Show/hide the card header |
 | `show_points` | boolean | `true` | Show/hide point values |
-| `show_description` | boolean | `false` | Show/hide chore descriptions |
+| `show_completed` | boolean | `true` | Show/hide completed chores |
+| `show_overdue_only` | boolean | `false` | Show only overdue chores |
 
 ### Entity Format
 
-Entities must be ChoreBoard sensors created by the integration. They follow the format:
-- `sensor.choreboard_[chore_name]`
+The card works with ChoreBoard "My Chores" sensors created by the integration:
+- **Format**: `sensor.choreboard_my_chores_{username}`
+- **Example**: `sensor.choreboard_my_chores_ash`
 
-Each entity includes these attributes:
-- `assignee`: Person assigned to the chore
+Each sensor contains a list of chores in its `chores` attribute with these fields:
+- `id`: Chore instance ID (used for API calls)
+- `name`: Chore name
 - `due_date`: When the chore is due
 - `points`: Point value of the chore
-- `description`: Chore description
-
-Entity states:
-- `pending`: Chore needs to be done
-- `completed`: Chore is finished
-- `overdue`: Chore is past due date
+- `is_overdue`: Boolean indicating if the chore is overdue
+- `status`: Current status (`pending`, `completed`, etc.)
 
 ## Examples
 
-### Basic Usage
+### Example 1: Show All of Ash's Chores
 
 ```yaml
 type: custom:choreboard-card
-title: Chores
-entities:
-  - sensor.choreboard_wash_dishes
-  - sensor.choreboard_take_out_trash
+title: "Ash's Chores"
+entity: sensor.choreboard_my_chores_ash
 ```
 
-### Show All Details
+This displays all chores assigned to Ash, including completed ones.
+
+### Example 2: Active Chores Only (Hide Completed)
 
 ```yaml
 type: custom:choreboard-card
-title: Weekly Chores
-entities:
-  - sensor.choreboard_wash_dishes
-  - sensor.choreboard_take_out_trash
-  - sensor.choreboard_vacuum_living_room
-  - sensor.choreboard_clean_bathroom
-show_header: true
-show_points: true
-show_description: true
+title: "Active Chores"
+entity: sensor.choreboard_my_chores_ash
+show_completed: false
 ```
 
-### Minimal Display
+Perfect for focusing on what still needs to be done.
+
+### Example 3: Overdue Chores Alert
 
 ```yaml
 type: custom:choreboard-card
-title: Quick Chores
-entities:
-  - sensor.choreboard_water_plants
-  - sensor.choreboard_check_mail
+title: "⚠️ Overdue!"
+entity: sensor.choreboard_my_chores_ash
+show_overdue_only: true
+show_completed: false
+```
+
+Shows only overdue chores that need immediate attention.
+
+### Example 4: Minimal Display (No Header or Points)
+
+```yaml
+type: custom:choreboard-card
+entity: sensor.choreboard_my_chores_ash
 show_header: false
 show_points: false
-show_description: false
+show_completed: false
 ```
+
+Clean, minimal view showing only active chores.
+
+### Example 5: Using Immediate Chores Sensor
+
+```yaml
+type: custom:choreboard-card
+title: "Do Now"
+entity: sensor.choreboard_my_immediate_chores_ash
+```
+
+Uses the "immediate chores" sensor which excludes chores marked as "complete later".
 
 ## Usage
 
 ### Marking Chores Complete
 
-Click the "Complete" button on any pending or overdue chore to mark it as complete. This calls the `choreboard.mark_complete` service from the integration.
+Click the "Complete" button on any pending or overdue chore to mark it as complete. This calls the `choreboard.complete_chore` service from the integration using the chore's instance ID.
 
 Completed chores are indicated with:
 - Green checkmark icon
@@ -188,38 +219,41 @@ Completed chores are indicated with:
 ### Status Indicators
 
 The card uses color-coding to show chore status:
-- **Blue border**: Pending chores
+- **Blue border**: Pending chores (not overdue)
 - **Green border**: Completed chores
 - **Red border**: Overdue chores
+- **Alert icon**: Appears next to overdue chores with due date
 
 ## Troubleshooting
 
-### "No ChoreBoard entities found" Warning
+### "No ChoreBoard sensors found" Warning
 
 This means the ChoreBoard integration is not installed or configured. To resolve:
 
 1. Verify the integration is installed in HACS or `custom_components/`
 2. Configure the integration in Settings → Devices & Services
-3. Check that chore entities exist in Developer Tools → States
-4. Look for entities starting with `sensor.choreboard_`
+3. Check that "My Chores" sensors exist in Developer Tools → States
+4. Look for entities starting with `sensor.choreboard_my_chores_` or `sensor.choreboard_my_immediate_chores_`
 
-### Entities Not Showing
+### "No chores found" Message
 
-If specific entities don't appear:
+If the card shows no chores for a user:
 
-1. Check entity IDs in Developer Tools → States
-2. Verify entities start with `sensor.choreboard_`
-3. Ensure the integration has successfully fetched chore data
-4. Check integration logs for errors
+1. Check that the selected entity exists in Developer Tools → States
+2. Verify the `chores` attribute contains data
+3. Check your filter settings (show_completed, show_overdue_only)
+4. Ensure the integration has successfully fetched chore data from the ChoreBoard API
+5. Check integration logs for errors
 
 ### "Complete" Button Not Working
 
 If marking chores complete fails:
 
 1. Check Home Assistant logs for errors
-2. Verify the `choreboard.mark_complete` service exists
-3. Test the service in Developer Tools → Services
+2. Verify the `choreboard.complete_chore` service exists in Developer Tools → Services
+3. Test the service manually with a chore instance_id
 4. Ensure the integration API connection is working
+5. Check that the chore's `id` field is present and valid
 
 ## Development
 
