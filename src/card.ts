@@ -19,9 +19,13 @@ export class ChoreboardCard extends LitElement {
       throw new Error("Invalid configuration");
     }
 
-    if (!config.entities || config.entities.length === 0) {
+    // Require either entities or filter_assignee
+    if (
+      !config.filter_assignee &&
+      (!config.entities || config.entities.length === 0)
+    ) {
       throw new Error(
-        "You must specify at least one ChoreBoard entity. Please configure the ChoreBoard integration first.",
+        'You must specify either "entities" or "filter_assignee". Please configure the ChoreBoard integration first.',
       );
     }
 
@@ -29,6 +33,7 @@ export class ChoreboardCard extends LitElement {
       show_header: true,
       show_points: true,
       show_description: false,
+      show_completed: true,
       ...config,
     };
   }
@@ -52,26 +57,64 @@ export class ChoreboardCard extends LitElement {
     };
   }
 
+  private getAllChoreboardEntities(): string[] {
+    if (!this.hass) {
+      return [];
+    }
+
+    // Get all entities that start with sensor.choreboard_
+    return Object.keys(this.hass.states).filter((entityId) =>
+      entityId.startsWith("sensor.choreboard_"),
+    );
+  }
+
   private getChoreEntities(): ChoreboardEntity[] {
-    if (!this.hass || !this.config.entities) {
+    if (!this.hass) {
+      return [];
+    }
+
+    let entityIds: string[];
+
+    // If filter_assignee is set, discover all ChoreBoard entities
+    if (this.config.filter_assignee) {
+      entityIds = this.getAllChoreboardEntities();
+    } else if (this.config.entities) {
+      entityIds = this.config.entities;
+    } else {
       return [];
     }
 
     const entities: ChoreboardEntity[] = [];
 
-    for (const entityId of this.config.entities) {
+    for (const entityId of entityIds) {
       const stateObj = this.hass.states[entityId];
       if (!stateObj) {
         console.warn(`ChoreBoard entity not found: ${entityId}`);
         continue;
       }
 
-      entities.push({
+      const entity: ChoreboardEntity = {
         entity_id: entityId,
         state: stateObj.state as "pending" | "completed" | "overdue",
         attributes: stateObj.attributes as ChoreboardEntityAttributes,
         last_changed: stateObj.last_changed,
-      });
+      };
+
+      // Filter by assignee if configured
+      if (
+        this.config.filter_assignee &&
+        entity.attributes.assignee?.toLowerCase() !==
+          this.config.filter_assignee.toLowerCase()
+      ) {
+        continue;
+      }
+
+      // Filter out completed chores if show_completed is false
+      if (!this.config.show_completed && entity.state === "completed") {
+        continue;
+      }
+
+      entities.push(entity);
     }
 
     return entities;

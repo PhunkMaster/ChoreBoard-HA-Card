@@ -8,9 +8,11 @@ export interface ChoreboardCardConfig {
   type: string;
   title?: string;
   entities?: string[]; // List of ChoreBoard sensor entity IDs
+  filter_assignee?: string; // Filter chores by assignee (e.g., "ash")
   show_header?: boolean;
   show_points?: boolean;
   show_description?: boolean;
+  show_completed?: boolean; // Show completed chores (default: true)
 }
 
 export interface ChoreboardEntityAttributes {
