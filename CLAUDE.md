@@ -13,8 +13,15 @@ ChoreBoard-HA-Card is a Home Assistant custom card for managing and tracking hou
 ### Overview
 
 The card works exclusively with the ChoreBoard integration, which creates **aggregate "My Chores" sensors** for each user:
-- Entity format: `sensor.choreboard_my_chores_{username}` (e.g., `sensor.choreboard_my_chores_ash`)
-- Also available: `sensor.choreboard_my_immediate_chores_{username}` (excludes chores marked "complete later")
+
+**Supported Sensor Naming Patterns:**
+- `sensor.choreboard_my_chores_{username}` (e.g., `sensor.choreboard_my_chores_ash`)
+- `sensor.{username}_my_chores` (e.g., `sensor.ash_my_chores`)
+- `sensor.choreboard_my_immediate_chores_{username}` (excludes chores marked "complete later")
+- `sensor.{username}_my_immediate_chores`
+
+The card's visual editor auto-detects all sensor patterns above.
+
 - Each sensor contains a list of chores in its `attributes.chores` array
 - Sensor state: Number of chores for that user
 
@@ -28,17 +35,21 @@ Each My Chores sensor has these attributes:
   "count": 5,
   "chores": [
     {
-      "id": 123,                    // Chore instance ID
+      "id": 123,                    // Chore instance ID (number)
       "name": "Wash Dishes",
       "due_date": "2025-12-20",
-      "points": 10,
+      "points": "10.00",            // STRING (not number) - integration returns as string
       "is_overdue": false,
-      "status": "pending"           // "pending", "completed", etc.
+      "status": "assigned"          // "assigned", "pending", "completed", etc.
     },
     // ... more chores
   ]
 }
 ```
+
+**Important Data Type Notes:**
+- `points`: Integration returns as **string** (e.g., "2.50", "10.00"), card parses to number for display
+- `status`: Can be "assigned", "pending", "completed" - card treats non-"completed" as active/completable
 
 ### Integration Setup
 
@@ -161,6 +172,7 @@ src/
   - `set hass(hass)` - Receives Home Assistant state updates
   - `getCardSize()` - Returns card height based on chore count
   - `getStubConfig()` - Provides default configuration for card picker
+  - `getConfigElement()` - Returns visual editor element (enables UI configuration)
 - Key methods:
   - `getChores()` - Reads chores from sensor's `attributes.chores` array
   - `completeChore(chore)` - Calls `choreboard.complete_chore` service with `instance_id`
@@ -177,13 +189,19 @@ src/
   - Show/hide completed chores
   - Show only overdue chores
   - Show/hide points
-- Auto-discovers available My Chores sensors
+- Auto-discovers available My Chores sensors using flexible pattern matching:
+  - `sensor.choreboard_my_chores_*`
+  - `sensor.*_my_chores`
+  - `sensor.choreboard_my_immediate_chores_*`
+  - `sensor.*_my_immediate_chores`
 - Dispatches `config-changed` events when configuration updates
 
 **common.ts:**
 - TypeScript interfaces:
   - `ChoreboardCardConfig` - Card configuration (requires `entity`)
   - `Chore` - Individual chore from sensor's chores array
+    - `points: string | number` - Handles both types from integration
+    - `status: string` - Supports "assigned", "pending", "completed", etc.
   - `MyChoresSensorAttributes` - Structure of sensor's attributes
   - `HomeAssistantExtended` - Extended Home Assistant type
 - Constants: `CARD_VERSION`, `CARD_NAME`, `ELEMENT_NAME`
@@ -665,9 +683,9 @@ If you're updating code from v1.0.0:
      id: number;              // Instance ID for API calls
      name: string;
      due_date: string;
-     points: number;
+     points: string | number; // Integration returns string, card handles both
      is_overdue: boolean;
-     status: string;
+     status: string;          // "assigned", "pending", "completed", etc.
    }
    ```
 
@@ -677,7 +695,75 @@ If you're updating code from v1.0.0:
 2. **Attribute-Based Data**: Chores are stored in sensor's `attributes.chores` array, not as separate entities
 3. **Instance ID for Actions**: Use chore's `id` field (instance_id) for service calls, not entity_id
 4. **Client-Side Filtering**: Card filters chores by status/overdue on the client side
-5. **Auto-Discovery**: Editor auto-discovers My Chores sensors by prefix match
+5. **Auto-Discovery**: Editor auto-discovers My Chores sensors by flexible pattern matching
+6. **Type Flexibility**: Card handles both string and number point values from integration
+
+## Architecture Updates (v1.0.3)
+
+### Sensor Pattern Flexibility
+
+Version 1.0.3 added support for multiple sensor naming patterns to accommodate different integration configurations:
+
+**Original Expected Pattern (v1.0.2):**
+- `sensor.choreboard_my_chores_{username}`
+- `sensor.choreboard_my_immediate_chores_{username}`
+
+**Actual Integration Pattern (v1.0.3+):**
+- `sensor.{username}_my_chores` (e.g., `sensor.ash_my_chores`)
+- `sensor.{username}_my_immediate_chores`
+
+The editor now detects all patterns automatically using flexible filtering logic in `getMyChoresSensors()`:
+
+```typescript
+return Object.keys(this.hass.states).filter(
+  (entityId) =>
+    entityId.startsWith("sensor.choreboard_my_chores_") ||
+    entityId.startsWith("sensor.choreboard_my_immediate_chores_") ||
+    (entityId.startsWith("sensor.") && entityId.endsWith("_my_chores")) ||
+    (entityId.startsWith("sensor.") && entityId.endsWith("_my_immediate_chores")),
+);
+```
+
+### Data Type Compatibility
+
+**Points Field:**
+The integration returns `points` as a **string** (e.g., "2.50", "10.00", "50.00"), not a number. The card now handles both types:
+
+```typescript
+// Interface allows both types
+interface Chore {
+  points: string | number;
+  // ... other fields
+}
+
+// Display logic parses strings to numbers
+${typeof chore.points === "string" ? parseFloat(chore.points) : chore.points} pts
+```
+
+**Status Field:**
+The integration uses "assigned" for active chores, not "pending". The card treats all non-"completed" statuses as active/completable:
+
+```typescript
+// Only "completed" gets special treatment
+if (chore.status === "completed") {
+  // Show as completed
+} else {
+  // Show as active (includes "assigned", "pending", or any other status)
+}
+```
+
+### Visual Editor Support
+
+Added `getConfigElement()` static method to enable Home Assistant's visual configuration editor:
+
+```typescript
+// src/card.ts
+public static getConfigElement(): HTMLElement {
+  return document.createElement("choreboard-card-editor");
+}
+```
+
+This allows users to configure the card through the Home Assistant UI without writing YAML.
 
 ## Additional Resources
 
