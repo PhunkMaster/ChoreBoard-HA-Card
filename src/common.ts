@@ -20,14 +20,15 @@ export interface Chore {
   name: string;
   due_date: string;
   points: string | number; // Integration may return string or number
-  is_overdue: boolean;
-  status: string; // "pending", "completed", "assigned", etc.
+  is_overdue?: boolean; // Optional - some sensors may not include this field
+  status: string; // "pending", "completed", "assigned", "pool", etc.
   complete_later?: boolean; // Available in my_immediate_chores sensor
+  description?: string; // Optional description field
 }
 
 // Attributes structure of the my_chores sensor
 export interface MyChoresSensorAttributes {
-  username: string;
+  username?: string; // Optional - some sensors may not have a username
   chores: Chore[];
   count: number;
   total_chores?: number; // For immediate_chores sensor
