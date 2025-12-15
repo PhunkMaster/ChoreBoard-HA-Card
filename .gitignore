@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+yarn.lock
+
+# Build output (keep .js files for HACS, ignore maps and declarations)
+dist/*.js.map
+dist/*.d.ts
+dist/*.d.ts.map
+
+# Development
+.hass-dev/.storage/
+.hass-dev/home-assistant.log
+.hass-dev/home-assistant_v2.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.env
+.env.local

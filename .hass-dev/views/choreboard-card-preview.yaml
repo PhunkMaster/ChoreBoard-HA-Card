@@ -1,0 +1,72 @@
+# ChoreBoard Card Development Dashboard
+# This dashboard showcases different configurations of the ChoreBoard Card
+# Using mock ChoreBoard entities defined in configuration.yaml
+
+title: ChoreBoard Card Preview
+views:
+  - title: Examples
+    path: examples
+    icon: mdi:clipboard-check
+    cards:
+      # Full Configuration - All Chores
+      - type: custom:choreboard-card
+        title: "All Chores"
+        entities:
+          - sensor.choreboard_wash_dishes
+          - sensor.choreboard_take_out_trash
+          - sensor.choreboard_vacuum_living_room
+          - sensor.choreboard_clean_bathroom
+          - sensor.choreboard_water_plants
+          - sensor.choreboard_mow_lawn
+        show_header: true
+        show_points: true
+        show_description: true
+
+      # Pending Chores Only
+      - type: custom:choreboard-card
+        title: "Pending Chores"
+        entities:
+          - sensor.choreboard_wash_dishes
+          - sensor.choreboard_take_out_trash
+          - sensor.choreboard_clean_bathroom
+        show_header: true
+        show_points: true
+        show_description: false
+
+      # Overdue Chores
+      - type: custom:choreboard-card
+        title: "Overdue Chores"
+        entities:
+          - sensor.choreboard_vacuum_living_room
+          - sensor.choreboard_mow_lawn
+        show_header: true
+        show_points: true
+        show_description: false
+
+      # Minimal Display - No Header, No Points
+      - type: custom:choreboard-card
+        show_header: false
+        entities:
+          - sensor.choreboard_wash_dishes
+          - sensor.choreboard_take_out_trash
+        show_points: false
+        show_description: false
+
+      # With Descriptions
+      - type: custom:choreboard-card
+        title: "Detailed View"
+        entities:
+          - sensor.choreboard_clean_bathroom
+          - sensor.choreboard_vacuum_living_room
+        show_header: true
+        show_points: true
+        show_description: true
+
+      # Single Chore
+      - type: custom:choreboard-card
+        title: "Water Plants"
+        entities:
+          - sensor.choreboard_water_plants
+        show_header: true
+        show_points: true
+        show_description: true

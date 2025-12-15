@@ -1,0 +1,85 @@
+# Development Home Assistant Configuration
+# This configuration is used for testing the ChoreBoard Card
+
+# Configure frontend to load the custom card from development server
+frontend:
+  extra_module_url:
+    - http://localhost:4000/choreboard-card.js
+
+# Basic configuration
+default_config:
+
+# Enable the logger for debugging
+logger:
+  default: info
+  logs:
+    homeassistant.components.frontend: debug
+
+# Mock ChoreBoard sensors for development
+# In production, these are created by the ChoreBoard integration
+template:
+  - sensor:
+      - name: "ChoreBoard Wash Dishes"
+        unique_id: choreboard_wash_dishes
+        state: "pending"
+        attributes:
+          assignee: "John"
+          due_date: "Today"
+          points: 10
+          description: "Wash all dishes in the sink and put them away"
+
+      - name: "ChoreBoard Take Out Trash"
+        unique_id: choreboard_take_out_trash
+        state: "pending"
+        attributes:
+          assignee: "Jane"
+          due_date: "Monday"
+          points: 5
+          description: "Take out kitchen and bathroom trash"
+
+      - name: "ChoreBoard Vacuum Living Room"
+        unique_id: choreboard_vacuum_living_room
+        state: "overdue"
+        attributes:
+          assignee: "John"
+          due_date: "Yesterday"
+          points: 15
+          description: "Vacuum the entire living room including under furniture"
+
+      - name: "ChoreBoard Clean Bathroom"
+        unique_id: choreboard_clean_bathroom
+        state: "pending"
+        attributes:
+          assignee: "Jane"
+          due_date: "Saturday"
+          points: 20
+          description: "Clean toilet, sink, shower, and mop floor"
+
+      - name: "ChoreBoard Water Plants"
+        unique_id: choreboard_water_plants
+        state: "completed"
+        attributes:
+          assignee: "Kids"
+          due_date: "Today"
+          points: 3
+          description: "Water all indoor plants"
+
+      - name: "ChoreBoard Mow Lawn"
+        unique_id: choreboard_mow_lawn
+        state: "overdue"
+        attributes:
+          assignee: "Dad"
+          due_date: "Last Week"
+          points: 25
+          description: "Mow front and back lawn, trim edges"
+
+# Lovelace dashboards
+lovelace:
+  mode: storage
+  dashboards:
+    lovelace-choreboard:
+      mode: yaml
+      title: ChoreBoard Dev
+      icon: mdi:clipboard-check
+      show_in_sidebar: true
+      filename: views/choreboard-card-preview.yaml
