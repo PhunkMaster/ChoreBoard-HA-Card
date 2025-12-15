@@ -1,5 +1,9 @@
 # ChoreBoard Card for Home Assistant
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+[![GitHub Release](https://img.shields.io/github/v/release/PhunkMaster/ChoreBoard-HA-Card)](https://github.com/PhunkMaster/ChoreBoard-HA-Card/releases)
+[![License](https://img.shields.io/github/license/PhunkMaster/ChoreBoard-HA-Card)](LICENSE)
+
 A custom Lovelace card for Home Assistant to display and manage chores from the [ChoreBoard Integration](https://github.com/PhunkMaster/ChoreBoard-HA-Integration).
 
 ## Prerequisites
@@ -36,6 +40,19 @@ For detailed integration setup instructions, see the [ChoreBoard Integration doc
 - Visual configuration editor for easy setup
 - Customizable display options
 - HACS compatible
+
+## Screenshots
+
+![Card Preview](https://via.placeholder.com/800x400/1c1c1c/ffffff?text=ChoreBoard+Card+Preview+%7C+Screenshots+Coming+Soon)
+
+> **Note**: This is a pre-release version. Screenshots of the card in action will be added once the first version is deployed and tested in a live Home Assistant environment.
+
+The card displays:
+- Chore name and status badge (pending, completed, overdue)
+- Assignee and due date information
+- Optional point values and descriptions
+- Complete button for pending/overdue chores
+- Color-coded borders based on status
 
 ## Installation
 
