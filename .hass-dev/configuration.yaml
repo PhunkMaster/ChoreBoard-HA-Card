@@ -4,7 +4,7 @@
 # Configure frontend to load the custom card from development server
 frontend:
   extra_module_url:
-    - http://localhost:4000/choreboard-card.js
+    - http://localhost:4000/choreboard-ha-card.js
 
 # Basic configuration
 default_config:

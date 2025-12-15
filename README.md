@@ -67,14 +67,14 @@ The card displays:
 
 ### Manual Installation
 
-1. Download `choreboard-card.js` from the [latest release](https://github.com/yourusername/choreboard-ha-card/releases)
+1. Download `choreboard-ha-card.js` from the [latest release](https://github.com/yourusername/choreboard-ha-card/releases)
 2. Copy it to `config/www/` directory
 3. Add the following to your `configuration.yaml`:
 
 ```yaml
 lovelace:
   resources:
-    - url: /local/choreboard-card.js
+    - url: /local/choreboard-ha-card.js
       type: module
 ```
 

@@ -113,8 +113,8 @@ jobs:
           name: Release v${{ steps.new_version.outputs.version }}
           body_path: CHANGELOG.md
           files: |
-            dist/choreboard-card.js
-            dist/choreboard-card.js.map
+            dist/choreboard-ha-card.js
+            dist/choreboard-ha-card.js.map
           draft: false
           prerelease: false
         env:

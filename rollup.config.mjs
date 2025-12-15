@@ -8,7 +8,7 @@ import serve from 'rollup-plugin-serve';
 const isProduction = process.env.BUILD === 'production';
 const isWatch = process.env.ROLLUP_WATCH === 'true';
 
-const outputFile = 'choreboard-card.js';
+const outputFile = 'choreboard-ha-card.js';
 
 const plugins = [
   resolve({

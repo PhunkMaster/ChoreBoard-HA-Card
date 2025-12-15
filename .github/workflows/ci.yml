@@ -37,11 +37,11 @@ jobs:
 
       - name: Check build output exists
         run: |
-          if [ ! -f "dist/choreboard-card.js" ]; then
-            echo "Build failed: dist/choreboard-card.js not found"
+          if [ ! -f "dist/choreboard-ha-card.js" ]; then
+            echo "Build failed: dist/choreboard-ha-card.js not found"
             exit 1
           fi
-          echo "Build output size: $(ls -lh dist/choreboard-card.js | awk '{print $5}')"
+          echo "Build output size: $(ls -lh dist/choreboard-ha-card.js | awk '{print $5}')"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v6
