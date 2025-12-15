@@ -23,6 +23,22 @@ export class ChoreboardCardEditor extends LitElement {
     );
   }
 
+  private getAvailableAssignees(): string[] {
+    if (!this.hass) return [];
+
+    const assignees = new Set<string>();
+    const entities = this.getChoreboardEntities();
+
+    entities.forEach((entityId) => {
+      const stateObj = this.hass.states[entityId];
+      if (stateObj?.attributes?.assignee) {
+        assignees.add(stateObj.attributes.assignee);
+      }
+    });
+
+    return Array.from(assignees).sort();
+  }
+
   protected render(): TemplateResult {
     if (!this.hass || !this.config) {
       return html``;
@@ -30,6 +46,7 @@ export class ChoreboardCardEditor extends LitElement {
 
     const choreboardEntities = this.getChoreboardEntities();
     const selectedEntities = this.config.entities || [];
+    const availableAssignees = this.getAvailableAssignees();
 
     return html`
       <div class="card-config">
@@ -66,25 +83,56 @@ export class ChoreboardCardEditor extends LitElement {
         </div>
 
         <div class="option">
-          <label>Entities:</label>
-          <div class="entity-list">
-            ${choreboardEntities.length > 0
-              ? choreboardEntities.map(
-                  (entityId) => html`
-                    <label class="entity-item">
-                      <input
-                        type="checkbox"
-                        .checked=${selectedEntities.includes(entityId)}
-                        @change=${() => this.toggleEntity(entityId)}
-                      />
-                      <span>${this.getEntityDisplayName(entityId)}</span>
-                      <span class="entity-id">${entityId}</span>
-                    </label>
-                  `,
-                )
-              : html`<p class="hint">No ChoreBoard entities available</p>`}
-          </div>
+          <label for="filter-assignee">Filter by Assignee:</label>
+          <select
+            id="filter-assignee"
+            .value=${this.config.filter_assignee || ""}
+            @change=${this.filterAssigneeChanged}
+          >
+            <option value="">All (manual selection below)</option>
+            ${availableAssignees.map(
+              (assignee) => html`
+                <option
+                  value=${assignee}
+                  ?selected=${this.config.filter_assignee === assignee}
+                >
+                  ${assignee}
+                </option>
+              `,
+            )}
+          </select>
+          <p class="hint">
+            Select an assignee to automatically show all their chores, or leave
+            as "All" to manually select entities below.
+          </p>
         </div>
+
+        ${!this.config.filter_assignee
+          ? html`
+              <div class="option">
+                <label>Entities:</label>
+                <div class="entity-list">
+                  ${choreboardEntities.length > 0
+                    ? choreboardEntities.map(
+                        (entityId) => html`
+                          <label class="entity-item">
+                            <input
+                              type="checkbox"
+                              .checked=${selectedEntities.includes(entityId)}
+                              @change=${() => this.toggleEntity(entityId)}
+                            />
+                            <span>${this.getEntityDisplayName(entityId)}</span>
+                            <span class="entity-id">${entityId}</span>
+                          </label>
+                        `,
+                      )
+                    : html`<p class="hint">
+                        No ChoreBoard entities available
+                      </p>`}
+                </div>
+              </div>
+            `
+          : ""}
 
         <div class="option">
           <label>
@@ -119,16 +167,37 @@ export class ChoreboardCardEditor extends LitElement {
           </label>
         </div>
 
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_completed !== false}
+              @change=${this.showCompletedChanged}
+            />
+            Show Completed Chores
+          </label>
+        </div>
+
         <div class="info">
           <ha-icon icon="mdi:information"></ha-icon>
           <div>
             <strong>About ChoreBoard Card</strong>
             <p>
-              This card displays chores from the ChoreBoard integration. Select
-              which chore entities you want to display above.
+              This card displays chores from the ChoreBoard integration. You can
+              either:
             </p>
+            <ul>
+              <li>
+                <strong>Filter by assignee:</strong> Automatically show all
+                chores for a specific person
+              </li>
+              <li>
+                <strong>Manual selection:</strong> Choose specific chore
+                entities to display
+              </li>
+            </ul>
             <p>
-              You can mark chores as complete directly from the card using the
+              Mark chores as complete directly from the card using the
               "Complete" button.
             </p>
           </div>
@@ -212,6 +281,31 @@ export class ChoreboardCardEditor extends LitElement {
     this.configChanged();
   }
 
+  private showCompletedChanged(ev: Event): void {
+    const target = ev.target as HTMLInputElement;
+    if (!this.config || !this.hass) {
+      return;
+    }
+    this.config = { ...this.config, show_completed: target.checked };
+    this.configChanged();
+  }
+
+  private filterAssigneeChanged(ev: Event): void {
+    const target = ev.target as HTMLSelectElement;
+    if (!this.config || !this.hass) {
+      return;
+    }
+    const value = target.value;
+    if (value) {
+      // When filtering by assignee, clear manual entity selection
+      this.config = { ...this.config, filter_assignee: value, entities: [] };
+    } else {
+      // When switching back to manual, remove filter
+      this.config = { ...this.config, filter_assignee: undefined };
+    }
+    this.configChanged();
+  }
+
   private configChanged(): void {
     const event = new CustomEvent("config-changed", {
       detail: { config: this.config },
@@ -240,13 +334,19 @@ export class ChoreboardCardEditor extends LitElement {
         font-size: 14px;
       }
 
-      .option input[type="text"] {
+      .option input[type="text"],
+      .option select {
         padding: 8px;
         border: 1px solid var(--divider-color);
         border-radius: 4px;
         font-size: 14px;
         background: var(--card-background-color);
         color: var(--primary-text-color);
+      }
+
+      .option select {
+        width: 100%;
+        cursor: pointer;
       }
 
       .option input[type="checkbox"] {
@@ -329,6 +429,16 @@ export class ChoreboardCardEditor extends LitElement {
       }
 
       .info p {
+        margin: 4px 0;
+        line-height: 1.4;
+      }
+
+      .info ul {
+        margin: 8px 0;
+        padding-left: 20px;
+      }
+
+      .info li {
         margin: 4px 0;
         line-height: 1.4;
       }
