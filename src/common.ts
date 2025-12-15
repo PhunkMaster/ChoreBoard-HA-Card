@@ -7,27 +7,31 @@ export const ELEMENT_NAME = "choreboard-card";
 export interface ChoreboardCardConfig {
   type: string;
   title?: string;
-  entities?: string[]; // List of ChoreBoard sensor entity IDs
-  filter_assignee?: string; // Filter chores by assignee (e.g., "ash")
+  entity: string; // ChoreBoard my_chores sensor entity ID (e.g., sensor.choreboard_my_chores_ash)
   show_header?: boolean;
   show_points?: boolean;
-  show_description?: boolean;
   show_completed?: boolean; // Show completed chores (default: true)
+  show_overdue_only?: boolean; // Show only overdue chores (default: false)
 }
 
-export interface ChoreboardEntityAttributes {
-  assignee: string;
+// Chore object from the sensor's attributes.chores list
+export interface Chore {
+  id: number; // Instance ID for API calls
+  name: string;
   due_date: string;
   points: number;
-  description: string;
-  friendly_name?: string;
+  is_overdue: boolean;
+  status: string; // "pending", "completed", etc.
+  complete_later?: boolean; // Available in my_immediate_chores sensor
 }
 
-export interface ChoreboardEntity {
-  entity_id: string;
-  state: "pending" | "completed" | "overdue";
-  attributes: ChoreboardEntityAttributes;
-  last_changed?: string;
+// Attributes structure of the my_chores sensor
+export interface MyChoresSensorAttributes {
+  username: string;
+  chores: Chore[];
+  count: number;
+  total_chores?: number; // For immediate_chores sensor
+  complete_later_chores?: number; // For immediate_chores sensor
 }
 
 export interface HomeAssistantExtended extends HomeAssistant {
