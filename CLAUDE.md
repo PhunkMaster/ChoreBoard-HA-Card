@@ -83,7 +83,7 @@ npm run build
    ```bash
    npm run watch
    ```
-   This starts Rollup in watch mode and serves the compiled card at http://localhost:4000/choreboard-card.js
+   This starts Rollup in watch mode and serves the compiled card at http://localhost:4000/choreboard-ha-card.js
 
 3. **Launch Test Home Assistant Instance (optional):**
    ```bash
@@ -108,7 +108,7 @@ npm run build
 
 - **Lit 3.x**: Lightweight web component library for building the card and editor
 - **TypeScript**: Provides type safety and enhanced developer experience
-- **Rollup**: Bundles all source files into a single `dist/choreboard-card.js` file
+- **Rollup**: Bundles all source files into a single `dist/choreboard-ha-card.js` file
 - **custom-card-helpers**: Helper library providing Home Assistant types and utilities
 
 ### Source Structure
@@ -182,7 +182,7 @@ All Home Assistant custom cards must implement:
 ### rollup.config.mjs
 
 - **Entry**: `src/main.ts`
-- **Output**: `dist/choreboard-card.js`
+- **Output**: `dist/choreboard-ha-card.js`
 - **Plugins**:
   - `@rollup/plugin-typescript` - Compiles TypeScript
   - `@rollup/plugin-node-resolve` - Resolves node_modules imports
@@ -206,7 +206,7 @@ To publish this card to HACS (Home Assistant Community Store):
 ### Requirements
 
 1. **Repository Structure**: JavaScript files must be in `dist/` directory
-2. **File Naming**: `choreboard-card.js` matches repository name (with optional `lovelace-` prefix stripped)
+2. **File Naming**: `choreboard-ha-card.js` matches repository name (with optional `lovelace-` prefix stripped)
 3. **GitHub Releases**: Required for version management
 4. **hacs.json**: Metadata file in repository root
 5. **README.md**: Installation and usage documentation
@@ -216,7 +216,7 @@ To publish this card to HACS (Home Assistant Community Store):
 ```json
 {
   "name": "ChoreBoard Card",
-  "filename": "choreboard-card.js",
+  "filename": "choreboard-ha-card.js",
   "render_readme": true,
   "content_in_root": false
 }
@@ -227,7 +227,7 @@ To publish this card to HACS (Home Assistant Community Store):
 1. Build production version: `npm run build:prod`
 2. Commit changes and create git tag (e.g., `v0.1.0`)
 3. Create GitHub release with tag
-4. Attach `dist/choreboard-card.js` to release (optional, HACS will fetch from dist/)
+4. Attach `dist/choreboard-ha-card.js` to release (optional, HACS will fetch from dist/)
 5. Submit to HACS default repository (optional, users can add as custom repository)
 
 ### HACS File Resolution
@@ -271,7 +271,7 @@ Automatically creates releases when code is merged to main:
 - Creates git tag (e.g., v1.0.0)
 - Generates changelog from commit messages
 - Creates GitHub release with built files attached
-- Attaches dist/choreboard-card.js and source maps to release
+- Attaches dist/choreboard-ha-card.js and source maps to release
 
 **Trigger**: Push to main branch
 
@@ -335,7 +335,7 @@ Releases are created automatically when merging to main:
 5. **Release is published:**
    - Available at: `https://github.com/yourusername/choreboard-ha-card/releases`
    - HACS users can update to the new version
-   - dist/choreboard-card.js is attached for manual installation
+   - dist/choreboard-ha-card.js is attached for manual installation
 
 ### Manual Release (if needed)
 
@@ -361,7 +361,7 @@ If you need to create a release manually:
    git push && git push --tags
    ```
 
-5. Create GitHub release manually with dist/choreboard-card.js attached
+5. Create GitHub release manually with dist/choreboard-ha-card.js attached
 
 ### Build Artifacts
 
