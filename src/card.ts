@@ -75,6 +75,7 @@ export class ChoreboardCard extends LitElement {
       }
 
       // Filter to only overdue if show_overdue_only is true
+      // Treat missing is_overdue as false (not overdue)
       if (this.config.show_overdue_only && !chore.is_overdue) {
         return false;
       }
