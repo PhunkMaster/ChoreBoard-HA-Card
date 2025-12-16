@@ -63,7 +63,9 @@ Users must install and configure the ChoreBoard integration before using this ca
 
 ### Service Calls
 
-The card uses the `choreboard.complete_chore` service with the chore's instance ID:
+#### For Assigned Chores
+
+Simple completion without user selection:
 
 ```typescript
 await this.hass.callService('choreboard', 'complete_chore', {
@@ -71,8 +73,28 @@ await this.hass.callService('choreboard', 'complete_chore', {
 });
 ```
 
+#### For Pool Chores (v1.1.0+)
+
+**Claim Service:**
+```typescript
+await this.hass.callService('choreboard', 'claim_chore', {
+  chore_id: chore.id,
+  assign_to_user_id: userId,  // User ID who is claiming
+});
+```
+
+**Complete Service (with user selection):**
+```typescript
+await this.hass.callService('choreboard', 'mark_complete', {
+  chore_id: chore.id,
+  completed_by_user_id: userId,    // User ID who completed
+  helpers: [helperId1, helperId2], // Optional: User IDs who helped
+});
+```
+
 ### Data Flow
 
+#### Assigned Chores Flow
 1. Integration fetches chore data from ChoreBoard API
 2. Creates/updates My Chores sensors in Home Assistant (one per user)
 3. Card reads sensor's `attributes.chores` array from `this.hass.states[entity]`
@@ -80,6 +102,22 @@ await this.hass.callService('choreboard', 'complete_chore', {
 5. User clicks "Complete" button → Card calls `choreboard.complete_chore` with `instance_id`
 6. Integration syncs changes back to ChoreBoard API
 7. Sensor updates automatically, card re-renders
+
+#### Pool Chores Flow (v1.1.0+)
+1. Integration fetches pool chores from ChoreBoard API
+2. Creates `sensor.pool_chores` (or similar pattern) with chores in pool
+3. Card detects pool chores by `status === "pool"` or sensor pattern
+4. Card displays "Claim" and "Complete" buttons
+5. **Claim Action:**
+   - User clicks "Claim" → Dialog shows available users
+   - User selects who to assign → Calls `claim_chore` service
+   - Chore moves from pool to assigned
+6. **Complete Action:**
+   - User clicks "Complete" → Dialog shows user selection + helper selection
+   - User selects completer (required) and helpers (optional)
+   - Calls `mark_complete` service with user IDs
+   - Points distributed according to selections
+7. Integration syncs to API, sensors update
 
 ## Build Commands
 
@@ -152,10 +190,12 @@ npm run build
 
 ```
 src/
-├── main.ts       - Entry point; registers custom elements with Home Assistant
-├── card.ts       - Main card component (ChoreboardCard class)
-├── editor.ts     - Configuration editor component (ChoreboardCardEditor class)
-└── common.ts     - Shared TypeScript interfaces and constants
+├── main.ts            - Entry point; registers custom elements with Home Assistant
+├── card.ts            - Main card component (ChoreboardCard class)
+├── editor.ts          - Configuration editor component (ChoreboardCardEditor class)
+├── claim-dialog.ts    - Claim chore dialog component (v1.1.0+)
+├── complete-dialog.ts - Complete chore dialog component (v1.1.0+)
+└── common.ts          - Shared TypeScript interfaces and constants
 ```
 
 ### Component Responsibilities
@@ -178,8 +218,14 @@ src/
   - `completeChore(chore)` - Calls `choreboard.complete_chore` service with `instance_id`
   - `getChoreStateClass(chore)` - Determines CSS class based on status/overdue
   - `getUsername()` - Extracts username from sensor attributes
+- **Pool Chores Methods (v1.1.0+):**
+  - `isPoolChore(chore)` - Detects if chore is from pool by status or sensor pattern
+  - `getUsers()` - Fetches ChoreBoard users from coordinator data
+  - `claimChore(chore)` - Shows claim dialog and handles claim action
+  - `completePoolChore(chore)` - Shows complete dialog with user/helper selection
 - Renders chore list with status indicators, points, due dates
 - Filters chores by completion status and overdue state
+- Dynamically loads dialog components when needed
 
 **editor.ts:**
 - Implements `ChoreboardCardEditor` as a Lit `LitElement`
@@ -196,15 +242,411 @@ src/
   - `sensor.*_my_immediate_chores`
 - Dispatches `config-changed` events when configuration updates
 
+**claim-dialog.ts (v1.1.0+):**
+- Implements `ClaimChoreDialog` as a Lit `LitElement` with custom element name `claim-chore-dialog`
+- Purpose: Allows user selection when claiming pool chores
+- Input properties:
+  - `users: User[]` - Array of available ChoreBoard users
+  - `chore: Chore` - The chore being claimed
+- State management:
+  - `selectedUserId: number | null` - Tracks currently selected user
+- User Interface:
+  - Displays chore name in dialog heading
+  - Shows clickable list of users with account icons
+  - Highlights selected user with primary color and check icon
+  - Cancel button to close dialog
+  - Claim button (disabled until user selected)
+- Event dispatching:
+  - `dialog-confirmed` - Fired when Claim button clicked, includes `detail.userId`
+  - `dialog-closed` - Fired when Cancel button or dialog backdrop clicked
+- Styling:
+  - Uses Home Assistant theme variables for colors
+  - Selected user has primary color background
+  - Hover effects on user options
+  - Responsive layout with flexbox
+- Lifecycle: Created dynamically when needed, removed from DOM after action completes
+
+**complete-dialog.ts (v1.1.0+):**
+- Implements `CompleteChoreDialog` as a Lit `LitElement` with custom element name `complete-chore-dialog`
+- Purpose: Allows user and helper selection when completing pool chores
+- Input properties:
+  - `users: User[]` - Array of available ChoreBoard users
+  - `chore: Chore` - The chore being completed
+- State management:
+  - `selectedUserId: number | null` - Who completed the chore (required)
+  - `selectedHelperIds: number[]` - Who helped with the chore (optional)
+- User Interface:
+  - Two-section layout:
+    1. **Who completed** (required): Single-select user list with radio-like behavior
+    2. **Who helped** (optional): Multi-select checkbox list, excludes selected completer
+  - Selected completer cannot appear in helpers list
+  - Complete button disabled until someone is selected
+  - Cancel button to close without action
+- Event dispatching:
+  - `dialog-confirmed` - Fired when Complete button clicked, includes:
+    - `detail.userId` - ID of user who completed
+    - `detail.helperIds` - Array of helper user IDs (may be empty)
+  - `dialog-closed` - Fired when dialog is cancelled
+- Logic:
+  - `_selectUser(userId)` - Sets completer, removes them from helpers if previously selected
+  - `_toggleHelper(userId, checked)` - Adds/removes user from helpers array
+  - Helper section only visible if completer selected and other users available
+- Styling:
+  - User options styled as clickable cards with borders
+  - Helper options styled as checkbox labels
+  - Required field indicator (*) in red
+  - Optional label in secondary text color
+  - Scrollable content area with max-height
+- Lifecycle: Created dynamically on demand, removed after confirmation or cancellation
+
 **common.ts:**
 - TypeScript interfaces:
   - `ChoreboardCardConfig` - Card configuration (requires `entity`)
   - `Chore` - Individual chore from sensor's chores array
+    - `id: number` - Instance ID for API calls
+    - `name: string` - Chore name
+    - `due_date: string` - Due date in ISO format
     - `points: string | number` - Handles both types from integration
-    - `status: string` - Supports "assigned", "pending", "completed", etc.
+    - `is_overdue?: boolean` - Optional overdue flag
+    - `status: string` - Supports "assigned", "pending", "completed", "pool", etc.
+    - `complete_later?: boolean` - Available in immediate_chores sensor
+    - `description?: string` - Optional description
   - `MyChoresSensorAttributes` - Structure of sensor's attributes
+    - `username?: string` - Optional username
+    - `chores: Chore[]` - Array of chores
+    - `count: number` - Number of chores
+    - `total_chores?: number` - For immediate_chores sensor
+    - `complete_later_chores?: number` - For immediate_chores sensor
+  - `User` (v1.1.0+) - ChoreBoard user from integration coordinator:
+    - `id: number` - User ID for API calls
+    - `username: string` - Login username
+    - `display_name: string` - Friendly display name
+    - `first_name: string` - First name
+    - `can_be_assigned: boolean` - Can receive chore assignments
+    - `eligible_for_points: boolean` - Can earn points
+    - `weekly_points: string | number` - Points this week
+    - `all_time_points: string | number` - Total points earned
+    - `claims_today?: number` - Optional claim count
   - `HomeAssistantExtended` - Extended Home Assistant type
 - Constants: `CARD_VERSION`, `CARD_NAME`, `ELEMENT_NAME`
+
+## Pool Chores Feature (v1.1.0+)
+
+### Overview
+
+Version 1.1.0 introduced support for pool chores - chores that are available in a shared pool and can be claimed by any user. This feature enables households to manage unassigned chores that can be picked up by anyone.
+
+### Detection Logic
+
+The card automatically detects pool chores using two methods:
+
+1. **Status-based detection**: Chores with `status === "pool"`
+2. **Sensor-based detection**: Chores from pool sensor entities
+   - Sensor entity contains "chores" but not "my_chores"
+   - Example patterns: `sensor.pool_chores`, `sensor.choreboard_pool_chores`
+
+Detection implementation in `card.ts:152-159`:
+```typescript
+private isPoolChore(chore: Chore): boolean {
+  return (
+    chore.status === "pool" ||
+    (this.config.entity.endsWith("_chores") &&
+      !this.config.entity.includes("_my_chores"))
+  );
+}
+```
+
+### User Interface Differences
+
+**Assigned Chores:**
+- Single "Complete" button
+- No user selection required
+- Directly marks chore complete for the assigned user
+
+**Pool Chores:**
+- Two action buttons: "Claim" and "Complete"
+- Both actions require user selection via dialogs
+- Claim assigns chore to selected user
+- Complete allows primary user + helper selection
+
+### User Data Retrieval
+
+The card fetches ChoreBoard users from the integration's coordinator data:
+
+```typescript
+private getUsers(): User[] {
+  if (!this.hass) return [];
+
+  // Search all ChoreBoard sensor entities for users array
+  for (const entityId of Object.keys(this.hass.states)) {
+    if (entityId.startsWith("sensor.choreboard_")) {
+      const state = this.hass.states[entityId];
+      if (state.attributes.users && Array.isArray(state.attributes.users)) {
+        return state.attributes.users as User[];
+      }
+    }
+  }
+
+  return [];
+}
+```
+
+**Important**: Users are stored in sensor attributes by the integration's coordinator. The card searches all ChoreBoard sensors to find the `users` array. This works because all sensors share the same coordinator instance.
+
+### Dialog Pattern and Lifecycle
+
+Both claim and complete dialogs follow a consistent pattern:
+
+**1. Dynamic Import and Creation:**
+```typescript
+// Import dialog component on demand (lazy loading)
+await import("./claim-dialog");
+
+// Create dialog element
+const dialog = document.createElement("claim-chore-dialog") as HTMLElement & {
+  users: User[];
+  chore: Chore;
+};
+
+// Set properties
+dialog.users = users;
+dialog.chore = chore;
+```
+
+**2. Event Listeners:**
+```typescript
+// Handle confirmation
+dialog.addEventListener("dialog-confirmed", async (e: Event) => {
+  const customEvent = e as CustomEvent;
+  const userId = customEvent.detail.userId;
+
+  // Call service
+  await this.hass.callService("choreboard", "claim_chore", {
+    chore_id: chore.id,
+    assign_to_user_id: userId,
+  });
+
+  // Show feedback
+  this.showToast("Chore claimed successfully");
+
+  // Cleanup
+  dialog.remove();
+});
+
+// Handle cancellation
+dialog.addEventListener("dialog-closed", () => {
+  dialog.remove();
+});
+```
+
+**3. Append to DOM:**
+```typescript
+document.body.appendChild(dialog);
+```
+
+**Why This Pattern:**
+- **Lazy loading**: Dialog components only loaded when needed
+- **Memory efficiency**: Dialogs removed after use
+- **Decoupling**: Dialog doesn't know about parent component
+- **Event-driven**: Communication via standard DOM events
+- **Reusable**: Same dialog can be used by different components
+
+### Claim Chore Flow
+
+**User Action Sequence:**
+1. User clicks "Claim" button on pool chore
+2. `claimChore(chore)` method called
+3. Users fetched via `getUsers()`
+4. Claim dialog dynamically imported and created
+5. Dialog shows list of available users
+6. User selects who will claim the chore
+7. Dialog fires `dialog-confirmed` event with `userId`
+8. Card calls `choreboard.claim_chore` service:
+   ```typescript
+   {
+     chore_id: chore.id,
+     assign_to_user_id: userId
+   }
+   ```
+9. Integration assigns chore to selected user
+10. Sensor updates, chore moves from pool to user's assigned list
+11. Card re-renders with updated data
+
+**Error Handling:**
+- Toast notification shown if users list unavailable
+- Service call wrapped in try-catch
+- Error toast displayed on failure
+- Dialog removed regardless of success/failure
+
+### Complete Pool Chore Flow
+
+**User Action Sequence:**
+1. User clicks "Complete" button on pool chore
+2. `completePoolChore(chore)` method called
+3. Users fetched via `getUsers()`
+4. Complete dialog dynamically imported and created
+5. Dialog shows two-section interface:
+   - **Section 1**: "Who completed?" (required, single-select)
+   - **Section 2**: "Who helped?" (optional, multi-select)
+6. User selects completer (required)
+7. Helper section appears with remaining users
+8. User optionally selects helpers
+9. Dialog fires `dialog-confirmed` event with:
+   ```typescript
+   {
+     userId: number,        // Who completed
+     helperIds: number[]    // Who helped (may be empty)
+   }
+   ```
+10. Card calls `choreboard.mark_complete` service:
+    ```typescript
+    {
+      chore_id: chore.id,
+      completed_by_user_id: userId,
+      helpers: helperIds
+    }
+    ```
+11. Integration:
+    - Marks chore complete
+    - Awards points to completer
+    - Awards partial points to helpers (if configured)
+    - Updates all affected user sensors
+12. Card re-renders with updated data
+
+**Important Logic:**
+- Selected completer is excluded from helpers list
+- If user switches completer selection, they're removed from helpers
+- Helper section hidden until completer selected
+- Complete button disabled until completer selected
+- Empty helpers array is valid (no helpers)
+
+### Rollup Configuration for Dynamic Imports
+
+Dynamic imports require specific Rollup configuration:
+
+**rollup.config.mjs:**
+```javascript
+export default {
+  input: 'src/main.ts',
+  output: {
+    file: `dist/${outputFile}`,
+    format: 'es',
+    sourcemap: !isProduction,
+    inlineDynamicImports: true,  // REQUIRED for dialog lazy loading
+  },
+  // ...
+};
+```
+
+**Why `inlineDynamicImports: true`:**
+- Bundles dynamic imports into single output file
+- Prevents creation of separate chunk files
+- Simplifies deployment (single .js file)
+- Compatible with HACS distribution requirements
+- Home Assistant custom cards prefer single-file distribution
+
+**Without this setting:**
+- Rollup creates separate chunk files (e.g., `claim-dialog-[hash].js`)
+- HACS doesn't know which files to distribute
+- Card loading may fail in production
+
+### Service Parameter Differences
+
+**Assigned Chores - Simple Completion:**
+```typescript
+await this.hass.callService("choreboard", "complete_chore", {
+  instance_id: chore.id,  // Only parameter needed
+});
+```
+
+**Pool Chores - Claim:**
+```typescript
+await this.hass.callService("choreboard", "claim_chore", {
+  chore_id: chore.id,           // Pool chore ID
+  assign_to_user_id: userId,    // Who is claiming
+});
+```
+
+**Pool Chores - Complete:**
+```typescript
+await this.hass.callService("choreboard", "mark_complete", {
+  chore_id: chore.id,              // Pool chore ID
+  completed_by_user_id: userId,    // Who completed (required)
+  helpers: [id1, id2],             // Who helped (optional array)
+});
+```
+
+**Key Differences:**
+- Assigned: `instance_id` parameter, no user selection
+- Pool: `chore_id` parameter, requires user selection
+- Complete service allows helper assignment for point distribution
+
+### Testing Pool Chores
+
+**Setup Requirements:**
+1. ChoreBoard integration installed and configured
+2. Pool chores created in ChoreBoard API
+3. Multiple users configured in ChoreBoard
+4. Pool chores sensor entity available
+
+**Test Cases:**
+1. **Pool Chore Detection:**
+   - Verify "Claim" and "Complete" buttons appear for pool chores
+   - Verify single "Complete" button for assigned chores
+
+2. **Claim Dialog:**
+   - Click "Claim" button
+   - Verify all users appear in dialog
+   - Select a user
+   - Verify selection highlighted
+   - Click "Claim" button
+   - Verify chore assigned to user
+   - Verify chore removed from pool sensor
+   - Verify chore appears in user's my_chores sensor
+
+3. **Complete Dialog:**
+   - Click "Complete" button on pool chore
+   - Verify "Who completed?" section appears
+   - Verify "Complete" button disabled
+   - Select a user as completer
+   - Verify "Complete" button enabled
+   - Verify "Who helped?" section appears
+   - Verify completer not in helpers list
+   - Select one or more helpers
+   - Click "Complete" button
+   - Verify chore marked complete
+   - Verify points awarded correctly
+
+4. **Dialog Cancellation:**
+   - Open claim dialog and click "Cancel"
+   - Verify dialog closes without action
+   - Open complete dialog and click backdrop
+   - Verify dialog closes without action
+
+5. **Error Handling:**
+   - Test with no users available
+   - Verify error toast shown
+   - Test with service call failure
+   - Verify error toast shown
+
+### Implementation Checklist
+
+When implementing pool chores support:
+
+- [ ] Detect pool chores via status or sensor pattern
+- [ ] Fetch users from coordinator data
+- [ ] Create claim dialog component
+- [ ] Create complete dialog component
+- [ ] Implement lazy loading with dynamic imports
+- [ ] Configure Rollup with `inlineDynamicImports: true`
+- [ ] Handle dialog events correctly
+- [ ] Call correct services with correct parameters
+- [ ] Show/hide UI elements based on chore type
+- [ ] Add error handling and user feedback
+- [ ] Clean up dialogs after use
+- [ ] Test with actual ChoreBoard integration
+- [ ] Document in README.md
+- [ ] Update version and create release
 
 ## Home Assistant Integration
 
@@ -781,3 +1223,4 @@ This allows users to configure the card through the Home Assistant UI without wr
 - Verify complete button calls correct service with instance_id
 - Test filtering options: show_completed, show_overdue_only
 - Ensure card works with both light and dark themes
+- Always let me know if a something needs to be fixed or implemented to accplish a goal in either the backend or the integration
