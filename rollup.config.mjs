@@ -50,6 +50,7 @@ export default {
     file: `dist/${outputFile}`,
     format: 'es',
     sourcemap: !isProduction,
+    inlineDynamicImports: true,
   },
   plugins,
   watch: {
