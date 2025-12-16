@@ -35,7 +35,9 @@ For detailed integration setup instructions, see the [ChoreBoard Integration doc
 
 - Display chores from ChoreBoard integration's "My Chores" sensors
 - Automatically shows all chores for a specific user
+- **Pool Chores Support (v1.1.0+)**: Claim and complete shared chores with user selection
 - Mark chores as complete directly from the card with one click
+- Select who completed pool chores and who helped for accurate point distribution
 - Color-coded status indicators (pending, completed, overdue)
 - Show/hide completed chores
 - Filter to show only overdue chores
@@ -135,9 +137,15 @@ show_completed: false
 
 ### Entity Format
 
-The card works with ChoreBoard "My Chores" sensors created by the integration:
-- **Format**: `sensor.choreboard_my_chores_{username}`
-- **Example**: `sensor.choreboard_my_chores_ash`
+The card works with ChoreBoard sensors created by the integration:
+
+**My Chores Sensors (per user):**
+- **Format**: `sensor.choreboard_my_chores_{username}` or `sensor.{username}_my_chores`
+- **Example**: `sensor.choreboard_my_chores_ash` or `sensor.ash_my_chores`
+
+**Pool Chores Sensors (shared chores):**
+- **Format**: `sensor.pool_chores` or `sensor.choreboard_pool_chores`
+- **Contains**: Chores available in the shared pool that can be claimed by any user
 
 Each sensor contains a list of chores in its `chores` attribute with these fields:
 - `id`: Chore instance ID (used for API calls)
@@ -145,7 +153,7 @@ Each sensor contains a list of chores in its `chores` attribute with these field
 - `due_date`: When the chore is due
 - `points`: Point value of the chore
 - `is_overdue`: Boolean indicating if the chore is overdue
-- `status`: Current status (`pending`, `completed`, etc.)
+- `status`: Current status (`assigned`, `pending`, `completed`, `pool`, etc.)
 
 ## Examples
 
@@ -204,17 +212,61 @@ entity: sensor.choreboard_my_immediate_chores_ash
 
 Uses the "immediate chores" sensor which excludes chores marked as "complete later".
 
+### Example 6: Pool Chores (v1.1.0+)
+
+```yaml
+type: custom:choreboard-card
+title: "Available Chores"
+entity: sensor.pool_chores
+show_completed: false
+```
+
+Displays shared pool chores that anyone can claim. Each pool chore shows "Claim" and "Complete" buttons.
+
 ## Usage
 
-### Marking Chores Complete
+### Assigned Chores
 
-Click the "Complete" button on any pending or overdue chore to mark it as complete. This calls the `choreboard.complete_chore` service from the integration using the chore's instance ID.
+**Marking Chores Complete:**
+
+Click the "Complete" button on any assigned chore to mark it as complete. This calls the `choreboard.complete_chore` service from the integration using the chore's instance ID.
 
 Completed chores are indicated with:
 - Green checkmark icon
 - "✓ Done" badge
 - Reduced opacity
 - Strike-through name
+
+### Pool Chores (v1.1.0+)
+
+Pool chores are shared chores that anyone can claim or complete. The card automatically detects pool chores and displays different action buttons.
+
+**Claiming Pool Chores:**
+
+1. Click the "Claim" button on a pool chore
+2. A dialog appears showing all available users
+3. Select who is claiming the chore
+4. Click "Claim" to assign the chore to the selected user
+5. The chore moves from the pool to the user's assigned chores
+
+**Completing Pool Chores:**
+
+1. Click the "Complete" button on a pool chore
+2. A dialog appears with two sections:
+   - **Who completed this chore?** (required) - Select the person who did the work
+   - **Who helped?** (optional) - Select any helpers who assisted
+3. Click "Complete" to finish
+4. Points are distributed to the completer and helpers based on ChoreBoard configuration
+
+**Pool Chore Detection:**
+
+The card automatically identifies pool chores by:
+- Chores with `status: "pool"`
+- Chores from pool sensor entities (e.g., `sensor.pool_chores`)
+
+Pool chores display two buttons:
+- **Claim**: Assign the chore to someone
+- **Complete**: Mark complete with user selection and optional helpers
 
 ### Status Indicators
 
@@ -254,6 +306,25 @@ If marking chores complete fails:
 3. Test the service manually with a chore instance_id
 4. Ensure the integration API connection is working
 5. Check that the chore's `id` field is present and valid
+
+### Pool Chores Not Showing Claim/Complete Buttons
+
+If pool chores show a single "Complete" button instead of "Claim" and "Complete":
+
+1. Check that the chore's `status` field is set to `"pool"`
+2. Verify the sensor entity name contains "chores" but not "my_chores"
+3. Check in Developer Tools → States that the entity's chores have `status: "pool"`
+4. Ensure you're using integration version that supports pool chores
+
+### User Selection Dialog Not Appearing
+
+If clicking "Claim" or "Complete" on pool chores doesn't show a dialog:
+
+1. Check browser console for JavaScript errors
+2. Verify the integration has user data in sensor attributes
+3. Look for `users` array in any `sensor.choreboard_*` entity attributes
+4. Clear browser cache and refresh Home Assistant
+5. Check that you're using card version 1.1.0 or later
 
 ## Development
 
