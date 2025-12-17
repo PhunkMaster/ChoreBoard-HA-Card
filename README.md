@@ -6,8 +6,6 @@
 
 A custom Lovelace card for Home Assistant to display and manage chores from the [ChoreBoard Integration](https://github.com/PhunkMaster/ChoreBoard-HA-Integration).
 
-<!-- v1.1.3 release test -->
-
 ## Prerequisites
 
 **⚠️ IMPORTANT**: This card requires the [ChoreBoard Home Assistant Integration](https://github.com/PhunkMaster/ChoreBoard-HA-Integration) to be installed and configured first.
