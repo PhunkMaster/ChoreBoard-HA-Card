@@ -746,7 +746,19 @@ To publish this card to HACS (Home Assistant Community Store):
 ### Release Process
 
 **Automated Process (Recommended):**
-1. Create a semver branch: `git checkout -b bugfix/1.1.3` (or `feature/1.2.0`, `hotfix/1.0.4`)
+1. Create a semver branch with **EXACT** version format (no descriptive suffixes):
+   ```bash
+   git checkout -b feature/1.2.0   # ✅ Correct
+   git checkout -b bugfix/1.1.3    # ✅ Correct
+   git checkout -b hotfix/1.0.4    # ✅ Correct
+
+   # ❌ WRONG - Do not add descriptive text after version:
+   git checkout -b feature/1.2.0-points-name     # Will NOT trigger auto-release
+   git checkout -b feature/1.2.0-my-feature      # Will NOT trigger auto-release
+   ```
+
+   **Important**: The branch name must match the pattern `(feature|bugfix|hotfix|release)/X.Y.Z` exactly. Adding descriptive text after the version number will prevent the auto-release workflow from triggering.
+
 2. Make your changes and commit
 3. Push and create a pull request
 4. Merge PR to main (squash or regular merge both supported)
@@ -1234,8 +1246,10 @@ This allows users to configure the card through the Home Assistant UI without wr
 
 ## Development Best Practices
 
-- **Always use semver branches** for feature development (e.g., `feature/1.2.3`, `bugfix/1.0.2`)
-- Commit with semantic prefixes: `feat:`, `fix:`, `breaking:` to control version bumping
+- **Always use EXACT semver branch format** for releases: `feature/1.2.0`, `bugfix/1.0.2`, `hotfix/1.0.3`
+  - ✅ Correct: `feature/1.2.0`, `bugfix/1.1.3`
+  - ❌ Wrong: `feature/1.2.0-points-name`, `feature/1.2.0-my-feature` (will NOT trigger auto-release)
+  - For non-release feature branches, use descriptive names: `feature/add-dark-mode`, `fix/button-alignment`
 - Test with actual ChoreBoard integration sensors, not mock data
 - Verify complete button calls correct service with instance_id
 - Test filtering options: show_completed, show_overdue_only
