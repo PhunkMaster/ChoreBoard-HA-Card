@@ -1,8 +1,31 @@
 name: Release
 
+# NOTE: This workflow is deprecated in favor of auto-release.yml
+# The auto-release.yml workflow handles version updates and release creation
+# when semver branches (feature/X.Y.Z, bugfix/X.Y.Z, etc.) are merged to main.
+#
+# This workflow is disabled to prevent conflicts. If you need manual release
+# creation, use auto-release.yml by merging a semver-named branch.
+#
+# To re-enable this workflow, uncomment the 'on:' section below.
+
 on:
-  release:
-    types: [ published ]
+  workflow_dispatch: # Manual trigger only
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+# Disabled - conflicts with auto-release.yml
+# on:
+#   release:
+#     types: [ published ]
 
 jobs:
   release:
@@ -39,19 +62,8 @@ jobs:
       - name: Determine version bump
         id: version_bump
         run: |
-          # Get the latest commit message
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MSG"
-
-          # Determine version bump based on commit message
-          if echo "$COMMIT_MSG" | grep -qiE "^(breaking|major):"; then
-            BUMP="major"
-          elif echo "$COMMIT_MSG" | grep -qiE "^(feat|feature|minor):"; then
-            BUMP="minor"
-          else
-            BUMP="patch"
-          fi
-
+          # Use manual input for version bump type
+          BUMP="${{ github.event.inputs.version_bump || 'patch' }}"
           echo "bump=$BUMP" >> $GITHUB_OUTPUT
           echo "Version bump type: $BUMP"
 
@@ -64,11 +76,14 @@ jobs:
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION"
 
-      - name: Update src/common.ts version
+      - name: Update src/common.ts CARD_VERSION
         run: |
           NEW_VERSION="${{ steps.new_version.outputs.version }}"
-          sed -i "s/export const CARD_VERSION = '[^']*'/export const CARD_VERSION = '$NEW_VERSION'/" src/common.ts
-          echo "Updated CARD_VERSION in src/common.ts to $NEW_VERSION"
+          echo "Updating CARD_VERSION in src/common.ts to $NEW_VERSION"
+          sed -i 's/export const CARD_VERSION = "[^"]*"/export const CARD_VERSION = "'"$NEW_VERSION"'"/' src/common.ts
+
+          # Verify the change
+          grep "CARD_VERSION" src/common.ts
 
       - name: Commit version bump
         run: |

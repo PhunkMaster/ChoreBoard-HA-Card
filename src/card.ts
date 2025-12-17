@@ -164,8 +164,20 @@ export class ChoreboardCard extends LitElement {
       return [];
     }
 
-    // Try to get users from any ChoreBoard entity attributes
-    // The coordinator stores users in the entity attributes
+    // Priority 1: Check dedicated sensor.users entity
+    const usersEntity = this.hass.states["sensor.users"];
+    if (usersEntity?.attributes.users && Array.isArray(usersEntity.attributes.users)) {
+      return usersEntity.attributes.users as User[];
+    }
+
+    // Priority 2: Check sensor.choreboard_users entity
+    const choreboardUsersEntity = this.hass.states["sensor.choreboard_users"];
+    if (choreboardUsersEntity?.attributes.users && Array.isArray(choreboardUsersEntity.attributes.users)) {
+      return choreboardUsersEntity.attributes.users as User[];
+    }
+
+    // Priority 3: Fallback to any ChoreBoard sensor with users array
+    // The coordinator stores users in the entity attributes (maintains backwards compatibility)
     for (const entityId of Object.keys(this.hass.states)) {
       if (entityId.startsWith("sensor.choreboard_")) {
         const state = this.hass.states[entityId];
@@ -179,9 +191,12 @@ export class ChoreboardCard extends LitElement {
   }
 
   private async claimChore(chore: Chore): Promise<void> {
-    if (!this.hass) return;
+    if (!this.hass) {
+      return;
+    }
 
     const users = this.getUsers();
+
     if (users.length === 0) {
       this.showToast("Unable to load users list", true);
       return;
@@ -224,9 +239,12 @@ export class ChoreboardCard extends LitElement {
   }
 
   private async completePoolChore(chore: Chore): Promise<void> {
-    if (!this.hass) return;
+    if (!this.hass) {
+      return;
+    }
 
     const users = this.getUsers();
+
     if (users.length === 0) {
       this.showToast("Unable to load users list", true);
       return;
@@ -362,20 +380,33 @@ export class ChoreboardCard extends LitElement {
                       : this.isPoolChore(chore)
                         ? html`
                             <div class="pool-actions">
-                              <mwc-button @click=${() => this.claimChore(chore)}>
-                                Claim
-                              </mwc-button>
-                              <mwc-button
+                              <button
+                                class="action-button action-button--primary"
                                 @click=${() => this.completePoolChore(chore)}
+                                aria-label="Mark chore as complete"
                               >
-                                Complete
-                              </mwc-button>
+                                <ha-icon icon="mdi:check-circle"></ha-icon>
+                                <span>Complete</span>
+                              </button>
+                              <button
+                                class="action-button action-button--secondary"
+                                @click=${() => this.claimChore(chore)}
+                                aria-label="Claim this chore"
+                              >
+                                <ha-icon icon="mdi:hand-okay"></ha-icon>
+                                <span>Claim</span>
+                              </button>
                             </div>
                           `
                         : html`
-                            <mwc-button @click=${() => this.completeChore(chore)}>
-                              Complete
-                            </mwc-button>
+                            <button
+                              class="action-button action-button--primary"
+                              @click=${() => this.completeChore(chore)}
+                              aria-label="Mark chore as complete"
+                            >
+                              <ha-icon icon="mdi:check-circle"></ha-icon>
+                              <span>Complete</span>
+                            </button>
                           `}
                   </div>
                 </div>
@@ -410,12 +441,16 @@ export class ChoreboardCard extends LitElement {
       }
 
       .badge {
-        background: var(--primary-color);
-        color: var(--text-primary-color);
+        display: inline-flex;
+        align-items: center;
+        background: var(--secondary-background-color);
+        color: var(--primary-text-color);
+        border: 1px solid var(--divider-color);
         padding: 4px 12px;
         border-radius: 12px;
         font-size: 12px;
         font-weight: 600;
+        line-height: 1;
       }
 
       .card-content {
@@ -533,12 +568,15 @@ export class ChoreboardCard extends LitElement {
       }
 
       .chore-points {
+        display: inline-flex;
+        align-items: center;
         background: var(--primary-color);
         color: var(--text-primary-color);
         padding: 2px 8px;
         border-radius: 8px;
         font-size: 12px;
         font-weight: 600;
+        line-height: 1;
         white-space: nowrap;
       }
 
@@ -576,23 +614,129 @@ export class ChoreboardCard extends LitElement {
         flex-shrink: 0;
       }
 
+      /* Button Container */
       .pool-actions {
         display: flex;
-        flex-direction: column;
-        gap: 8px;
+        gap: 12px;
+        width: 100%;
+        margin-top: 8px;
       }
 
-      mwc-button {
-        --mdc-theme-primary: var(--primary-color);
+      /* Responsive Layout */
+      @media (min-width: 600px) {
+        .pool-actions {
+          flex-direction: row;
+        }
+
+        .pool-actions .action-button {
+          flex: 1;
+          min-width: 120px;
+        }
+      }
+
+      @media (max-width: 599px) {
+        .pool-actions {
+          flex-direction: column;
+        }
+
+        .pool-actions .action-button {
+          width: 100%;
+        }
+      }
+
+      /* Base Button Styles */
+      .action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 24px;
+        min-height: 48px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        line-height: 1;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        outline: none;
+        position: relative;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .action-button ha-icon {
+        --mdc-icon-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .action-button:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+      }
+
+      .action-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      /* Primary Button (Filled) */
+      .action-button--primary {
+        background: var(--primary-color);
+        color: var(--text-primary-color);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      }
+
+      .action-button--primary:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .action-button--primary:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        transition: all 0.1s;
+      }
+
+      /* Secondary Button (Outlined) */
+      .action-button--secondary {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        box-shadow: none;
+      }
+
+      .action-button--secondary:hover {
+        background: var(--secondary-background-color);
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .action-button--secondary:active {
+        background: var(--divider-color);
+        transform: translateY(0);
+        box-shadow: none;
+        transition: all 0.1s;
+      }
+
+      /* Single Action Button (Not in pool-actions) */
+      .chore-action .action-button {
+        min-width: 120px;
       }
 
       .completed-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         background: var(--success-color, #4caf50);
         color: white;
-        padding: 8px 16px;
+        padding: 10px 16px;
         border-radius: 8px;
         font-size: 14px;
         font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
     `;
   }
