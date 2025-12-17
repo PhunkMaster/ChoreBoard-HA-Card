@@ -49,7 +49,7 @@ export default {
   output: {
     file: `dist/${outputFile}`,
     format: 'es',
-    sourcemap: !isProduction,
+    sourcemap: true, // Always generate source maps for debugging
     inlineDynamicImports: true,
   },
   plugins,
