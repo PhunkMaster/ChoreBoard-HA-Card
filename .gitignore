@@ -2,8 +2,7 @@
 node_modules/
 yarn.lock
 
-# Build output (keep .js files for HACS, ignore maps and declarations)
-dist/*.js.map
+# Build output (keep .js and .js.map files for HACS, ignore declarations)
 dist/*.d.ts
 dist/*.d.ts.map
 
