@@ -287,7 +287,7 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
         font-size: 14px;
         font-weight: 600;
       }
-    `}};e([de({attribute:!1})],ue.prototype,"hass",void 0),e([pe()],ue.prototype,"config",void 0),ue=e([ce("choreboard-card")],ue),console.info("%c ChoreBoard Card %c 0.1.0 ","color: white; background: #039be5; font-weight: 700;","color: #039be5; background: white; font-weight: 700;");let ge=class extends ne{setConfig(e){this.config=e}getMyChoresSensors(){return this.hass?Object.keys(this.hass.states).filter(e=>e.startsWith("sensor.choreboard_my_chores_")||e.startsWith("sensor.choreboard_my_immediate_chores_")||e.startsWith("sensor.")&&e.endsWith("_my_chores")||e.startsWith("sensor.")&&e.endsWith("_my_immediate_chores")||e.startsWith("sensor.")&&e.endsWith("_chores")):[]}render(){if(!this.hass||!this.config)return W``;const e=this.getMyChoresSensors();return W`
+    `}};e([de({attribute:!1})],ue.prototype,"hass",void 0),e([pe()],ue.prototype,"config",void 0),ue=e([ce("choreboard-card")],ue),console.info("%c ChoreBoard Card %c 1.1.3 ","color: white; background: #039be5; font-weight: 700;","color: #039be5; background: white; font-weight: 700;");let ge=class extends ne{setConfig(e){this.config=e}getMyChoresSensors(){return this.hass?Object.keys(this.hass.states).filter(e=>e.startsWith("sensor.choreboard_my_chores_")||e.startsWith("sensor.choreboard_my_immediate_chores_")||e.startsWith("sensor.")&&e.endsWith("_my_chores")||e.startsWith("sensor.")&&e.endsWith("_my_immediate_chores")||e.startsWith("sensor.")&&e.endsWith("_chores")):[]}render(){if(!this.hass||!this.config)return W``;const e=this.getMyChoresSensors();return W`
       <div class="card-config">
         ${0===e.length?W`
               <div class="warning">
@@ -780,3 +780,4 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
         --mdc-checkbox-size: 20px;
       }
     `}};e([de({type:Array})],ve.prototype,"users",void 0),e([de({type:Object})],ve.prototype,"chore",void 0),e([pe()],ve.prototype,"selectedUserId",void 0),e([pe()],ve.prototype,"selectedHelperIds",void 0),ve=e([ce("complete-chore-dialog")],ve);var ye=Object.freeze({__proto__:null,get CompleteChoreDialog(){return ve}});
+//# sourceMappingURL=choreboard-ha-card.js.map
