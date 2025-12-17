@@ -35,3 +35,9 @@ coverage/
 # Misc
 .env
 .env.local
+
+# Claude Code workspace
+.claude/
+
+# Downstream planning docs
+downstream_card_needs/
