@@ -150,6 +150,22 @@ export class ChoreboardCard extends LitElement {
     return attributes.username || "";
   }
 
+  private getPointsName(): string {
+    // Get custom points name from sensor attributes (e.g., "Stars", "Credits")
+    // Falls back to "points" if not configured
+    if (!this.hass || !this.config.entity) {
+      return "points";
+    }
+
+    const stateObj = this.hass.states[this.config.entity];
+    if (!stateObj) {
+      return "points";
+    }
+
+    const attributes = stateObj.attributes as MyChoresSensorAttributes;
+    return attributes.points_label || "points";
+  }
+
   private isPoolChore(chore: Chore): boolean {
     // Pool chores have status "pool" or the entity is a pool sensor
     return (
@@ -337,7 +353,7 @@ export class ChoreboardCard extends LitElement {
                       <div class="chore-name">${chore.name}</div>
                       ${this.config.show_points && chore.points
                         ? html`<div class="chore-points">
-                            ${typeof chore.points === "string" ? parseFloat(chore.points) : chore.points} pts
+                            ${typeof chore.points === "string" ? parseFloat(chore.points) : chore.points} ${this.getPointsName()}
                           </div>`
                         : ""}
                     </div>
