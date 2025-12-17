@@ -163,7 +163,7 @@ export class ChoreboardCard extends LitElement {
     }
 
     const attributes = stateObj.attributes as MyChoresSensorAttributes;
-    return attributes.points_name || "points";
+    return attributes.points_label || "points";
   }
 
   private isPoolChore(chore: Chore): boolean {

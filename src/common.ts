@@ -33,7 +33,7 @@ export interface MyChoresSensorAttributes {
   count: number;
   total_chores?: number; // For immediate_chores sensor
   complete_later_chores?: number; // For immediate_chores sensor
-  points_name?: string; // Custom name for points (e.g., "Stars", "Credits") - defaults to "points"
+  points_label?: string; // Custom label for points (e.g., "Stars", "Credits") - defaults to "points"
 }
 
 // User object from ChoreBoard integration
