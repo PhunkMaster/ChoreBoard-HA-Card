@@ -745,10 +745,27 @@ To publish this card to HACS (Home Assistant Community Store):
 
 ### Release Process
 
+**Automated Process (Recommended):**
+1. Create a semver branch: `git checkout -b bugfix/1.1.3` (or `feature/1.2.0`, `hotfix/1.0.4`)
+2. Make your changes and commit
+3. Push and create a pull request
+4. Merge PR to main (squash or regular merge both supported)
+5. Auto-release workflow automatically:
+   - Updates version in package.json, package-lock.json, and src/common.ts
+   - Builds production bundle with `npm run build:prod`
+   - Commits all version files + built artifacts to main
+   - Creates git tag (e.g., `v1.1.3`)
+   - Creates GitHub release with 4 assets:
+     - dist/choreboard-ha-card.js
+     - dist/choreboard-ha-card.js.map
+     - package.json
+     - package-lock.json
+
+**Manual Process (Deprecated):**
 1. Build production version: `npm run build:prod`
 2. Commit changes and create git tag (e.g., `v0.1.0`)
 3. Create GitHub release with tag
-4. Attach `dist/choreboard-ha-card.js` to release (optional, HACS will fetch from dist/)
+4. Attach assets to release
 5. Submit to HACS default repository (optional, users can add as custom repository)
 
 ### HACS File Resolution
