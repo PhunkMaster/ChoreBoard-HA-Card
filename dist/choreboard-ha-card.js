@@ -1,17 +1,361 @@
-function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPropertyDescriptor(t,s):o;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)n=Reflect.decorate(e,t,s,o);else for(var a=e.length-1;a>=0;a--)(i=e[a])&&(n=(r<3?i(n):r>3?i(t,s,n):i(t,s))||n);return r>3&&n&&Object.defineProperty(t,s,n),n}"function"==typeof SuppressedError&&SuppressedError;const t=globalThis,s=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,o=Symbol(),i=new WeakMap;let r=class{constructor(e,t,s){if(this._$cssResult$=!0,s!==o)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(s&&void 0===e){const s=void 0!==t&&1===t.length;s&&(e=i.get(t)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),s&&i.set(t,e))}return e}toString(){return this.cssText}};const n=(e,...t)=>{const s=1===e.length?e[0]:t.reduce((t,s,o)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+e[o+1],e[0]);return new r(s,e,o)},a=s?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const s of e.cssRules)t+=s.cssText;return(e=>new r("string"==typeof e?e:e+"",void 0,o))(t)})(e):e,{is:c,defineProperty:h,getOwnPropertyDescriptor:l,getOwnPropertyNames:d,getOwnPropertySymbols:p,getPrototypeOf:u}=Object,g=globalThis,m=g.trustedTypes,f=m?m.emptyScript:"",v=g.reactiveElementPolyfillSupport,y=(e,t)=>e,_={toAttribute(e,t){switch(t){case Boolean:e=e?f:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let s=e;switch(t){case Boolean:s=null!==e;break;case Number:s=null===e?null:Number(e);break;case Object:case Array:try{s=JSON.parse(e)}catch(e){s=null}}return s}},$=(e,t)=>!c(e,t),b={attribute:!0,type:String,converter:_,reflect:!1,useDefault:!1,hasChanged:$};Symbol.metadata??=Symbol("metadata"),g.litPropertyMetadata??=new WeakMap;let x=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=b){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const s=Symbol(),o=this.getPropertyDescriptor(e,s,t);void 0!==o&&h(this.prototype,e,o)}}static getPropertyDescriptor(e,t,s){const{get:o,set:i}=l(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:o,set(t){const r=o?.call(this);i?.call(this,t),this.requestUpdate(e,r,s)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??b}static _$Ei(){if(this.hasOwnProperty(y("elementProperties")))return;const e=u(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(y("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(y("properties"))){const e=this.properties,t=[...d(e),...p(e)];for(const s of t)this.createProperty(s,e[s])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,s]of t)this.elementProperties.set(e,s)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const s=this._$Eu(e,t);void 0!==s&&this._$Eh.set(s,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const s=new Set(e.flat(1/0).reverse());for(const e of s)t.unshift(a(e))}else void 0!==e&&t.push(a(e));return t}static _$Eu(e,t){const s=t.attribute;return!1===s?void 0:"string"==typeof s?s:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const s of t.keys())this.hasOwnProperty(s)&&(e.set(s,this[s]),delete this[s]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((e,o)=>{if(s)e.adoptedStyleSheets=o.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const s of o){const o=document.createElement("style"),i=t.litNonce;void 0!==i&&o.setAttribute("nonce",i),o.textContent=s.cssText,e.appendChild(o)}})(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,s){this._$AK(e,s)}_$ET(e,t){const s=this.constructor.elementProperties.get(e),o=this.constructor._$Eu(e,s);if(void 0!==o&&!0===s.reflect){const i=(void 0!==s.converter?.toAttribute?s.converter:_).toAttribute(t,s.type);this._$Em=e,null==i?this.removeAttribute(o):this.setAttribute(o,i),this._$Em=null}}_$AK(e,t){const s=this.constructor,o=s._$Eh.get(e);if(void 0!==o&&this._$Em!==o){const e=s.getPropertyOptions(o),i="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:_;this._$Em=o;const r=i.fromAttribute(t,e.type);this[o]=r??this._$Ej?.get(o)??r,this._$Em=null}}requestUpdate(e,t,s){if(void 0!==e){const o=this.constructor,i=this[e];if(s??=o.getPropertyOptions(e),!((s.hasChanged??$)(i,t)||s.useDefault&&s.reflect&&i===this._$Ej?.get(e)&&!this.hasAttribute(o._$Eu(e,s))))return;this.C(e,t,s)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:s,reflect:o,wrapped:i},r){s&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,r??t??this[e]),!0!==i||void 0!==r)||(this._$AL.has(e)||(this.hasUpdated||s||(t=void 0),this._$AL.set(e,t)),!0===o&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,s]of e){const{wrapped:e}=s,o=this[t];!0!==e||this._$AL.has(t)||void 0===o||this.C(t,void 0,s,o)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};x.elementStyles=[],x.shadowRootOptions={mode:"open"},x[y("elementProperties")]=new Map,x[y("finalized")]=new Map,v?.({ReactiveElement:x}),(g.reactiveElementVersions??=[]).push("2.1.1");const w=globalThis,C=w.trustedTypes,A=C?C.createPolicy("lit-html",{createHTML:e=>e}):void 0,E="$lit$",k=`lit$${Math.random().toFixed(9).slice(2)}$`,S="?"+k,U=`<${S}>`,P=document,O=()=>P.createComment(""),I=e=>null===e||"object"!=typeof e&&"function"!=typeof e,H=Array.isArray,T="[ \t\n\f\r]",M=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,z=/-->/g,N=/>/g,R=RegExp(`>|${T}(?:([^\\s"'>=/]+)(${T}*=${T}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),j=/'/g,B=/"/g,D=/^(?:script|style|textarea|title)$/i,W=(e=>(t,...s)=>({_$litType$:e,strings:t,values:s}))(1),L=Symbol.for("lit-noChange"),q=Symbol.for("lit-nothing"),V=new WeakMap,F=P.createTreeWalker(P,129);function J(e,t){if(!H(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==A?A.createHTML(t):t}const K=(e,t)=>{const s=e.length-1,o=[];let i,r=2===t?"<svg>":3===t?"<math>":"",n=M;for(let t=0;t<s;t++){const s=e[t];let a,c,h=-1,l=0;for(;l<s.length&&(n.lastIndex=l,c=n.exec(s),null!==c);)l=n.lastIndex,n===M?"!--"===c[1]?n=z:void 0!==c[1]?n=N:void 0!==c[2]?(D.test(c[2])&&(i=RegExp("</"+c[2],"g")),n=R):void 0!==c[3]&&(n=R):n===R?">"===c[0]?(n=i??M,h=-1):void 0===c[1]?h=-2:(h=n.lastIndex-c[2].length,a=c[1],n=void 0===c[3]?R:'"'===c[3]?B:j):n===B||n===j?n=R:n===z||n===N?n=M:(n=R,i=void 0);const d=n===R&&e[t+1].startsWith("/>")?" ":"";r+=n===M?s+U:h>=0?(o.push(a),s.slice(0,h)+E+s.slice(h)+k+d):s+k+(-2===h?t:d)}return[J(e,r+(e[s]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),o]};class Y{constructor({strings:e,_$litType$:t},s){let o;this.parts=[];let i=0,r=0;const n=e.length-1,a=this.parts,[c,h]=K(e,t);if(this.el=Y.createElement(c,s),F.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(o=F.nextNode())&&a.length<n;){if(1===o.nodeType){if(o.hasAttributes())for(const e of o.getAttributeNames())if(e.endsWith(E)){const t=h[r++],s=o.getAttribute(e).split(k),n=/([.?@])?(.*)/.exec(t);a.push({type:1,index:i,name:n[2],strings:s,ctor:"."===n[1]?ee:"?"===n[1]?te:"@"===n[1]?se:X}),o.removeAttribute(e)}else e.startsWith(k)&&(a.push({type:6,index:i}),o.removeAttribute(e));if(D.test(o.tagName)){const e=o.textContent.split(k),t=e.length-1;if(t>0){o.textContent=C?C.emptyScript:"";for(let s=0;s<t;s++)o.append(e[s],O()),F.nextNode(),a.push({type:2,index:++i});o.append(e[t],O())}}}else if(8===o.nodeType)if(o.data===S)a.push({type:2,index:i});else{let e=-1;for(;-1!==(e=o.data.indexOf(k,e+1));)a.push({type:7,index:i}),e+=k.length-1}i++}}static createElement(e,t){const s=P.createElement("template");return s.innerHTML=e,s}}function Z(e,t,s=e,o){if(t===L)return t;let i=void 0!==o?s._$Co?.[o]:s._$Cl;const r=I(t)?void 0:t._$litDirective$;return i?.constructor!==r&&(i?._$AO?.(!1),void 0===r?i=void 0:(i=new r(e),i._$AT(e,s,o)),void 0!==o?(s._$Co??=[])[o]=i:s._$Cl=i),void 0!==i&&(t=Z(e,i._$AS(e,t.values),i,o)),t}class G{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:s}=this._$AD,o=(e?.creationScope??P).importNode(t,!0);F.currentNode=o;let i=F.nextNode(),r=0,n=0,a=s[0];for(;void 0!==a;){if(r===a.index){let t;2===a.type?t=new Q(i,i.nextSibling,this,e):1===a.type?t=new a.ctor(i,a.name,a.strings,this,e):6===a.type&&(t=new oe(i,this,e)),this._$AV.push(t),a=s[++n]}r!==a?.index&&(i=F.nextNode(),r++)}return F.currentNode=P,o}p(e){let t=0;for(const s of this._$AV)void 0!==s&&(void 0!==s.strings?(s._$AI(e,s,t),t+=s.strings.length-2):s._$AI(e[t])),t++}}class Q{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,s,o){this.type=2,this._$AH=q,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=s,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=Z(this,e,t),I(e)?e===q||null==e||""===e?(this._$AH!==q&&this._$AR(),this._$AH=q):e!==this._$AH&&e!==L&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>H(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==q&&I(this._$AH)?this._$AA.nextSibling.data=e:this.T(P.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:s}=e,o="number"==typeof s?this._$AC(e):(void 0===s.el&&(s.el=Y.createElement(J(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===o)this._$AH.p(t);else{const e=new G(o,this),s=e.u(this.options);e.p(t),this.T(s),this._$AH=e}}_$AC(e){let t=V.get(e.strings);return void 0===t&&V.set(e.strings,t=new Y(e)),t}k(e){H(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let s,o=0;for(const i of e)o===t.length?t.push(s=new Q(this.O(O()),this.O(O()),this,this.options)):s=t[o],s._$AI(i),o++;o<t.length&&(this._$AR(s&&s._$AB.nextSibling,o),t.length=o)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=e.nextSibling;e.remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class X{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,s,o,i){this.type=1,this._$AH=q,this._$AN=void 0,this.element=e,this.name=t,this._$AM=o,this.options=i,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=q}_$AI(e,t=this,s,o){const i=this.strings;let r=!1;if(void 0===i)e=Z(this,e,t,0),r=!I(e)||e!==this._$AH&&e!==L,r&&(this._$AH=e);else{const o=e;let n,a;for(e=i[0],n=0;n<i.length-1;n++)a=Z(this,o[s+n],t,n),a===L&&(a=this._$AH[n]),r||=!I(a)||a!==this._$AH[n],a===q?e=q:e!==q&&(e+=(a??"")+i[n+1]),this._$AH[n]=a}r&&!o&&this.j(e)}j(e){e===q?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class ee extends X{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===q?void 0:e}}class te extends X{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==q)}}class se extends X{constructor(e,t,s,o,i){super(e,t,s,o,i),this.type=5}_$AI(e,t=this){if((e=Z(this,e,t,0)??q)===L)return;const s=this._$AH,o=e===q&&s!==q||e.capture!==s.capture||e.once!==s.once||e.passive!==s.passive,i=e!==q&&(s===q||o);o&&this.element.removeEventListener(this.name,this,s),i&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class oe{constructor(e,t,s){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=s}get _$AU(){return this._$AM._$AU}_$AI(e){Z(this,e)}}const ie=w.litHtmlPolyfillSupport;ie?.(Y,Q),(w.litHtmlVersions??=[]).push("3.3.1");const re=globalThis;class ne extends x{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,s)=>{const o=s?.renderBefore??t;let i=o._$litPart$;if(void 0===i){const e=s?.renderBefore??null;o._$litPart$=i=new Q(t.insertBefore(O(),e),e,void 0,s??{})}return i._$AI(e),i})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return L}}ne._$litElement$=!0,ne.finalized=!0,re.litElementHydrateSupport?.({LitElement:ne});const ae=re.litElementPolyfillSupport;ae?.({LitElement:ne}),(re.litElementVersions??=[]).push("4.2.1");const ce=e=>(t,s)=>{void 0!==s?s.addInitializer(()=>{customElements.define(e,t)}):customElements.define(e,t)},he={attribute:!0,type:String,converter:_,reflect:!1,hasChanged:$},le=(e=he,t,s)=>{const{kind:o,metadata:i}=s;let r=globalThis.litPropertyMetadata.get(i);if(void 0===r&&globalThis.litPropertyMetadata.set(i,r=new Map),"setter"===o&&((e=Object.create(e)).wrapped=!0),r.set(s.name,e),"accessor"===o){const{name:o}=s;return{set(s){const i=t.get.call(this);t.set.call(this,s),this.requestUpdate(o,i,e)},init(t){return void 0!==t&&this.C(o,void 0,e,t),t}}}if("setter"===o){const{name:o}=s;return function(s){const i=this[o];t.call(this,s),this.requestUpdate(o,i,e)}}throw Error("Unsupported decorator location: "+o)};function de(e){return(t,s)=>"object"==typeof s?le(e,t,s):((e,t,s)=>{const o=t.hasOwnProperty(s);return t.constructor.createProperty(s,e),o?Object.getOwnPropertyDescriptor(t,s):void 0})(e,t,s)}function pe(e){return de({...e,state:!0,attribute:!1})}let ue=class extends ne{setConfig(e){if(!e)throw new Error("Invalid configuration");if(!e.entity)throw new Error('You must specify an "entity" (e.g., sensor.choreboard_my_chores_ash). Please configure the ChoreBoard integration first.');this.config={show_header:!0,show_points:!0,show_completed:!0,show_overdue_only:!1,...e}}getCardSize(){const e=this.getChores();return Math.max(2,Math.ceil(e.length/2)+1)}static getStubConfig(){return{type:"custom:choreboard-card",title:"My Chores",entity:"sensor.choreboard_my_chores_ash",show_header:!0,show_points:!0,show_completed:!0}}static getConfigElement(){return document.createElement("choreboard-card-editor")}getChores(){if(!this.hass||!this.config.entity)return[];const e=this.hass.states[this.config.entity];if(!e)return console.warn(`ChoreBoard entity not found: ${this.config.entity}`),[];return(e.attributes.chores||[]).filter(e=>!(!this.config.show_completed&&"completed"===e.status)&&!(this.config.show_overdue_only&&!e.is_overdue))}async completeChore(e){if(this.hass)if("completed"!==e.status)try{await this.hass.callService("choreboard","complete_chore",{instance_id:e.id}),this.showToast(`Marked "${e.name}" as complete`)}catch(e){console.error("Error marking chore as complete:",e),this.showToast("Failed to mark chore as complete",!0)}else this.showToast("This chore is already marked as completed")}showToast(e,t=!1){const s=new CustomEvent("hass-notification",{detail:{message:e,duration:t?5e3:3e3},bubbles:!0,composed:!0});this.dispatchEvent(s)}getChoreStateClass(e){return"completed"===e.status?"state-completed":e.is_overdue?"state-overdue":"state-pending"}getChoreStateIcon(e){return"completed"===e.status?"mdi:check-circle":e.is_overdue?"mdi:alert-circle":"mdi:circle-outline"}getUsername(){if(!this.hass||!this.config.entity)return"";const e=this.hass.states[this.config.entity];if(!e)return"";return e.attributes.username||""}getPointsName(){if(!this.hass||!this.config.entity)return"points";const e=this.hass.states[this.config.entity];if(!e)return"points";return e.attributes.points_label||"points"}isPoolChore(e){return"pool"===e.status||this.config.entity.endsWith("_chores")&&!this.config.entity.includes("_my_chores")}getUsers(){if(!this.hass)return[];for(const e of Object.keys(this.hass.states))if(e.startsWith("sensor.choreboard_")){const t=this.hass.states[e];if(t.attributes.users&&Array.isArray(t.attributes.users))return t.attributes.users}return[]}async claimChore(e){if(!this.hass)return;const t=this.getUsers();if(0===t.length)return void this.showToast("Unable to load users list",!0);await Promise.resolve().then(function(){return fe});const s=document.createElement("claim-chore-dialog");s.users=t,s.chore=e,s.addEventListener("dialog-confirmed",async t=>{const o=t.detail.userId;try{await this.hass.callService("choreboard","claim_chore",{chore_id:e.id,assign_to_user_id:o}),this.showToast("Chore claimed successfully")}catch(e){console.error("Error claiming chore:",e),this.showToast("Failed to claim chore",!0)}finally{s.remove()}}),s.addEventListener("dialog-closed",()=>{s.remove()}),document.body.appendChild(s)}async completePoolChore(e){if(!this.hass)return;const t=this.getUsers();if(0===t.length)return void this.showToast("Unable to load users list",!0);await Promise.resolve().then(function(){return ye});const s=document.createElement("complete-chore-dialog");s.users=t,s.chore=e,s.addEventListener("dialog-confirmed",async t=>{const o=t,i=o.detail.userId,r=o.detail.helperIds||[];try{await this.hass.callService("choreboard","mark_complete",{chore_id:e.id,completed_by_user_id:i,helpers:r}),this.showToast("Chore marked as complete")}catch(e){console.error("Error completing chore:",e),this.showToast("Failed to complete chore",!0)}finally{s.remove()}}),s.addEventListener("dialog-closed",()=>{s.remove()}),document.body.appendChild(s)}render(){if(!this.config||!this.hass)return W``;const e=this.getUsername(),t=this.config.title||`${e}'s Chores`||"Chores",s=this.getChores();return 0===s.length?W`
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol, Iterator */
+
+
+function __decorate(decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+/**
+ * @license
+ * Copyright 2019 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t$2=globalThis,e$2=t$2.ShadowRoot&&(void 0===t$2.ShadyCSS||t$2.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s$2=Symbol(),o$4=new WeakMap;let n$3 = class n{constructor(t,e,o){if(this._$cssResult$=true,o!==s$2)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e;}get styleSheet(){let t=this.o;const s=this.t;if(e$2&&void 0===t){const e=void 0!==s&&1===s.length;e&&(t=o$4.get(s)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),e&&o$4.set(s,t));}return t}toString(){return this.cssText}};const r$4=t=>new n$3("string"==typeof t?t:t+"",void 0,s$2),i$3=(t,...e)=>{const o=1===t.length?t[0]:e.reduce(((e,s,o)=>e+(t=>{if(true===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+t[o+1]),t[0]);return new n$3(o,t,s$2)},S$1=(s,o)=>{if(e$2)s.adoptedStyleSheets=o.map((t=>t instanceof CSSStyleSheet?t:t.styleSheet));else for(const e of o){const o=document.createElement("style"),n=t$2.litNonce;void 0!==n&&o.setAttribute("nonce",n),o.textContent=e.cssText,s.appendChild(o);}},c$2=e$2?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return r$4(e)})(t):t;
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const{is:i$2,defineProperty:e$1,getOwnPropertyDescriptor:h$1,getOwnPropertyNames:r$3,getOwnPropertySymbols:o$3,getPrototypeOf:n$2}=Object,a$1=globalThis,c$1=a$1.trustedTypes,l$1=c$1?c$1.emptyScript:"",p$1=a$1.reactiveElementPolyfillSupport,d$1=(t,s)=>t,u$1={toAttribute(t,s){switch(s){case Boolean:t=t?l$1:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,s){let i=t;switch(s){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t);}catch(t){i=null;}}return i}},f$1=(t,s)=>!i$2(t,s),b={attribute:true,type:String,converter:u$1,reflect:false,useDefault:false,hasChanged:f$1};Symbol.metadata??=Symbol("metadata"),a$1.litPropertyMetadata??=new WeakMap;let y$1 = class y extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t);}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,s=b){if(s.state&&(s.attribute=false),this._$Ei(),this.prototype.hasOwnProperty(t)&&((s=Object.create(s)).wrapped=true),this.elementProperties.set(t,s),!s.noAccessor){const i=Symbol(),h=this.getPropertyDescriptor(t,i,s);void 0!==h&&e$1(this.prototype,t,h);}}static getPropertyDescriptor(t,s,i){const{get:e,set:r}=h$1(this.prototype,t)??{get(){return this[s]},set(t){this[s]=t;}};return {get:e,set(s){const h=e?.call(this);r?.call(this,s),this.requestUpdate(t,h,i);},configurable:true,enumerable:true}}static getPropertyOptions(t){return this.elementProperties.get(t)??b}static _$Ei(){if(this.hasOwnProperty(d$1("elementProperties")))return;const t=n$2(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties);}static finalize(){if(this.hasOwnProperty(d$1("finalized")))return;if(this.finalized=true,this._$Ei(),this.hasOwnProperty(d$1("properties"))){const t=this.properties,s=[...r$3(t),...o$3(t)];for(const i of s)this.createProperty(i,t[i]);}const t=this[Symbol.metadata];if(null!==t){const s=litPropertyMetadata.get(t);if(void 0!==s)for(const[t,i]of s)this.elementProperties.set(t,i);}this._$Eh=new Map;for(const[t,s]of this.elementProperties){const i=this._$Eu(t,s);void 0!==i&&this._$Eh.set(i,t);}this.elementStyles=this.finalizeStyles(this.styles);}static finalizeStyles(s){const i=[];if(Array.isArray(s)){const e=new Set(s.flat(1/0).reverse());for(const s of e)i.unshift(c$2(s));}else void 0!==s&&i.push(c$2(s));return i}static _$Eu(t,s){const i=s.attribute;return  false===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=false,this.hasUpdated=false,this._$Em=null,this._$Ev();}_$Ev(){this._$ES=new Promise((t=>this.enableUpdating=t)),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach((t=>t(this)));}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.();}removeController(t){this._$EO?.delete(t);}_$E_(){const t=new Map,s=this.constructor.elementProperties;for(const i of s.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t);}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return S$1(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(true),this._$EO?.forEach((t=>t.hostConnected?.()));}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach((t=>t.hostDisconnected?.()));}attributeChangedCallback(t,s,i){this._$AK(t,i);}_$ET(t,s){const i=this.constructor.elementProperties.get(t),e=this.constructor._$Eu(t,i);if(void 0!==e&&true===i.reflect){const h=(void 0!==i.converter?.toAttribute?i.converter:u$1).toAttribute(s,i.type);this._$Em=t,null==h?this.removeAttribute(e):this.setAttribute(e,h),this._$Em=null;}}_$AK(t,s){const i=this.constructor,e=i._$Eh.get(t);if(void 0!==e&&this._$Em!==e){const t=i.getPropertyOptions(e),h="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:u$1;this._$Em=e;const r=h.fromAttribute(s,t.type);this[e]=r??this._$Ej?.get(e)??r,this._$Em=null;}}requestUpdate(t,s,i){if(void 0!==t){const e=this.constructor,h=this[t];if(i??=e.getPropertyOptions(t),!((i.hasChanged??f$1)(h,s)||i.useDefault&&i.reflect&&h===this._$Ej?.get(t)&&!this.hasAttribute(e._$Eu(t,i))))return;this.C(t,s,i);} false===this.isUpdatePending&&(this._$ES=this._$EP());}C(t,s,{useDefault:i,reflect:e,wrapped:h},r){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,r??s??this[t]),true!==h||void 0!==r)||(this._$AL.has(t)||(this.hasUpdated||i||(s=void 0),this._$AL.set(t,s)),true===e&&this._$Em!==t&&(this._$Eq??=new Set).add(t));}async _$EP(){this.isUpdatePending=true;try{await this._$ES;}catch(t){Promise.reject(t);}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,s]of this._$Ep)this[t]=s;this._$Ep=void 0;}const t=this.constructor.elementProperties;if(t.size>0)for(const[s,i]of t){const{wrapped:t}=i,e=this[s];true!==t||this._$AL.has(s)||void 0===e||this.C(s,void 0,i,e);}}let t=false;const s=this._$AL;try{t=this.shouldUpdate(s),t?(this.willUpdate(s),this._$EO?.forEach((t=>t.hostUpdate?.())),this.update(s)):this._$EM();}catch(s){throw t=false,this._$EM(),s}t&&this._$AE(s);}willUpdate(t){}_$AE(t){this._$EO?.forEach((t=>t.hostUpdated?.())),this.hasUpdated||(this.hasUpdated=true,this.firstUpdated(t)),this.updated(t);}_$EM(){this._$AL=new Map,this.isUpdatePending=false;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return  true}update(t){this._$Eq&&=this._$Eq.forEach((t=>this._$ET(t,this[t]))),this._$EM();}updated(t){}firstUpdated(t){}};y$1.elementStyles=[],y$1.shadowRootOptions={mode:"open"},y$1[d$1("elementProperties")]=new Map,y$1[d$1("finalized")]=new Map,p$1?.({ReactiveElement:y$1}),(a$1.reactiveElementVersions??=[]).push("2.1.1");
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t$1=globalThis,i$1=t$1.trustedTypes,s$1=i$1?i$1.createPolicy("lit-html",{createHTML:t=>t}):void 0,e="$lit$",h=`lit$${Math.random().toFixed(9).slice(2)}$`,o$2="?"+h,n$1=`<${o$2}>`,r$2=document,l=()=>r$2.createComment(""),c=t=>null===t||"object"!=typeof t&&"function"!=typeof t,a=Array.isArray,u=t=>a(t)||"function"==typeof t?.[Symbol.iterator],d="[ \t\n\f\r]",f=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,v=/-->/g,_=/>/g,m=RegExp(`>|${d}(?:([^\\s"'>=/]+)(${d}*=${d}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),p=/'/g,g=/"/g,$=/^(?:script|style|textarea|title)$/i,y=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),x=y(1),T=Symbol.for("lit-noChange"),E=Symbol.for("lit-nothing"),A=new WeakMap,C=r$2.createTreeWalker(r$2,129);function P(t,i){if(!a(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==s$1?s$1.createHTML(i):i}const V=(t,i)=>{const s=t.length-1,o=[];let r,l=2===i?"<svg>":3===i?"<math>":"",c=f;for(let i=0;i<s;i++){const s=t[i];let a,u,d=-1,y=0;for(;y<s.length&&(c.lastIndex=y,u=c.exec(s),null!==u);)y=c.lastIndex,c===f?"!--"===u[1]?c=v:void 0!==u[1]?c=_:void 0!==u[2]?($.test(u[2])&&(r=RegExp("</"+u[2],"g")),c=m):void 0!==u[3]&&(c=m):c===m?">"===u[0]?(c=r??f,d=-1):void 0===u[1]?d=-2:(d=c.lastIndex-u[2].length,a=u[1],c=void 0===u[3]?m:'"'===u[3]?g:p):c===g||c===p?c=m:c===v||c===_?c=f:(c=m,r=void 0);const x=c===m&&t[i+1].startsWith("/>")?" ":"";l+=c===f?s+n$1:d>=0?(o.push(a),s.slice(0,d)+e+s.slice(d)+h+x):s+h+(-2===d?i:x);}return [P(t,l+(t[s]||"<?>")+(2===i?"</svg>":3===i?"</math>":"")),o]};class N{constructor({strings:t,_$litType$:s},n){let r;this.parts=[];let c=0,a=0;const u=t.length-1,d=this.parts,[f,v]=V(t,s);if(this.el=N.createElement(f,n),C.currentNode=this.el.content,2===s||3===s){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes);}for(;null!==(r=C.nextNode())&&d.length<u;){if(1===r.nodeType){if(r.hasAttributes())for(const t of r.getAttributeNames())if(t.endsWith(e)){const i=v[a++],s=r.getAttribute(t).split(h),e=/([.?@])?(.*)/.exec(i);d.push({type:1,index:c,name:e[2],strings:s,ctor:"."===e[1]?H:"?"===e[1]?I:"@"===e[1]?L:k}),r.removeAttribute(t);}else t.startsWith(h)&&(d.push({type:6,index:c}),r.removeAttribute(t));if($.test(r.tagName)){const t=r.textContent.split(h),s=t.length-1;if(s>0){r.textContent=i$1?i$1.emptyScript:"";for(let i=0;i<s;i++)r.append(t[i],l()),C.nextNode(),d.push({type:2,index:++c});r.append(t[s],l());}}}else if(8===r.nodeType)if(r.data===o$2)d.push({type:2,index:c});else {let t=-1;for(;-1!==(t=r.data.indexOf(h,t+1));)d.push({type:7,index:c}),t+=h.length-1;}c++;}}static createElement(t,i){const s=r$2.createElement("template");return s.innerHTML=t,s}}function S(t,i,s=t,e){if(i===T)return i;let h=void 0!==e?s._$Co?.[e]:s._$Cl;const o=c(i)?void 0:i._$litDirective$;return h?.constructor!==o&&(h?._$AO?.(false),void 0===o?h=void 0:(h=new o(t),h._$AT(t,s,e)),void 0!==e?(s._$Co??=[])[e]=h:s._$Cl=h),void 0!==h&&(i=S(t,h._$AS(t,i.values),h,e)),i}class M{constructor(t,i){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:i},parts:s}=this._$AD,e=(t?.creationScope??r$2).importNode(i,true);C.currentNode=e;let h=C.nextNode(),o=0,n=0,l=s[0];for(;void 0!==l;){if(o===l.index){let i;2===l.type?i=new R(h,h.nextSibling,this,t):1===l.type?i=new l.ctor(h,l.name,l.strings,this,t):6===l.type&&(i=new z(h,this,t)),this._$AV.push(i),l=s[++n];}o!==l?.index&&(h=C.nextNode(),o++);}return C.currentNode=r$2,e}p(t){let i=0;for(const s of this._$AV) void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class R{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,i,s,e){this.type=2,this._$AH=E,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cv=e?.isConnected??true;}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===t?.nodeType&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=S(this,t,i),c(t)?t===E||null==t||""===t?(this._$AH!==E&&this._$AR(),this._$AH=E):t!==this._$AH&&t!==T&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):u(t)?this.k(t):this._(t);}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t));}_(t){this._$AH!==E&&c(this._$AH)?this._$AA.nextSibling.data=t:this.T(r$2.createTextNode(t)),this._$AH=t;}$(t){const{values:i,_$litType$:s}=t,e="number"==typeof s?this._$AC(t):(void 0===s.el&&(s.el=N.createElement(P(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===e)this._$AH.p(i);else {const t=new M(e,this),s=t.u(this.options);t.p(i),this.T(s),this._$AH=t;}}_$AC(t){let i=A.get(t.strings);return void 0===i&&A.set(t.strings,i=new N(t)),i}k(t){a(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const h of t)e===i.length?i.push(s=new R(this.O(l()),this.O(l()),this,this.options)):s=i[e],s._$AI(h),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,i){for(this._$AP?.(false,true,i);t!==this._$AB;){const i=t.nextSibling;t.remove(),t=i;}}setConnected(t){ void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t));}}class k{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,i,s,e,h){this.type=1,this._$AH=E,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=h,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=E;}_$AI(t,i=this,s,e){const h=this.strings;let o=false;if(void 0===h)t=S(this,t,i,0),o=!c(t)||t!==this._$AH&&t!==T,o&&(this._$AH=t);else {const e=t;let n,r;for(t=h[0],n=0;n<h.length-1;n++)r=S(this,e[s+n],i,n),r===T&&(r=this._$AH[n]),o||=!c(r)||r!==this._$AH[n],r===E?t=E:t!==E&&(t+=(r??"")+h[n+1]),this._$AH[n]=r;}o&&!e&&this.j(t);}j(t){t===E?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"");}}class H extends k{constructor(){super(...arguments),this.type=3;}j(t){this.element[this.name]=t===E?void 0:t;}}class I extends k{constructor(){super(...arguments),this.type=4;}j(t){this.element.toggleAttribute(this.name,!!t&&t!==E);}}class L extends k{constructor(t,i,s,e,h){super(t,i,s,e,h),this.type=5;}_$AI(t,i=this){if((t=S(this,t,i,0)??E)===T)return;const s=this._$AH,e=t===E&&s!==E||t.capture!==s.capture||t.once!==s.once||t.passive!==s.passive,h=t!==E&&(s===E||e);e&&this.element.removeEventListener(this.name,this,s),h&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t);}}class z{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){S(this,t);}}const j=t$1.litHtmlPolyfillSupport;j?.(N,R),(t$1.litHtmlVersions??=[]).push("3.3.1");const B=(t,i,s)=>{const e=s?.renderBefore??i;let h=e._$litPart$;if(void 0===h){const t=s?.renderBefore??null;e._$litPart$=h=new R(i.insertBefore(l(),t),t,void 0,s??{});}return h._$AI(t),h};
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const s=globalThis;class i extends y$1{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0;}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const r=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=B(r,this.renderRoot,this.renderOptions);}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(true);}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(false);}render(){return T}}i._$litElement$=true,i["finalized"]=true,s.litElementHydrateSupport?.({LitElement:i});const o$1=s.litElementPolyfillSupport;o$1?.({LitElement:i});(s.litElementVersions??=[]).push("4.2.1");
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e);})):customElements.define(t,e);};
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const o={attribute:true,type:String,converter:u$1,reflect:false,hasChanged:f$1},r$1=(t=o,e,r)=>{const{kind:n,metadata:i}=r;let s=globalThis.litPropertyMetadata.get(i);if(void 0===s&&globalThis.litPropertyMetadata.set(i,s=new Map),"setter"===n&&((t=Object.create(t)).wrapped=true),s.set(r.name,t),"accessor"===n){const{name:o}=r;return {set(r){const n=e.get.call(this);e.set.call(this,r),this.requestUpdate(o,n,t);},init(e){return void 0!==e&&this.C(o,void 0,t,e),e}}}if("setter"===n){const{name:o}=r;return function(r){const n=this[o];e.call(this,r),this.requestUpdate(o,n,t);}}throw Error("Unsupported decorator location: "+n)};function n(t){return (e,o)=>"object"==typeof o?r$1(t,e,o):((t,e,o)=>{const r=e.hasOwnProperty(o);return e.constructor.createProperty(o,t),r?Object.getOwnPropertyDescriptor(e,o):void 0})(t,e,o)}
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */function r(r){return n({...r,state:true,attribute:false})}
+
+const CARD_VERSION = "1.2.0";
+const CARD_NAME = "ChoreBoard Card";
+
+let ChoreboardCard = class ChoreboardCard extends i {
+    setConfig(config) {
+        if (!config) {
+            throw new Error("Invalid configuration");
+        }
+        if (!config.entity) {
+            throw new Error('You must specify an "entity" (e.g., sensor.choreboard_my_chores_ash). Please configure the ChoreBoard integration first.');
+        }
+        this.config = {
+            show_header: true,
+            show_points: true,
+            show_completed: true,
+            show_overdue_only: false,
+            show_undo: false,
+            show_user_points: false,
+            ...config,
+        };
+    }
+    getCardSize() {
+        const chores = this.getChores();
+        return Math.max(2, Math.ceil(chores.length / 2) + 1);
+    }
+    static getStubConfig() {
+        return {
+            type: "custom:choreboard-card",
+            title: "My Chores",
+            entity: "sensor.choreboard_my_chores_ash",
+            show_header: true,
+            show_points: true,
+            show_completed: true,
+        };
+    }
+    static getConfigElement() {
+        return document.createElement("choreboard-card-editor");
+    }
+    getChores() {
+        if (!this.hass || !this.config.entity) {
+            return [];
+        }
+        const stateObj = this.hass.states[this.config.entity];
+        if (!stateObj) {
+            console.warn(`ChoreBoard entity not found: ${this.config.entity}`);
+            return [];
+        }
+        const attributes = stateObj.attributes;
+        const chores = attributes.chores || [];
+        return chores.filter((chore) => {
+            if (!this.config.show_completed && chore.status === "completed") {
+                return false;
+            }
+            if (this.config.show_overdue_only && !chore.is_overdue) {
+                return false;
+            }
+            return true;
+        });
+    }
+    async completeChore(chore) {
+        if (!this.hass)
+            return;
+        if (chore.status === "completed") {
+            this.showToast("This chore is already marked as completed");
+            return;
+        }
+        try {
+            await this.hass.callService("choreboard", "complete_chore", {
+                instance_id: chore.id,
+            });
+            this.showToast(`Marked "${chore.name}" as complete`);
+        }
+        catch (error) {
+            console.error("Error marking chore as complete:", error);
+            this.showToast("Failed to mark chore as complete", true);
+        }
+    }
+    async undoCompletion(chore) {
+        if (!this.hass)
+            return;
+        if (chore.status !== "completed") {
+            this.showToast("This chore is not marked as completed");
+            return;
+        }
+        const confirmed = confirm(`Are you sure you want to undo completion of "${chore.name}"?`);
+        if (!confirmed) {
+            return;
+        }
+        try {
+            await this.hass.callService("choreboard", "undo_completion", {
+                chore_id: chore.id,
+            });
+            this.showToast(`Undid completion of "${chore.name}"`);
+        }
+        catch (error) {
+            console.error("Error undoing chore completion:", error);
+            this.showToast("Failed to undo completion", true);
+        }
+    }
+    showToast(message, isError = false) {
+        const event = new CustomEvent("hass-notification", {
+            detail: {
+                message,
+                duration: isError ? 5000 : 3000,
+            },
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
+    getChoreStateClass(chore) {
+        if (chore.status === "completed") {
+            return "state-completed";
+        }
+        if (chore.is_overdue) {
+            return "state-overdue";
+        }
+        return "state-pending";
+    }
+    getChoreStateIcon(chore) {
+        if (chore.status === "completed") {
+            return "mdi:check-circle";
+        }
+        if (chore.is_overdue) {
+            return "mdi:alert-circle";
+        }
+        return "mdi:circle-outline";
+    }
+    getUsername() {
+        if (!this.hass || !this.config.entity) {
+            return "";
+        }
+        const stateObj = this.hass.states[this.config.entity];
+        if (!stateObj) {
+            return "";
+        }
+        const attributes = stateObj.attributes;
+        return attributes.username || "";
+    }
+    getPointsName() {
+        if (!this.hass || !this.config.entity) {
+            return "points";
+        }
+        const stateObj = this.hass.states[this.config.entity];
+        if (!stateObj) {
+            return "points";
+        }
+        const attributes = stateObj.attributes;
+        return attributes.points_label || "points";
+    }
+    getUserPoints() {
+        if (!this.hass || !this.config.entity) {
+            return { weekly: null, allTime: null };
+        }
+        const username = this.getUsername();
+        if (!username) {
+            return { weekly: null, allTime: null };
+        }
+        const weeklyEntity = `sensor.${username}_weekly_points`;
+        const allTimeEntity = `sensor.${username}_all_time_points`;
+        const weeklyState = this.hass.states[weeklyEntity];
+        const allTimeState = this.hass.states[allTimeEntity];
+        return {
+            weekly: weeklyState ? parseFloat(weeklyState.state) : null,
+            allTime: allTimeState ? parseFloat(allTimeState.state) : null,
+        };
+    }
+    isPoolChore(chore) {
+        return (chore.status === "pool" ||
+            (this.config.entity.endsWith("_chores") &&
+                !this.config.entity.includes("_my_chores")));
+    }
+    getUsers() {
+        if (!this.hass) {
+            return [];
+        }
+        for (const entityId of Object.keys(this.hass.states)) {
+            if (entityId.startsWith("sensor.choreboard_")) {
+                const state = this.hass.states[entityId];
+                if (state.attributes.users && Array.isArray(state.attributes.users)) {
+                    return state.attributes.users;
+                }
+            }
+        }
+        return [];
+    }
+    async claimChore(chore) {
+        if (!this.hass)
+            return;
+        const users = this.getUsers();
+        if (users.length === 0) {
+            this.showToast("Unable to load users list", true);
+            return;
+        }
+        await Promise.resolve().then(function () { return claimDialog; });
+        const dialog = document.createElement("claim-chore-dialog");
+        dialog.users = users;
+        dialog.chore = chore;
+        dialog.addEventListener("dialog-confirmed", async (e) => {
+            const customEvent = e;
+            const userId = customEvent.detail.userId;
+            try {
+                await this.hass.callService("choreboard", "claim_chore", {
+                    chore_id: chore.id,
+                    assign_to_user_id: userId,
+                });
+                this.showToast(`Chore claimed successfully`);
+            }
+            catch (error) {
+                console.error("Error claiming chore:", error);
+                this.showToast("Failed to claim chore", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("dialog-closed", () => {
+            dialog.remove();
+        });
+        document.body.appendChild(dialog);
+    }
+    async completePoolChore(chore) {
+        if (!this.hass)
+            return;
+        const users = this.getUsers();
+        if (users.length === 0) {
+            this.showToast("Unable to load users list", true);
+            return;
+        }
+        await Promise.resolve().then(function () { return completeDialog; });
+        const dialog = document.createElement("complete-chore-dialog");
+        dialog.users = users;
+        dialog.chore = chore;
+        dialog.addEventListener("dialog-confirmed", async (e) => {
+            const customEvent = e;
+            const completedByUserId = customEvent.detail.userId;
+            const helperIds = customEvent.detail.helperIds || [];
+            try {
+                await this.hass.callService("choreboard", "mark_complete", {
+                    chore_id: chore.id,
+                    completed_by_user_id: completedByUserId,
+                    helpers: helperIds,
+                });
+                this.showToast(`Chore marked as complete`);
+            }
+            catch (error) {
+                console.error("Error completing chore:", error);
+                this.showToast("Failed to complete chore", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("dialog-closed", () => {
+            dialog.remove();
+        });
+        document.body.appendChild(dialog);
+    }
+    render() {
+        if (!this.config || !this.hass) {
+            return x ``;
+        }
+        const username = this.getUsername();
+        const title = this.config.title || `${username}'s Chores` || "Chores";
+        const chores = this.getChores();
+        if (chores.length === 0) {
+            return x `
         <ha-card>
-          ${this.config.show_header?W`
+          ${this.config.show_header
+                ? x `
                 <div class="card-header">
-                  <div class="name">${t}</div>
+                  <div class="name">${title}</div>
                 </div>
-              `:""}
+              `
+                : ""}
           <div class="card-content">
             <div class="warning">
               <ha-icon icon="mdi:alert"></ha-icon>
               <div>
                 <strong>No chores found</strong>
                 <p>
-                  ${e?`${e} has no chores matching the current filters.`:"Please ensure the ChoreBoard integration is installed and configured."}
+                  ${username
+                ? `${username} has no chores matching the current filters.`
+                : "Please ensure the ChoreBoard integration is installed and configured."}
                   Visit the
                   <a
                     href="https://github.com/PhunkMaster/ChoreBoard-HA-Integration"
@@ -25,53 +369,96 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
             </div>
           </div>
         </ha-card>
-      `:W`
+      `;
+        }
+        const userPoints = this.config.show_user_points
+            ? this.getUserPoints()
+            : { weekly: null, allTime: null };
+        return x `
       <ha-card>
-        ${this.config.show_header?W`
+        ${this.config.show_header
+            ? x `
               <div class="card-header">
-                <div class="name">${t}</div>
-                <div class="badge">${s.length} chores</div>
+                <div class="name">${title}</div>
+                <div class="header-badges">
+                  <div class="badge">${chores.length} chores</div>
+                  ${this.config.show_user_points && userPoints.weekly !== null
+                ? x `<div class="badge points-badge">
+                        ${userPoints.weekly} ${this.getPointsName()} this week
+                      </div>`
+                : ""}
+                  ${this.config.show_user_points && userPoints.allTime !== null
+                ? x `<div class="badge points-badge">
+                        ${userPoints.allTime} ${this.getPointsName()} total
+                      </div>`
+                : ""}
+                </div>
               </div>
-            `:""}
+            `
+            : ""}
         <div class="card-content">
           <div class="chore-list">
-            ${s.map(e=>W`
-                <div class="chore-item ${this.getChoreStateClass(e)}">
+            ${chores.map((chore) => x `
+                <div class="chore-item ${this.getChoreStateClass(chore)}">
                   <div class="chore-status">
-                    <ha-icon icon="${this.getChoreStateIcon(e)}"></ha-icon>
+                    <ha-icon icon="${this.getChoreStateIcon(chore)}"></ha-icon>
                   </div>
                   <div class="chore-details">
                     <div class="chore-header">
-                      <div class="chore-name">${e.name}</div>
-                      ${this.config.show_points&&e.points?W`<div class="chore-points">
-                            ${"string"==typeof e.points?parseFloat(e.points):e.points} ${this.getPointsName()}
-                          </div>`:""}
+                      <div class="chore-name">${chore.name}</div>
+                      ${this.config.show_points && chore.points
+            ? x `<div class="chore-points">
+                            ${typeof chore.points === "string" ? parseFloat(chore.points) : chore.points} ${this.getPointsName()}
+                          </div>`
+            : ""}
                     </div>
                     <div class="chore-meta">
-                      ${e.due_date?W`<span class="meta-item"
+                      ${chore.due_date
+            ? x `<span class="meta-item"
                             ><ha-icon icon="mdi:calendar"></ha-icon
-                            >${e.due_date}</span
-                          >`:""}
-                      ${e.is_overdue?W`<span class="meta-item overdue"
+                            >${chore.due_date}</span
+                          >`
+            : ""}
+                      ${chore.is_overdue
+            ? x `<span class="meta-item overdue"
                             ><ha-icon icon="mdi:clock-alert"></ha-icon
                             >Overdue</span
-                          >`:""}
+                          >`
+            : ""}
                     </div>
                   </div>
                   <div class="chore-action">
-                    ${"completed"===e.status?W`<div class="completed-badge">✓ Done</div>`:this.isPoolChore(e)?W`
+                    ${chore.status === "completed"
+            ? x `
+                          <div class="completed-actions">
+                            <div class="completed-badge">✓ Done</div>
+                            ${this.config.show_undo
+                ? x `
+                                  <mwc-button
+                                    class="undo-button"
+                                    @click=${() => this.undoCompletion(chore)}
+                                  >
+                                    Undo
+                                  </mwc-button>
+                                `
+                : ""}
+                          </div>
+                        `
+            : this.isPoolChore(chore)
+                ? x `
                             <div class="pool-actions">
-                              <mwc-button @click=${()=>this.claimChore(e)}>
+                              <mwc-button @click=${() => this.claimChore(chore)}>
                                 Claim
                               </mwc-button>
                               <mwc-button
-                                @click=${()=>this.completePoolChore(e)}
+                                @click=${() => this.completePoolChore(chore)}
                               >
                                 Complete
                               </mwc-button>
                             </div>
-                          `:W`
-                            <mwc-button @click=${()=>this.completeChore(e)}>
+                          `
+                : x `
+                            <mwc-button @click=${() => this.completeChore(chore)}>
                               Complete
                             </mwc-button>
                           `}
@@ -81,7 +468,10 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           </div>
         </div>
       </ha-card>
-    `}static get styles(){return n`
+    `;
+    }
+    static get styles() {
+        return i$3 `
       :host {
         display: block;
       }
@@ -102,6 +492,13 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
         font-weight: 500;
       }
 
+      .header-badges {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-end;
+      }
+
       .badge {
         background: var(--primary-color);
         color: var(--text-primary-color);
@@ -109,6 +506,10 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
         border-radius: 12px;
         font-size: 12px;
         font-weight: 600;
+      }
+
+      .points-badge {
+        background: var(--info-color, #2196f3);
       }
 
       .card-content {
@@ -275,8 +676,19 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
         gap: 8px;
       }
 
+      .completed-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-end;
+      }
+
       mwc-button {
         --mdc-theme-primary: var(--primary-color);
+      }
+
+      .undo-button {
+        --mdc-theme-primary: var(--warning-color, #ff9800);
       }
 
       .completed-badge {
@@ -287,9 +699,44 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
         font-size: 14px;
         font-weight: 600;
       }
-    `}};e([de({attribute:!1})],ue.prototype,"hass",void 0),e([pe()],ue.prototype,"config",void 0),ue=e([ce("choreboard-card")],ue),console.info("%c ChoreBoard Card %c 1.2.0 ","color: white; background: #039be5; font-weight: 700;","color: #039be5; background: white; font-weight: 700;");let ge=class extends ne{setConfig(e){this.config=e}getMyChoresSensors(){return this.hass?Object.keys(this.hass.states).filter(e=>e.startsWith("sensor.choreboard_my_chores_")||e.startsWith("sensor.choreboard_my_immediate_chores_")||e.startsWith("sensor.")&&e.endsWith("_my_chores")||e.startsWith("sensor.")&&e.endsWith("_my_immediate_chores")||e.startsWith("sensor.")&&e.endsWith("_chores")):[]}render(){if(!this.hass||!this.config)return W``;const e=this.getMyChoresSensors();return W`
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
+], ChoreboardCard.prototype, "hass", void 0);
+__decorate([
+    r()
+], ChoreboardCard.prototype, "config", void 0);
+ChoreboardCard = __decorate([
+    t("choreboard-card")
+], ChoreboardCard);
+console.info(`%c ${CARD_NAME} %c ${CARD_VERSION} `, "color: white; background: #039be5; font-weight: 700;", "color: #039be5; background: white; font-weight: 700;");
+
+let ChoreboardCardEditor = class ChoreboardCardEditor extends i {
+    setConfig(config) {
+        this.config = config;
+    }
+    getMyChoresSensors() {
+        if (!this.hass)
+            return [];
+        return Object.keys(this.hass.states).filter((entityId) => entityId.startsWith("sensor.choreboard_my_chores_") ||
+            entityId.startsWith("sensor.choreboard_my_immediate_chores_") ||
+            entityId === "sensor.choreboard_outstanding_chores" ||
+            entityId === "sensor.choreboard_late_chores" ||
+            (entityId.startsWith("sensor.") && entityId.endsWith("_my_chores")) ||
+            (entityId.startsWith("sensor.") && entityId.endsWith("_my_immediate_chores")) ||
+            (entityId.startsWith("sensor.") && entityId.endsWith("_chores")));
+    }
+    render() {
+        if (!this.hass || !this.config) {
+            return x ``;
+        }
+        const myChoresSensors = this.getMyChoresSensors();
+        return x `
       <div class="card-config">
-        ${0===e.length?W`
+        ${myChoresSensors.length === 0
+            ? x `
               <div class="warning">
                 <ha-icon icon="mdi:alert"></ha-icon>
                 <div>
@@ -306,14 +753,15 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
                   </p>
                 </div>
               </div>
-            `:""}
+            `
+            : ""}
 
         <div class="option">
           <label for="title">Title:</label>
           <input
             id="title"
             type="text"
-            .value=${this.config.title||""}
+            .value=${this.config.title || ""}
             @input=${this.titleChanged}
             placeholder="My Chores"
           />
@@ -323,16 +771,16 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           <label for="entity">ChoreBoard Sensor:</label>
           <select
             id="entity"
-            .value=${this.config.entity||""}
+            .value=${this.config.entity || ""}
             @change=${this.entityChanged}
           >
             <option value="">Select a sensor...</option>
-            ${e.map(e=>W`
+            ${myChoresSensors.map((entityId) => x `
                 <option
-                  value=${e}
-                  ?selected=${this.config.entity===e}
+                  value=${entityId}
+                  ?selected=${this.config.entity === entityId}
                 >
-                  ${this.getEntityDisplayName(e)}
+                  ${this.getEntityDisplayName(entityId)}
                 </option>
               `)}
           </select>
@@ -346,7 +794,7 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_header}
+              ?checked=${this.config.show_header !== false}
               @change=${this.showHeaderChanged}
             />
             Show Header
@@ -357,7 +805,7 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_points}
+              ?checked=${this.config.show_points !== false}
               @change=${this.showPointsChanged}
             />
             Show Points
@@ -368,7 +816,7 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_completed}
+              ?checked=${this.config.show_completed !== false}
               @change=${this.showCompletedChanged}
             />
             Show Completed Chores
@@ -379,10 +827,32 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!0===this.config.show_overdue_only}
+              ?checked=${this.config.show_overdue_only === true}
               @change=${this.showOverdueOnlyChanged}
             />
             Show Only Overdue Chores
+          </label>
+        </div>
+
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_undo === true}
+              @change=${this.showUndoChanged}
+            />
+            Show Undo Button for Completed Chores
+          </label>
+        </div>
+
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_user_points === true}
+              @change=${this.showUserPointsChanged}
+            />
+            Show User Points in Header
           </label>
         </div>
 
@@ -402,7 +872,94 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           </div>
         </div>
       </div>
-    `}getEntityDisplayName(e){const t=this.hass?.states[e];if(t?.attributes?.friendly_name)return t.attributes.friendly_name;const s=e.split(".");if(2===s.length&&s[1].startsWith("choreboard_")){const e=s[1].replace("choreboard_","").replace(/_/g," ");return e.charAt(0).toUpperCase()+e.slice(1)}return e}entityChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,entity:t.value},this.configChanged())}titleChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,title:t.value},this.configChanged())}showHeaderChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_header:t.checked},this.configChanged())}showPointsChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_points:t.checked},this.configChanged())}showCompletedChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_completed:t.checked},this.configChanged())}showOverdueOnlyChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_overdue_only:t.checked},this.configChanged())}configChanged(){const e=new CustomEvent("config-changed",{detail:{config:this.config},bubbles:!0,composed:!0});this.dispatchEvent(e)}static get styles(){return n`
+    `;
+    }
+    getEntityDisplayName(entityId) {
+        const stateObj = this.hass?.states[entityId];
+        if (stateObj?.attributes?.friendly_name) {
+            return stateObj.attributes.friendly_name;
+        }
+        const parts = entityId.split(".");
+        if (parts.length === 2 && parts[1].startsWith("choreboard_")) {
+            const name = parts[1].replace("choreboard_", "").replace(/_/g, " ");
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        return entityId;
+    }
+    entityChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, entity: target.value };
+        this.configChanged();
+    }
+    titleChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, title: target.value };
+        this.configChanged();
+    }
+    showHeaderChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_header: target.checked };
+        this.configChanged();
+    }
+    showPointsChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_points: target.checked };
+        this.configChanged();
+    }
+    showCompletedChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_completed: target.checked };
+        this.configChanged();
+    }
+    showOverdueOnlyChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_overdue_only: target.checked };
+        this.configChanged();
+    }
+    showUndoChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_undo: target.checked };
+        this.configChanged();
+    }
+    showUserPointsChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_user_points: target.checked };
+        this.configChanged();
+    }
+    configChanged() {
+        const event = new CustomEvent("config-changed", {
+            detail: { config: this.config },
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
+    static get styles() {
+        return i$3 `
       .card-config {
         display: flex;
         flex-direction: column;
@@ -518,7 +1075,39 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
         color: var(--text-primary-color, white);
         text-decoration: underline;
       }
-    `}};e([de({attribute:!1})],ge.prototype,"hass",void 0),e([pe()],ge.prototype,"config",void 0),ge=e([ce("choreboard-card-editor")],ge),window.customCards=window.customCards||[],window.customCards.push({type:"choreboard-card",name:"ChoreBoard Card",description:"A custom card for managing and tracking chores in Home Assistant",preview:!0,documentationURL:"https://github.com/yourusername/choreboard-ha-card"}),customElements.define("choreboard-card",ue),customElements.define("choreboard-card-editor",ge),console.info("ChoreBoard Card has been loaded");let me=class extends ne{constructor(){super(...arguments),this.users=[],this.selectedUserId=null}render(){return W`
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
+], ChoreboardCardEditor.prototype, "hass", void 0);
+__decorate([
+    r()
+], ChoreboardCardEditor.prototype, "config", void 0);
+ChoreboardCardEditor = __decorate([
+    t("choreboard-card-editor")
+], ChoreboardCardEditor);
+
+window.customCards = window.customCards || [];
+window.customCards.push({
+    type: "choreboard-card",
+    name: "ChoreBoard Card",
+    description: "A custom card for managing and tracking chores in Home Assistant",
+    preview: true,
+    documentationURL: "https://github.com/yourusername/choreboard-ha-card",
+});
+customElements.define("choreboard-card", ChoreboardCard);
+customElements.define("choreboard-card-editor", ChoreboardCardEditor);
+console.info("ChoreBoard Card has been loaded");
+
+let ClaimChoreDialog = class ClaimChoreDialog extends i {
+    constructor() {
+        super(...arguments);
+        this.users = [];
+        this.selectedUserId = null;
+    }
+    render() {
+        return x `
       <ha-dialog open @closed=${this._handleClosed}>
         <div slot="heading">Claim: ${this.chore.name}</div>
 
@@ -526,17 +1115,21 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           <div class="section">
             <h3>Who is claiming this chore?</h3>
             <div class="user-list">
-              ${this.users.map(e=>W`
+              ${this.users.map((user) => x `
                   <div
-                    class="user-option ${this.selectedUserId===e.id?"selected":""}"
-                    @click=${()=>this._selectUser(e.id)}
+                    class="user-option ${this.selectedUserId === user.id
+            ? "selected"
+            : ""}"
+                    @click=${() => this._selectUser(user.id)}
                   >
                     <ha-icon icon="mdi:account"></ha-icon>
-                    <span>${e.display_name}</span>
-                    ${this.selectedUserId===e.id?W`<ha-icon
+                    <span>${user.display_name}</span>
+                    ${this.selectedUserId === user.id
+            ? x `<ha-icon
                           icon="mdi:check"
                           class="check-icon"
-                        ></ha-icon>`:""}
+                        ></ha-icon>`
+            : ""}
                   </div>
                 `)}
             </div>
@@ -554,7 +1147,29 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           Claim
         </mwc-button>
       </ha-dialog>
-    `}_selectUser(e){this.selectedUserId=e}_handleClosed(){this._cancel()}_cancel(){this.dispatchEvent(new CustomEvent("dialog-closed"))}_confirm(){this.selectedUserId&&this.dispatchEvent(new CustomEvent("dialog-confirmed",{detail:{userId:this.selectedUserId}}))}static get styles(){return n`
+    `;
+    }
+    _selectUser(userId) {
+        this.selectedUserId = userId;
+    }
+    _handleClosed() {
+        this._cancel();
+    }
+    _cancel() {
+        this.dispatchEvent(new CustomEvent("dialog-closed"));
+    }
+    _confirm() {
+        if (!this.selectedUserId) {
+            return;
+        }
+        this.dispatchEvent(new CustomEvent("dialog-confirmed", {
+            detail: {
+                userId: this.selectedUserId,
+            },
+        }));
+    }
+    static get styles() {
+        return i$3 `
       .dialog-content {
         padding: 16px 24px;
       }
@@ -617,7 +1232,37 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
         font-size: 16px;
         font-weight: 500;
       }
-    `}};e([de({type:Array})],me.prototype,"users",void 0),e([de({type:Object})],me.prototype,"chore",void 0),e([pe()],me.prototype,"selectedUserId",void 0),me=e([ce("claim-chore-dialog")],me);var fe=Object.freeze({__proto__:null,get ClaimChoreDialog(){return me}});let ve=class extends ne{constructor(){super(...arguments),this.users=[],this.selectedUserId=null,this.selectedHelperIds=[]}render(){const e=this.users.filter(e=>e.id!==this.selectedUserId);return W`
+    `;
+    }
+};
+__decorate([
+    n({ type: Array })
+], ClaimChoreDialog.prototype, "users", void 0);
+__decorate([
+    n({ type: Object })
+], ClaimChoreDialog.prototype, "chore", void 0);
+__decorate([
+    r()
+], ClaimChoreDialog.prototype, "selectedUserId", void 0);
+ClaimChoreDialog = __decorate([
+    t("claim-chore-dialog")
+], ClaimChoreDialog);
+
+var claimDialog = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    get ClaimChoreDialog () { return ClaimChoreDialog; }
+});
+
+let CompleteChoreDialog = class CompleteChoreDialog extends i {
+    constructor() {
+        super(...arguments);
+        this.users = [];
+        this.selectedUserId = null;
+        this.selectedHelperIds = [];
+    }
+    render() {
+        const availableHelpers = this.users.filter((user) => user.id !== this.selectedUserId);
+        return x `
       <ha-dialog open @closed=${this._handleClosed}>
         <div slot="heading">Complete: ${this.chore.name}</div>
 
@@ -626,39 +1271,45 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           <div class="section">
             <h3>Who completed this chore? <span class="required">*</span></h3>
             <div class="user-list">
-              ${this.users.map(e=>W`
+              ${this.users.map((user) => x `
                   <div
-                    class="user-option ${this.selectedUserId===e.id?"selected":""}"
-                    @click=${()=>this._selectUser(e.id)}
+                    class="user-option ${this.selectedUserId === user.id
+            ? "selected"
+            : ""}"
+                    @click=${() => this._selectUser(user.id)}
                   >
                     <ha-icon icon="mdi:account"></ha-icon>
-                    <span>${e.display_name}</span>
-                    ${this.selectedUserId===e.id?W`<ha-icon
+                    <span>${user.display_name}</span>
+                    ${this.selectedUserId === user.id
+            ? x `<ha-icon
                           icon="mdi:check"
                           class="check-icon"
-                        ></ha-icon>`:""}
+                        ></ha-icon>`
+            : ""}
                   </div>
                 `)}
             </div>
           </div>
 
           <!-- Helpers section -->
-          ${this.selectedUserId&&e.length>0?W`
+          ${this.selectedUserId && availableHelpers.length > 0
+            ? x `
                 <div class="section">
                   <h3>Who helped? <span class="optional">(optional)</span></h3>
                   <div class="helper-list">
-                    ${e.map(e=>W`
+                    ${availableHelpers.map((user) => x `
                         <label class="helper-option">
                           <ha-checkbox
-                            .checked=${this.selectedHelperIds.includes(e.id)}
-                            @change=${t=>this._toggleHelper(e.id,t.target.checked)}
+                            .checked=${this.selectedHelperIds.includes(user.id)}
+                            @change=${(e) => this._toggleHelper(user.id, e.target.checked)}
                           ></ha-checkbox>
-                          <span>${e.display_name}</span>
+                          <span>${user.display_name}</span>
                         </label>
                       `)}
                   </div>
                 </div>
-              `:""}
+              `
+            : ""}
         </div>
 
         <mwc-button slot="secondaryAction" @click=${this._cancel}>
@@ -672,7 +1323,43 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
           Complete
         </mwc-button>
       </ha-dialog>
-    `}_selectUser(e){this.selectedUserId!==e&&(this.selectedHelperIds=this.selectedHelperIds.filter(t=>t!==e)),this.selectedUserId=e}_toggleHelper(e,t){t?this.selectedHelperIds.includes(e)||(this.selectedHelperIds=[...this.selectedHelperIds,e]):this.selectedHelperIds=this.selectedHelperIds.filter(t=>t!==e)}_handleClosed(){this._cancel()}_cancel(){this.dispatchEvent(new CustomEvent("dialog-closed"))}_confirm(){this.selectedUserId&&this.dispatchEvent(new CustomEvent("dialog-confirmed",{detail:{userId:this.selectedUserId,helperIds:this.selectedHelperIds}}))}static get styles(){return n`
+    `;
+    }
+    _selectUser(userId) {
+        if (this.selectedUserId !== userId) {
+            this.selectedHelperIds = this.selectedHelperIds.filter((id) => id !== userId);
+        }
+        this.selectedUserId = userId;
+    }
+    _toggleHelper(userId, checked) {
+        if (checked) {
+            if (!this.selectedHelperIds.includes(userId)) {
+                this.selectedHelperIds = [...this.selectedHelperIds, userId];
+            }
+        }
+        else {
+            this.selectedHelperIds = this.selectedHelperIds.filter((id) => id !== userId);
+        }
+    }
+    _handleClosed() {
+        this._cancel();
+    }
+    _cancel() {
+        this.dispatchEvent(new CustomEvent("dialog-closed"));
+    }
+    _confirm() {
+        if (!this.selectedUserId) {
+            return;
+        }
+        this.dispatchEvent(new CustomEvent("dialog-confirmed", {
+            detail: {
+                userId: this.selectedUserId,
+                helperIds: this.selectedHelperIds,
+            },
+        }));
+    }
+    static get styles() {
+        return i$3 `
       .dialog-content {
         padding: 16px 24px;
         max-height: 60vh;
@@ -779,5 +1466,27 @@ function e(e,t,s,o){var i,r=arguments.length,n=r<3?t:null===o?o=Object.getOwnPro
       ha-checkbox {
         --mdc-checkbox-size: 20px;
       }
-    `}};e([de({type:Array})],ve.prototype,"users",void 0),e([de({type:Object})],ve.prototype,"chore",void 0),e([pe()],ve.prototype,"selectedUserId",void 0),e([pe()],ve.prototype,"selectedHelperIds",void 0),ve=e([ce("complete-chore-dialog")],ve);var ye=Object.freeze({__proto__:null,get CompleteChoreDialog(){return ve}});
+    `;
+    }
+};
+__decorate([
+    n({ type: Array })
+], CompleteChoreDialog.prototype, "users", void 0);
+__decorate([
+    n({ type: Object })
+], CompleteChoreDialog.prototype, "chore", void 0);
+__decorate([
+    r()
+], CompleteChoreDialog.prototype, "selectedUserId", void 0);
+__decorate([
+    r()
+], CompleteChoreDialog.prototype, "selectedHelperIds", void 0);
+CompleteChoreDialog = __decorate([
+    t("complete-chore-dialog")
+], CompleteChoreDialog);
+
+var completeDialog = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    get CompleteChoreDialog () { return CompleteChoreDialog; }
+});
 //# sourceMappingURL=choreboard-ha-card.js.map

@@ -31,6 +31,8 @@ export class ChoreboardCard extends LitElement {
       show_points: true,
       show_completed: true,
       show_overdue_only: false,
+      show_undo: false,
+      show_user_points: false,
       ...config,
     };
   }
@@ -104,6 +106,33 @@ export class ChoreboardCard extends LitElement {
     }
   }
 
+  private async undoCompletion(chore: Chore): Promise<void> {
+    if (!this.hass) return;
+
+    if (chore.status !== "completed") {
+      this.showToast("This chore is not marked as completed");
+      return;
+    }
+
+    // Show confirmation dialog
+    const confirmed = confirm(
+      `Are you sure you want to undo completion of "${chore.name}"?`,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.hass.callService("choreboard", "undo_completion", {
+        chore_id: chore.id,
+      });
+      this.showToast(`Undid completion of "${chore.name}"`);
+    } catch (error) {
+      console.error("Error undoing chore completion:", error);
+      this.showToast("Failed to undo completion", true);
+    }
+  }
+
   private showToast(message: string, isError = false): void {
     const event = new CustomEvent("hass-notification", {
       detail: {
@@ -164,6 +193,32 @@ export class ChoreboardCard extends LitElement {
 
     const attributes = stateObj.attributes as MyChoresSensorAttributes;
     return attributes.points_label || "points";
+  }
+
+  private getUserPoints(): {
+    weekly: number | null;
+    allTime: number | null;
+  } {
+    if (!this.hass || !this.config.entity) {
+      return { weekly: null, allTime: null };
+    }
+
+    const username = this.getUsername();
+    if (!username) {
+      return { weekly: null, allTime: null };
+    }
+
+    // Try to find user points sensors
+    const weeklyEntity = `sensor.${username}_weekly_points`;
+    const allTimeEntity = `sensor.${username}_all_time_points`;
+
+    const weeklyState = this.hass.states[weeklyEntity];
+    const allTimeState = this.hass.states[allTimeEntity];
+
+    return {
+      weekly: weeklyState ? parseFloat(weeklyState.state) : null,
+      allTime: allTimeState ? parseFloat(allTimeState.state) : null,
+    };
   }
 
   private isPoolChore(chore: Chore): boolean {
@@ -330,13 +385,29 @@ export class ChoreboardCard extends LitElement {
       `;
     }
 
+    const userPoints = this.config.show_user_points
+      ? this.getUserPoints()
+      : { weekly: null, allTime: null };
+
     return html`
       <ha-card>
         ${this.config.show_header
           ? html`
               <div class="card-header">
                 <div class="name">${title}</div>
-                <div class="badge">${chores.length} chores</div>
+                <div class="header-badges">
+                  <div class="badge">${chores.length} chores</div>
+                  ${this.config.show_user_points && userPoints.weekly !== null
+                    ? html`<div class="badge points-badge">
+                        ${userPoints.weekly} ${this.getPointsName()} this week
+                      </div>`
+                    : ""}
+                  ${this.config.show_user_points && userPoints.allTime !== null
+                    ? html`<div class="badge points-badge">
+                        ${userPoints.allTime} ${this.getPointsName()} total
+                      </div>`
+                    : ""}
+                </div>
               </div>
             `
           : ""}
@@ -374,7 +445,21 @@ export class ChoreboardCard extends LitElement {
                   </div>
                   <div class="chore-action">
                     ${chore.status === "completed"
-                      ? html`<div class="completed-badge">✓ Done</div>`
+                      ? html`
+                          <div class="completed-actions">
+                            <div class="completed-badge">✓ Done</div>
+                            ${this.config.show_undo
+                              ? html`
+                                  <mwc-button
+                                    class="undo-button"
+                                    @click=${() => this.undoCompletion(chore)}
+                                  >
+                                    Undo
+                                  </mwc-button>
+                                `
+                              : ""}
+                          </div>
+                        `
                       : this.isPoolChore(chore)
                         ? html`
                             <div class="pool-actions">
@@ -425,6 +510,13 @@ export class ChoreboardCard extends LitElement {
         font-weight: 500;
       }
 
+      .header-badges {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-end;
+      }
+
       .badge {
         background: var(--primary-color);
         color: var(--text-primary-color);
@@ -432,6 +524,10 @@ export class ChoreboardCard extends LitElement {
         border-radius: 12px;
         font-size: 12px;
         font-weight: 600;
+      }
+
+      .points-badge {
+        background: var(--info-color, #2196f3);
       }
 
       .card-content {
@@ -598,8 +694,19 @@ export class ChoreboardCard extends LitElement {
         gap: 8px;
       }
 
+      .completed-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-end;
+      }
+
       mwc-button {
         --mdc-theme-primary: var(--primary-color);
+      }
+
+      .undo-button {
+        --mdc-theme-primary: var(--warning-color, #ff9800);
       }
 
       .completed-badge {

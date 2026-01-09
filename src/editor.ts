@@ -16,11 +16,14 @@ export class ChoreboardCardEditor extends LitElement {
     if (!this.hass) return [];
 
     // Get sensors that follow ChoreBoard patterns
-    // Supports: sensor.choreboard_my_chores_*, sensor.*_my_chores, sensor.*_chores
+    // Supports: sensor.choreboard_my_chores_*, sensor.*_my_chores, sensor.*_chores,
+    // sensor.choreboard_outstanding_chores, sensor.choreboard_late_chores
     return Object.keys(this.hass.states).filter(
       (entityId) =>
         entityId.startsWith("sensor.choreboard_my_chores_") ||
         entityId.startsWith("sensor.choreboard_my_immediate_chores_") ||
+        entityId === "sensor.choreboard_outstanding_chores" ||
+        entityId === "sensor.choreboard_late_chores" ||
         (entityId.startsWith("sensor.") && entityId.endsWith("_my_chores")) ||
         (entityId.startsWith("sensor.") && entityId.endsWith("_my_immediate_chores")) ||
         (entityId.startsWith("sensor.") && entityId.endsWith("_chores")),
@@ -137,6 +140,28 @@ export class ChoreboardCardEditor extends LitElement {
           </label>
         </div>
 
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_undo === true}
+              @change=${this.showUndoChanged}
+            />
+            Show Undo Button for Completed Chores
+          </label>
+        </div>
+
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_user_points === true}
+              @change=${this.showUserPointsChanged}
+            />
+            Show User Points in Header
+          </label>
+        </div>
+
         <div class="info">
           <ha-icon icon="mdi:information"></ha-icon>
           <div>
@@ -223,6 +248,24 @@ export class ChoreboardCardEditor extends LitElement {
       return;
     }
     this.config = { ...this.config, show_overdue_only: target.checked };
+    this.configChanged();
+  }
+
+  private showUndoChanged(ev: Event): void {
+    const target = ev.target as HTMLInputElement;
+    if (!this.config || !this.hass) {
+      return;
+    }
+    this.config = { ...this.config, show_undo: target.checked };
+    this.configChanged();
+  }
+
+  private showUserPointsChanged(ev: Event): void {
+    const target = ev.target as HTMLInputElement;
+    if (!this.config || !this.hass) {
+      return;
+    }
+    this.config = { ...this.config, show_user_points: target.checked };
     this.configChanged();
   }
 
