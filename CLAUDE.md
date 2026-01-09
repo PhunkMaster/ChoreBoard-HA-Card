@@ -119,63 +119,25 @@ await this.hass.callService('choreboard', 'mark_complete', {
    - Points distributed according to selections
 7. Integration syncs to API, sensors update
 
-## Build Commands
+## Development
 
-### Development
-
+**Setup and Commands:**
 ```bash
-# Install dependencies
-npm install
-
-# Development mode with hot reload (starts dev server on port 4000)
-npm run watch
-
-# Launch test Home Assistant Docker container
-npm run start:hass
-
-# Format code with Prettier
-npm run format
+npm install                 # Install dependencies
+npm run watch              # Dev server with hot reload (http://localhost:4000)
+npm run start:hass         # Launch test Home Assistant (http://localhost:8123)
+npm run format             # Format code with Prettier
+npm run build              # Standard build (development)
+npm run build:prod         # Production build (minified)
 ```
 
-### Production
-
-```bash
-# Build for production (includes minification)
-npm run build:prod
-
-# Standard build (development mode)
-npm run build
-```
-
-## Development Workflow
-
-1. **Initial Setup:**
-   ```bash
-   npm install
-   ```
-
-2. **Start Development Server:**
-   ```bash
-   npm run watch
-   ```
-   This starts Rollup in watch mode and serves the compiled card at http://localhost:4000/choreboard-ha-card.js
-
-3. **Launch Test Home Assistant Instance (optional):**
-   ```bash
-   npm run start:hass
-   ```
-   Launches a Docker container with Home Assistant at http://localhost:8123
-
-4. **Development Cycle:**
-   - Edit TypeScript files in `src/` directory
-   - Changes automatically compile and reload
-   - Refresh Home Assistant dashboard to see changes
-   - View test examples in the ChoreBoard Dev dashboard
-
-5. **Testing Changes:**
-   - Access Home Assistant at http://localhost:8123
-   - Navigate to ChoreBoard Dev dashboard (sidebar)
-   - Test card with different configurations in `.hass-dev/views/choreboard-card-preview.yaml`
+**Workflow:**
+1. Run `npm install` (first time only)
+2. Start dev server: `npm run watch`
+3. Optional: Start test HA instance: `npm run start:hass`
+4. Edit TypeScript in `src/` → changes auto-compile
+5. Refresh HA dashboard to see updates
+6. Test configurations in `.hass-dev/views/choreboard-card-preview.yaml`
 
 ## Project Architecture
 
@@ -243,61 +205,18 @@ src/
 - Dispatches `config-changed` events when configuration updates
 
 **claim-dialog.ts (v1.1.0+):**
-- Implements `ClaimChoreDialog` as a Lit `LitElement` with custom element name `claim-chore-dialog`
-- Purpose: Allows user selection when claiming pool chores
-- Input properties:
-  - `users: User[]` - Array of available ChoreBoard users
-  - `chore: Chore` - The chore being claimed
-- State management:
-  - `selectedUserId: number | null` - Tracks currently selected user
-- User Interface:
-  - Displays chore name in dialog heading
-  - Shows clickable list of users with account icons
-  - Highlights selected user with primary color and check icon
-  - Cancel button to close dialog
-  - Claim button (disabled until user selected)
-- Event dispatching:
-  - `dialog-confirmed` - Fired when Claim button clicked, includes `detail.userId`
-  - `dialog-closed` - Fired when Cancel button or dialog backdrop clicked
-- Styling:
-  - Uses Home Assistant theme variables for colors
-  - Selected user has primary color background
-  - Hover effects on user options
-  - Responsive layout with flexbox
-- Lifecycle: Created dynamically when needed, removed from DOM after action completes
+- User selection dialog for claiming pool chores
+- Shows clickable list of available users
+- Fires `dialog-confirmed` with `userId` on selection
+- Dynamically created/removed via `claimChore()` method
+- See "Dialog Pattern and Lifecycle" section below for implementation details
 
 **complete-dialog.ts (v1.1.0+):**
-- Implements `CompleteChoreDialog` as a Lit `LitElement` with custom element name `complete-chore-dialog`
-- Purpose: Allows user and helper selection when completing pool chores
-- Input properties:
-  - `users: User[]` - Array of available ChoreBoard users
-  - `chore: Chore` - The chore being completed
-- State management:
-  - `selectedUserId: number | null` - Who completed the chore (required)
-  - `selectedHelperIds: number[]` - Who helped with the chore (optional)
-- User Interface:
-  - Two-section layout:
-    1. **Who completed** (required): Single-select user list with radio-like behavior
-    2. **Who helped** (optional): Multi-select checkbox list, excludes selected completer
-  - Selected completer cannot appear in helpers list
-  - Complete button disabled until someone is selected
-  - Cancel button to close without action
-- Event dispatching:
-  - `dialog-confirmed` - Fired when Complete button clicked, includes:
-    - `detail.userId` - ID of user who completed
-    - `detail.helperIds` - Array of helper user IDs (may be empty)
-  - `dialog-closed` - Fired when dialog is cancelled
-- Logic:
-  - `_selectUser(userId)` - Sets completer, removes them from helpers if previously selected
-  - `_toggleHelper(userId, checked)` - Adds/removes user from helpers array
-  - Helper section only visible if completer selected and other users available
-- Styling:
-  - User options styled as clickable cards with borders
-  - Helper options styled as checkbox labels
-  - Required field indicator (*) in red
-  - Optional label in secondary text color
-  - Scrollable content area with max-height
-- Lifecycle: Created dynamically on demand, removed after confirmation or cancellation
+- User + helper selection dialog for completing pool chores
+- Two sections: "Who completed" (required, single-select) and "Who helped" (optional, multi-select)
+- Fires `dialog-confirmed` with `userId` and `helperIds` array
+- Dynamically created/removed via `completePoolChore()` method
+- See "Dialog Pattern and Lifecycle" section below for implementation details
 
 **common.ts:**
 - TypeScript interfaces:
@@ -552,34 +471,9 @@ export default {
 
 ### Service Parameter Differences
 
-**Assigned Chores - Simple Completion:**
-```typescript
-await this.hass.callService("choreboard", "complete_chore", {
-  instance_id: chore.id,  // Only parameter needed
-});
-```
-
-**Pool Chores - Claim:**
-```typescript
-await this.hass.callService("choreboard", "claim_chore", {
-  chore_id: chore.id,           // Pool chore ID
-  assign_to_user_id: userId,    // Who is claiming
-});
-```
-
-**Pool Chores - Complete:**
-```typescript
-await this.hass.callService("choreboard", "mark_complete", {
-  chore_id: chore.id,              // Pool chore ID
-  completed_by_user_id: userId,    // Who completed (required)
-  helpers: [id1, id2],             // Who helped (optional array)
-});
-```
-
-**Key Differences:**
-- Assigned: `instance_id` parameter, no user selection
-- Pool: `chore_id` parameter, requires user selection
-- Complete service allows helper assignment for point distribution
+See the "Service Calls" section under "ChoreBoard Integration" above for complete service parameter documentation. Key differences:
+- **Assigned chores**: Use `complete_chore` with `instance_id` parameter
+- **Pool chores**: Use `claim_chore` or `mark_complete` with `chore_id` and user selection parameters
 
 ### Testing Pool Chores
 
@@ -745,40 +639,33 @@ To publish this card to HACS (Home Assistant Community Store):
 
 ### Release Process
 
-**Automated Process (Recommended):**
-1. Create a semver branch with **EXACT** version format (no descriptive suffixes):
-   ```bash
-   git checkout -b feature/1.2.0   # ✅ Correct
-   git checkout -b bugfix/1.1.3    # ✅ Correct
-   git checkout -b hotfix/1.0.4    # ✅ Correct
+Releases are created automatically via GitHub Actions when code is merged to main:
 
-   # ❌ WRONG - Do not add descriptive text after version:
-   git checkout -b feature/1.2.0-points-name     # Will NOT trigger auto-release
-   git checkout -b feature/1.2.0-my-feature      # Will NOT trigger auto-release
+1. **Create a semver branch** with **EXACT** version format (no descriptive suffixes):
+   ```bash
+   git checkout -b feature/1.2.0   # ✅ Correct - triggers auto-release
+   git checkout -b bugfix/1.1.3    # ✅ Correct - triggers auto-release
+   git checkout -b hotfix/1.0.4    # ✅ Correct - triggers auto-release
+
+   # ❌ WRONG - Adding text after version prevents auto-release:
+   git checkout -b feature/1.2.0-points-name     # Will NOT trigger
+   git checkout -b feature/1.2.0-my-feature      # Will NOT trigger
    ```
 
-   **Important**: The branch name must match the pattern `(feature|bugfix|hotfix|release)/X.Y.Z` exactly. Adding descriptive text after the version number will prevent the auto-release workflow from triggering.
+   **Important**: Branch must match `(feature|bugfix|hotfix|release)/X.Y.Z` exactly.
 
-2. Make your changes and commit
-3. Push and create a pull request
-4. Merge PR to main (squash or regular merge both supported)
-5. Auto-release workflow automatically:
+2. **Make changes and create PR** - commit with appropriate message prefix (see CI/CD section)
+3. **Merge PR to main** - squash or regular merge both supported
+4. **Auto-release workflow runs** automatically:
    - Updates version in package.json, package-lock.json, and src/common.ts
-   - Builds production bundle with `npm run build:prod`
-   - Commits all version files + built artifacts to main
+   - Builds production bundle (`npm run build:prod`)
+   - Commits version files + built artifacts to main
    - Creates git tag (e.g., `v1.1.3`)
-   - Creates GitHub release with 4 assets:
+   - Creates GitHub release with assets:
      - dist/choreboard-ha-card.js
      - dist/choreboard-ha-card.js.map
      - package.json
      - package-lock.json
-
-**Manual Process (Deprecated):**
-1. Build production version: `npm run build:prod`
-2. Commit changes and create git tag (e.g., `v0.1.0`)
-3. Create GitHub release with tag
-4. Attach assets to release
-5. Submit to HACS default repository (optional, users can add as custom repository)
 
 ### HACS File Resolution
 
@@ -836,82 +723,13 @@ Validates HACS compatibility:
 
 ### Commit Message Convention
 
-To control version bumping in releases, use these commit message prefixes:
+To control automatic version bumping, use these commit message prefixes:
 
-- `major:` or `breaking:` - Breaking changes (1.0.0 → 2.0.0)
-  ```
-  major: remove deprecated configuration options
-  ```
+- `major:` or `breaking:` - Major version bump (1.0.0 → 2.0.0)
+- `feat:` or `feature:` or `minor:` - Minor version bump (1.0.0 → 1.1.0)
+- Any other prefix - Patch version bump (1.0.0 → 1.0.1)
 
-- `feat:` or `feature:` or `minor:` - New features (1.0.0 → 1.1.0)
-  ```
-  feat: add support for custom icons
-  ```
-
-- Any other prefix - Bug fixes and patches (1.0.0 → 1.0.1)
-  ```
-  fix: correct checkbox alignment issue
-  chore: update dependencies
-  docs: improve README examples
-  ```
-
-### Creating a Release
-
-Releases are created automatically when merging to main:
-
-1. **Create a feature branch:**
-   ```bash
-   git checkout -b feature/my-new-feature
-   ```
-
-2. **Make your changes and commit with appropriate prefix:**
-   ```bash
-   git commit -m "feat: add new chore filtering option"
-   ```
-
-3. **Push and create pull request:**
-   ```bash
-   git push origin feature/my-new-feature
-   ```
-
-4. **Merge to main:**
-   - Once PR is approved and CI passes, merge to main
-   - GitHub Actions automatically:
-     - Bumps version based on commit message
-     - Creates git tag
-     - Builds production version
-     - Creates GitHub release with artifacts
-
-5. **Release is published:**
-   - Available at: `https://github.com/yourusername/choreboard-ha-card/releases`
-   - HACS users can update to the new version
-   - dist/choreboard-ha-card.js is attached for manual installation
-
-### Manual Release (if needed)
-
-If you need to create a release manually:
-
-1. Update version in package.json:
-   ```bash
-   npm version patch  # or minor, or major
-   ```
-
-2. Update CARD_VERSION in src/common.ts to match
-
-3. Build production version:
-   ```bash
-   npm run build:prod
-   ```
-
-4. Create and push tag:
-   ```bash
-   git add package.json src/common.ts
-   git commit -m "chore: bump version to X.Y.Z"
-   git tag vX.Y.Z
-   git push && git push --tags
-   ```
-
-5. Create GitHub release manually with dist/choreboard-ha-card.js attached
+**Note**: See "HACS Publishing" section for detailed release process.
 
 ### Build Artifacts
 
@@ -938,42 +756,22 @@ After every successful build on CI:
 **Example: Adding a "show_assignee" option:**
 
 ```typescript
-// src/common.ts
-export interface ChoreboardCardConfig {
-  // ... existing fields
-  show_assignee?: boolean; // Show assignee name
-}
+// 1. Add to interface (src/common.ts)
+show_assignee?: boolean;
 
-// src/card.ts - setConfig
-this.config = {
-  show_assignee: true, // default value
-  ...config,
-};
+// 2. Set default (src/card.ts - setConfig)
+this.config = { show_assignee: true, ...config };
 
-// src/card.ts - render
-${chore.assignee && this.config.show_assignee
-  ? html`<span class="meta-item">
-      <ha-icon icon="mdi:account"></ha-icon>${chore.assignee}
-    </span>`
-  : ""}
+// 3. Use in render (src/card.ts)
+${this.config.show_assignee ? html`<span>${chore.assignee}</span>` : ""}
 
-// src/editor.ts - render
-<div class="option">
-  <label>
-    <input
-      type="checkbox"
-      ?checked=${this.config.show_assignee !== false}
-      @change=${this.showAssigneeChanged}
-    />
-    Show Assignee
-  </label>
-</div>
+// 4. Add editor toggle (src/editor.ts)
+<input type="checkbox" ?checked=${this.config.show_assignee !== false}
+  @change=${this.showAssigneeChanged} />
 
-// src/editor.ts - event handler
+// 5. Handle change event (src/editor.ts)
 private showAssigneeChanged(ev: Event): void {
-  const target = ev.target as HTMLInputElement;
-  if (!this.config || !this.hass) return;
-  this.config = { ...this.config, show_assignee: target.checked };
+  this.config = { ...this.config, show_assignee: (ev.target as HTMLInputElement).checked };
   this.configChanged();
 }
 ```
@@ -994,33 +792,17 @@ private showAssigneeChanged(ev: Event): void {
 
 ### Working with Chore Data
 
-**Reading chores from sensor:**
 ```typescript
-const stateObj = this.hass.states[this.config.entity];
-const attributes = stateObj.attributes as MyChoresSensorAttributes;
-const chores = attributes.chores || [];
-```
+// Read chores from sensor attributes
+const chores = this.hass.states[this.config.entity].attributes.chores || [];
 
-**Filtering chores:**
-```typescript
-return chores.filter((chore) => {
-  // Hide completed if configured
-  if (!this.config.show_completed && chore.status === "completed") {
-    return false;
-  }
-  // Only show overdue if configured
-  if (this.config.show_overdue_only && !chore.is_overdue) {
-    return false;
-  }
-  return true;
-});
-```
+// Filter by status/overdue
+const filtered = chores.filter(chore =>
+  (!this.config.show_completed && chore.status === "completed") ? false : true
+);
 
-**Calling integration service:**
-```typescript
-await this.hass.callService("choreboard", "complete_chore", {
-  instance_id: chore.id, // Use chore's instance ID, not entity_id
-});
+// Call service with instance_id (not entity_id)
+await this.hass.callService("choreboard", "complete_chore", { instance_id: chore.id });
 ```
 
 ### Debugging
@@ -1076,91 +858,9 @@ Manual testing workflow:
 6. Verify card behavior with different configurations
 7. Test in both light and dark themes
 
-## Architecture Changes (v1.0.2)
+## Architecture Principles
 
-### Breaking Changes from v1.0.0
-
-Version 1.0.2 introduced a complete redesign to match the ChoreBoard integration's actual architecture. The integration provides aggregate "My Chores" sensors, not individual chore entities as originally assumed.
-
-**Old Architecture (v1.0.0 - DEPRECATED):**
-- Card expected individual chore entities: `sensor.choreboard_wash_dishes`
-- Configuration used `entities` array or `filter_assignee` string
-- Called `choreboard.mark_complete` service with `entity_id`
-- Each chore was a separate Home Assistant entity
-
-**New Architecture (v1.0.2+):**
-- Card uses aggregate My Chores sensors: `sensor.choreboard_my_chores_ash`
-- Configuration uses single `entity` field
-- Calls `choreboard.complete_chore` service with `instance_id`
-- All user's chores are in sensor's `attributes.chores` array
-
-### Migration Guide for Developers
-
-If you're updating code from v1.0.0:
-
-1. **Configuration Changes:**
-   ```typescript
-   // OLD
-   interface ChoreboardCardConfig {
-     entities?: string[];
-     filter_assignee?: string;
-   }
-
-   // NEW
-   interface ChoreboardCardConfig {
-     entity: string; // Single sensor entity
-   }
-   ```
-
-2. **Data Access:**
-   ```typescript
-   // OLD - Reading individual entities
-   const entities = this.config.entities.map(id => this.hass.states[id]);
-
-   // NEW - Reading from sensor attributes
-   const sensor = this.hass.states[this.config.entity];
-   const chores = sensor.attributes.chores || [];
-   ```
-
-3. **Service Calls:**
-   ```typescript
-   // OLD
-   await this.hass.callService('choreboard', 'mark_complete', {
-     entity_id: 'sensor.choreboard_wash_dishes'
-   });
-
-   // NEW
-   await this.hass.callService('choreboard', 'complete_chore', {
-     instance_id: chore.id  // Chore's instance ID from attributes
-   });
-   ```
-
-4. **Chore Data Structure:**
-   ```typescript
-   // OLD - From entity attributes
-   interface ChoreboardEntity {
-     entity_id: string;
-     state: string;
-     attributes: {
-       assignee: string;
-       due_date: string;
-       points: number;
-       description: string;
-     };
-   }
-
-   // NEW - From sensor's chores array
-   interface Chore {
-     id: number;              // Instance ID for API calls
-     name: string;
-     due_date: string;
-     points: string | number; // Integration returns string, card handles both
-     is_overdue: boolean;
-     status: string;          // "assigned", "pending", "completed", etc.
-   }
-   ```
-
-### Key Architecture Principles
+The card follows these architectural principles:
 
 1. **Single Source of Truth**: Each user has one My Chores sensor containing all their chores
 2. **Attribute-Based Data**: Chores are stored in sensor's `attributes.chores` array, not as separate entities
@@ -1169,72 +869,7 @@ If you're updating code from v1.0.0:
 5. **Auto-Discovery**: Editor auto-discovers My Chores sensors by flexible pattern matching
 6. **Type Flexibility**: Card handles both string and number point values from integration
 
-## Architecture Updates (v1.0.3)
-
-### Sensor Pattern Flexibility
-
-Version 1.0.3 added support for multiple sensor naming patterns to accommodate different integration configurations:
-
-**Original Expected Pattern (v1.0.2):**
-- `sensor.choreboard_my_chores_{username}`
-- `sensor.choreboard_my_immediate_chores_{username}`
-
-**Actual Integration Pattern (v1.0.3+):**
-- `sensor.{username}_my_chores` (e.g., `sensor.ash_my_chores`)
-- `sensor.{username}_my_immediate_chores`
-
-The editor now detects all patterns automatically using flexible filtering logic in `getMyChoresSensors()`:
-
-```typescript
-return Object.keys(this.hass.states).filter(
-  (entityId) =>
-    entityId.startsWith("sensor.choreboard_my_chores_") ||
-    entityId.startsWith("sensor.choreboard_my_immediate_chores_") ||
-    (entityId.startsWith("sensor.") && entityId.endsWith("_my_chores")) ||
-    (entityId.startsWith("sensor.") && entityId.endsWith("_my_immediate_chores")),
-);
-```
-
-### Data Type Compatibility
-
-**Points Field:**
-The integration returns `points` as a **string** (e.g., "2.50", "10.00", "50.00"), not a number. The card now handles both types:
-
-```typescript
-// Interface allows both types
-interface Chore {
-  points: string | number;
-  // ... other fields
-}
-
-// Display logic parses strings to numbers
-${typeof chore.points === "string" ? parseFloat(chore.points) : chore.points} pts
-```
-
-**Status Field:**
-The integration uses "assigned" for active chores, not "pending". The card treats all non-"completed" statuses as active/completable:
-
-```typescript
-// Only "completed" gets special treatment
-if (chore.status === "completed") {
-  // Show as completed
-} else {
-  // Show as active (includes "assigned", "pending", or any other status)
-}
-```
-
-### Visual Editor Support
-
-Added `getConfigElement()` static method to enable Home Assistant's visual configuration editor:
-
-```typescript
-// src/card.ts
-public static getConfigElement(): HTMLElement {
-  return document.createElement("choreboard-card-editor");
-}
-```
-
-This allows users to configure the card through the Home Assistant UI without writing YAML.
+**Note**: For migration from v1.0.0 or earlier versions, see [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for detailed migration steps and breaking changes.
 
 ## Additional Resources
 

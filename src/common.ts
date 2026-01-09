@@ -12,6 +12,8 @@ export interface ChoreboardCardConfig {
   show_points?: boolean;
   show_completed?: boolean; // Show completed chores (default: true)
   show_overdue_only?: boolean; // Show only overdue chores (default: false)
+  show_undo?: boolean; // Show undo button for completed chores (default: false)
+  show_user_points?: boolean; // Show user's points in header (default: false)
 }
 
 // Chore object from the sensor's attributes.chores list
