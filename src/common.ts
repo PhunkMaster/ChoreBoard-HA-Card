@@ -1,6 +1,6 @@
 import { HomeAssistant } from "custom-card-helpers";
 
-export const CARD_VERSION = "1.3.0";
+export const CARD_VERSION = "1.4.0";
 export const CARD_NAME = "ChoreBoard Card";
 export const ELEMENT_NAME = "choreboard-card";
 
@@ -14,6 +14,10 @@ export interface ChoreboardCardConfig {
   show_overdue_only?: boolean; // Show only overdue chores (default: false)
   show_undo?: boolean; // Show undo button for completed chores (default: false)
   show_user_points?: boolean; // Show user's points in header (default: false)
+  show_arcade?: boolean; // Show arcade controls (default: true)
+  show_arcade_leaderboards?: boolean; // Show expandable leaderboards (default: true)
+  show_judge_controls?: boolean; // Show judge approval controls (default: true)
+  arcade_poll_interval?: number; // Timer update interval in seconds (default: 30)
 }
 
 // Chore object from the sensor's attributes.chores list
@@ -53,4 +57,31 @@ export interface User {
 
 export interface HomeAssistantExtended extends HomeAssistant {
   [key: string]: any;
+}
+
+// Arcade mode interfaces
+export interface ArcadeSession {
+  id: number; // Session ID for service calls
+  chore_id: number; // Instance ID of chore
+  chore_name: string;
+  user_id: number;
+  user_name: string;
+  start_time: string; // ISO timestamp
+  elapsed_seconds: number; // Current elapsed time
+  status: "active" | "stopped" | "judging" | "approved" | "denied";
+}
+
+export interface HighScore {
+  user_id: number;
+  user_name: string;
+  display_name: string;
+  time_seconds: number;
+  completed_at: string; // ISO timestamp
+  rank: number;
+}
+
+export interface ChoreLeaderboard {
+  chore_id: number;
+  chore_name: string;
+  high_scores: HighScore[];
 }
