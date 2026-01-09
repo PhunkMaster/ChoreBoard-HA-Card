@@ -105,23 +105,18 @@ export class ChoreboardCard extends LitElement {
     // This will fetch arcade session status from integration
     // For now, we'll implement a basic version that reads from sensor attributes
     // Later this can be enhanced to call the integration API directly
-    if (!this.hass) {
+    if (!this.hass || !this.config.entity) {
       return;
     }
 
-    // Try to get arcade session from any ChoreBoard sensor attributes
-    for (const entityId of Object.keys(this.hass.states)) {
-      if (entityId.startsWith("sensor.choreboard_")) {
-        const state = this.hass.states[entityId];
-        if (state.attributes.arcade_session) {
-          this.arcadeSession = state.attributes.arcade_session as ArcadeSession;
-          return;
-        }
-      }
+    // Get arcade session from the configured sensor's attributes
+    const state = this.hass.states[this.config.entity];
+    if (state && state.attributes.arcade_session) {
+      this.arcadeSession = state.attributes.arcade_session as ArcadeSession;
+    } else {
+      // No active session found
+      this.arcadeSession = null;
     }
-
-    // No active session found
-    this.arcadeSession = null;
   }
 
   private getChores(): Chore[] {
