@@ -299,16 +299,26 @@ let ChoreboardCard = class ChoreboardCard extends i {
     }
     getUsers() {
         if (!this.hass) {
+            console.log("getUsers - no hass");
             return [];
+        }
+        if (this.config.entity) {
+            const currentState = this.hass.states[this.config.entity];
+            if (currentState?.attributes?.users && Array.isArray(currentState.attributes.users)) {
+                console.log("getUsers - found users on current entity:", this.config.entity);
+                return currentState.attributes.users;
+            }
         }
         for (const entityId of Object.keys(this.hass.states)) {
             if (entityId.startsWith("sensor.choreboard_")) {
                 const state = this.hass.states[entityId];
                 if (state.attributes.users && Array.isArray(state.attributes.users)) {
+                    console.log("getUsers - found users on entity:", entityId);
                     return state.attributes.users;
                 }
             }
         }
+        console.log("getUsers - no users found in any sensor");
         return [];
     }
     async claimChore(chore) {
@@ -594,10 +604,16 @@ let ChoreboardCard = class ChoreboardCard extends i {
     }
     getCurrentUserId() {
         const username = this.getUsername();
-        if (!username)
+        console.log("getCurrentUserId - username:", username);
+        if (!username) {
+            console.log("getCurrentUserId - no username found");
             return null;
+        }
         const users = this.getUsers();
+        console.log("getCurrentUserId - users:", users);
+        console.log("getCurrentUserId - users count:", users.length);
         const user = users.find((u) => u.username === username);
+        console.log("getCurrentUserId - matched user:", user);
         return user ? user.id : null;
     }
     renderLeaderboard(chore) {

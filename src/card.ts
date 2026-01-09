@@ -309,7 +309,17 @@ export class ChoreboardCard extends LitElement {
 
   private getUsers(): User[] {
     if (!this.hass) {
+      console.log("getUsers - no hass");
       return [];
+    }
+
+    // First try to get users from the current entity
+    if (this.config.entity) {
+      const currentState = this.hass.states[this.config.entity];
+      if (currentState?.attributes?.users && Array.isArray(currentState.attributes.users)) {
+        console.log("getUsers - found users on current entity:", this.config.entity);
+        return currentState.attributes.users as User[];
+      }
     }
 
     // Try to get users from any ChoreBoard entity attributes
@@ -318,11 +328,13 @@ export class ChoreboardCard extends LitElement {
       if (entityId.startsWith("sensor.choreboard_")) {
         const state = this.hass.states[entityId];
         if (state.attributes.users && Array.isArray(state.attributes.users)) {
+          console.log("getUsers - found users on entity:", entityId);
           return state.attributes.users as User[];
         }
       }
     }
 
+    console.log("getUsers - no users found in any sensor");
     return [];
   }
 
@@ -680,10 +692,20 @@ export class ChoreboardCard extends LitElement {
 
   private getCurrentUserId(): number | null {
     const username = this.getUsername();
-    if (!username) return null;
+    console.log("getCurrentUserId - username:", username);
+
+    if (!username) {
+      console.log("getCurrentUserId - no username found");
+      return null;
+    }
 
     const users = this.getUsers();
+    console.log("getCurrentUserId - users:", users);
+    console.log("getCurrentUserId - users count:", users.length);
+
     const user = users.find((u) => u.username === username);
+    console.log("getCurrentUserId - matched user:", user);
+
     return user ? user.id : null;
   }
 
