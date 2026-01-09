@@ -1,7 +1,6 @@
+// Import card and editor modules - the @customElement decorators handle registration
 import "./card";
 import "./editor";
-import { ChoreboardCard } from "./card";
-import { ChoreboardCardEditor } from "./editor";
 
 // Register the card with Home Assistant
 declare global {
@@ -20,8 +19,7 @@ window.customCards.push({
   documentationURL: "https://github.com/yourusername/choreboard-ha-card",
 });
 
-// Make sure the custom elements are defined
-customElements.define("choreboard-card", ChoreboardCard);
-customElements.define("choreboard-card-editor", ChoreboardCardEditor);
+// Custom elements are already defined by @customElement decorators in card.ts and editor.ts
+// Importing those files above triggers the registration
 
 console.info("ChoreBoard Card has been loaded");

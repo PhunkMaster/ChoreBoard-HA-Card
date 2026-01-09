@@ -1844,8 +1844,6 @@ window.customCards.push({
     preview: true,
     documentationURL: "https://github.com/yourusername/choreboard-ha-card",
 });
-customElements.define("choreboard-card", ChoreboardCard);
-customElements.define("choreboard-card-editor", ChoreboardCardEditor);
 console.info("ChoreBoard Card has been loaded");
 
 let ClaimChoreDialog = class ClaimChoreDialog extends i {
