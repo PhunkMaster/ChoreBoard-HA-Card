@@ -439,17 +439,28 @@ export class ChoreboardCard extends LitElement {
         return;
       }
 
+      // Get current user ID to send with request
+      const userId = this.getCurrentUserId();
+
       console.log("Starting arcade mode for chore:", {
         chore_id: instanceId,
         chore_name: chore.name,
         chore_status: chore.status,
         original_id: chore.id,
         id_type: typeof chore.id,
+        user_id: userId,
       });
 
-      await this.hass.callService("choreboard", "start_arcade", {
+      const serviceData: any = {
         instance_id: instanceId,
-      });
+      };
+
+      // Include user_id if available to ensure backend matches the correct user
+      if (userId !== null) {
+        serviceData.user_id = userId;
+      }
+
+      await this.hass.callService("choreboard", "start_arcade", serviceData);
       this.showToast(`Started arcade mode for "${chore.name}"`);
       // Fetch status immediately after starting
       await this.fetchArcadeStatus();

@@ -397,16 +397,22 @@ let ChoreboardCard = class ChoreboardCard extends i {
                 console.error("Invalid chore ID:", chore.id);
                 return;
             }
+            const userId = this.getCurrentUserId();
             console.log("Starting arcade mode for chore:", {
                 chore_id: instanceId,
                 chore_name: chore.name,
                 chore_status: chore.status,
                 original_id: chore.id,
                 id_type: typeof chore.id,
+                user_id: userId,
             });
-            await this.hass.callService("choreboard", "start_arcade", {
+            const serviceData = {
                 instance_id: instanceId,
-            });
+            };
+            if (userId !== null) {
+                serviceData.user_id = userId;
+            }
+            await this.hass.callService("choreboard", "start_arcade", serviceData);
             this.showToast(`Started arcade mode for "${chore.name}"`);
             await this.fetchArcadeStatus();
         }
