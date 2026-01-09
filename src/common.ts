@@ -1,6 +1,6 @@
 import { HomeAssistant } from "custom-card-helpers";
 
-export const CARD_VERSION = "1.4.0";
+export const CARD_VERSION = "1.4.1";
 export const CARD_NAME = "ChoreBoard Card";
 export const ELEMENT_NAME = "choreboard-card";
 

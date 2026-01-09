@@ -1,6 +1,6 @@
 {
   "name": "choreboard-ha-card",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A Home Assistant custom card for managing and tracking chores with arcade mode",
   "main": "dist/choreboard-card.js",
   "scripts": {
