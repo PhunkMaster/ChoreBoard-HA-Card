@@ -72,10 +72,16 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
  * SPDX-License-Identifier: BSD-3-Clause
  */function r(r){return n({...r,state:true,attribute:false})}
 
-const CARD_VERSION = "1.2.0";
+const CARD_VERSION = "1.4.0";
 const CARD_NAME = "ChoreBoard Card";
 
 let ChoreboardCard = class ChoreboardCard extends i {
+    constructor() {
+        super(...arguments);
+        this.arcadeSession = null;
+        this.expandedLeaderboards = new Set();
+        this.arcadeTimerInterval = null;
+    }
     setConfig(config) {
         if (!config) {
             throw new Error("Invalid configuration");
@@ -90,6 +96,10 @@ let ChoreboardCard = class ChoreboardCard extends i {
             show_overdue_only: false,
             show_undo: false,
             show_user_points: false,
+            show_arcade: true,
+            show_arcade_leaderboards: true,
+            show_judge_controls: true,
+            arcade_poll_interval: 30,
             ...config,
         };
     }
@@ -109,6 +119,43 @@ let ChoreboardCard = class ChoreboardCard extends i {
     }
     static getConfigElement() {
         return document.createElement("choreboard-card-editor");
+    }
+    connectedCallback() {
+        super.connectedCallback();
+        this.startArcadePolling();
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.stopArcadePolling();
+    }
+    startArcadePolling() {
+        if (!this.config?.show_arcade) {
+            return;
+        }
+        this.stopArcadePolling();
+        this.arcadeTimerInterval = window.setInterval(() => this.fetchArcadeStatus(), (this.config.arcade_poll_interval || 30) * 1000);
+        this.fetchArcadeStatus();
+    }
+    stopArcadePolling() {
+        if (this.arcadeTimerInterval !== null) {
+            clearInterval(this.arcadeTimerInterval);
+            this.arcadeTimerInterval = null;
+        }
+    }
+    async fetchArcadeStatus() {
+        if (!this.hass) {
+            return;
+        }
+        for (const entityId of Object.keys(this.hass.states)) {
+            if (entityId.startsWith("sensor.choreboard_")) {
+                const state = this.hass.states[entityId];
+                if (state.attributes.arcade_session) {
+                    this.arcadeSession = state.attributes.arcade_session;
+                    return;
+                }
+            }
+        }
+        this.arcadeSession = null;
     }
     getChores() {
         if (!this.hass || !this.config.entity) {
@@ -330,6 +377,349 @@ let ChoreboardCard = class ChoreboardCard extends i {
         });
         document.body.appendChild(dialog);
     }
+    async startArcade(chore) {
+        if (!this.hass)
+            return;
+        if (this.arcadeSession && this.arcadeSession.status === "active") {
+            this.showToast("An arcade session is already in progress", true);
+            return;
+        }
+        try {
+            await this.hass.callService("choreboard", "start_arcade", {
+                instance_id: chore.id,
+            });
+            this.showToast(`Started arcade mode for "${chore.name}"`);
+            await this.fetchArcadeStatus();
+        }
+        catch (error) {
+            console.error("Error starting arcade mode:", error);
+            this.showToast("Failed to start arcade mode", true);
+        }
+    }
+    async stopArcade(session) {
+        if (!this.hass)
+            return;
+        try {
+            await this.hass.callService("choreboard", "stop_arcade", {
+                session_id: session.id,
+            });
+            this.showToast("Arcade session stopped - awaiting judge approval");
+            await this.fetchArcadeStatus();
+        }
+        catch (error) {
+            console.error("Error stopping arcade mode:", error);
+            this.showToast("Failed to stop arcade mode", true);
+        }
+    }
+    async cancelArcade(session) {
+        if (!this.hass)
+            return;
+        const confirmed = confirm(`Are you sure you want to cancel the arcade session for "${session.chore_name}"?`);
+        if (!confirmed) {
+            return;
+        }
+        try {
+            await this.hass.callService("choreboard", "cancel_arcade", {
+                session_id: session.id,
+            });
+            this.showToast("Arcade session cancelled");
+            await this.fetchArcadeStatus();
+        }
+        catch (error) {
+            console.error("Error cancelling arcade mode:", error);
+            this.showToast("Failed to cancel arcade mode", true);
+        }
+    }
+    async continueArcade(session) {
+        if (!this.hass)
+            return;
+        try {
+            await this.hass.callService("choreboard", "continue_arcade", {
+                session_id: session.id,
+            });
+            this.showToast("Arcade session resumed");
+            await this.fetchArcadeStatus();
+        }
+        catch (error) {
+            console.error("Error continuing arcade mode:", error);
+            this.showToast("Failed to continue arcade mode", true);
+        }
+    }
+    async showJudgeDialog(session) {
+        if (!this.hass)
+            return;
+        const users = this.getUsers();
+        await Promise.resolve().then(function () { return arcadeJudgeDialog; });
+        const dialog = document.createElement("arcade-judge-dialog");
+        dialog.users = users;
+        dialog.session = session;
+        dialog.addEventListener("judge-approved", async (e) => {
+            const customEvent = e;
+            const judgeId = customEvent.detail.judgeId;
+            const notes = customEvent.detail.notes;
+            try {
+                const serviceData = {
+                    session_id: session.id,
+                };
+                if (judgeId) {
+                    serviceData.judge_id = judgeId;
+                }
+                if (notes) {
+                    serviceData.notes = notes;
+                }
+                await this.hass.callService("choreboard", "approve_arcade", serviceData);
+                this.showToast("Arcade session approved - points awarded!");
+                await this.fetchArcadeStatus();
+            }
+            catch (error) {
+                console.error("Error approving arcade session:", error);
+                this.showToast("Failed to approve arcade session", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("judge-denied", async (e) => {
+            const customEvent = e;
+            const judgeId = customEvent.detail.judgeId;
+            const notes = customEvent.detail.notes;
+            try {
+                const serviceData = {
+                    session_id: session.id,
+                };
+                if (judgeId) {
+                    serviceData.judge_id = judgeId;
+                }
+                if (notes) {
+                    serviceData.notes = notes;
+                }
+                await this.hass.callService("choreboard", "deny_arcade", serviceData);
+                this.showToast("Arcade session denied - user can continue");
+                await this.fetchArcadeStatus();
+            }
+            catch (error) {
+                console.error("Error denying arcade session:", error);
+                this.showToast("Failed to deny arcade session", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("dialog-closed", () => {
+            dialog.remove();
+        });
+        document.body.appendChild(dialog);
+    }
+    formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        if (hours > 0) {
+            return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        }
+        return `${minutes}:${secs.toString().padStart(2, "0")}`;
+    }
+    getCurrentElapsedTime(session) {
+        const startTime = new Date(session.start_time).getTime();
+        const now = Date.now();
+        const elapsedMs = now - startTime;
+        return session.elapsed_seconds + Math.floor(elapsedMs / 1000);
+    }
+    getLeaderboardForChore(choreId) {
+        if (!this.hass)
+            return null;
+        for (const entityId of Object.keys(this.hass.states)) {
+            if (entityId.startsWith("sensor.choreboard_")) {
+                const state = this.hass.states[entityId];
+                const leaderboards = state.attributes.chore_leaderboards;
+                if (Array.isArray(leaderboards)) {
+                    const leaderboard = leaderboards.find((lb) => lb.chore_id === choreId);
+                    if (leaderboard) {
+                        return leaderboard;
+                    }
+                }
+            }
+        }
+        const leaderboardEntity = `sensor.arcade_${choreId}`;
+        const state = this.hass.states[leaderboardEntity];
+        if (state && state.attributes.high_scores) {
+            return {
+                chore_id: choreId,
+                chore_name: state.attributes.chore_name || "",
+                high_scores: state.attributes.high_scores,
+            };
+        }
+        return null;
+    }
+    toggleLeaderboard(choreId) {
+        if (this.expandedLeaderboards.has(choreId)) {
+            this.expandedLeaderboards.delete(choreId);
+        }
+        else {
+            this.expandedLeaderboards.add(choreId);
+        }
+        this.requestUpdate();
+    }
+    getCurrentUserId() {
+        const username = this.getUsername();
+        if (!username)
+            return null;
+        const users = this.getUsers();
+        const user = users.find((u) => u.username === username);
+        return user ? user.id : null;
+    }
+    renderLeaderboard(chore) {
+        if (!this.config.show_arcade_leaderboards) {
+            return x ``;
+        }
+        const leaderboard = this.getLeaderboardForChore(chore.id);
+        if (!leaderboard || leaderboard.high_scores.length === 0) {
+            return x ``;
+        }
+        const expanded = this.expandedLeaderboards.has(chore.id);
+        const displayScores = expanded
+            ? leaderboard.high_scores
+            : leaderboard.high_scores.slice(0, 3);
+        const currentUserId = this.getCurrentUserId();
+        return x `
+      <div class="leaderboard-section">
+        <div
+          class="leaderboard-header"
+          @click=${() => this.toggleLeaderboard(chore.id)}
+        >
+          <ha-icon icon="mdi:trophy"></ha-icon>
+          <span>High Scores (${leaderboard.high_scores.length})</span>
+          <ha-icon
+            icon="${expanded ? "mdi:chevron-up" : "mdi:chevron-down"}"
+          ></ha-icon>
+        </div>
+        ${expanded
+            ? x `
+              <div class="leaderboard-list">
+                ${displayScores.map((score, idx) => x `
+                    <div
+                      class="leaderboard-entry ${currentUserId === score.user_id
+                ? "current-user"
+                : ""}"
+                    >
+                      <span class="rank">#${idx + 1}</span>
+                      <span class="user-name">${score.display_name}</span>
+                      <span class="time"
+                        >${this.formatTime(score.time_seconds)}</span
+                      >
+                    </div>
+                  `)}
+                ${leaderboard.high_scores.length > 3 && !expanded
+                ? x `
+                      <div class="leaderboard-more">
+                        +${leaderboard.high_scores.length - 3} more
+                      </div>
+                    `
+                : ""}
+              </div>
+            `
+            : ""}
+      </div>
+    `;
+    }
+    renderArcadeControls(chore) {
+        if (!this.config.show_arcade || chore.status === "completed") {
+            return x ``;
+        }
+        const session = this.arcadeSession;
+        const isActiveForThisChore = session && session.chore_id === chore.id;
+        if (isActiveForThisChore && session) {
+            const username = this.getUsername();
+            const isCurrentUserSession = session.user_name === username;
+            const elapsedSeconds = this.getCurrentElapsedTime(session);
+            if (session.status === "active") {
+                return x `
+          <div class="arcade-controls active">
+            <div class="arcade-timer">
+              <ha-icon icon="mdi:timer"></ha-icon>
+              <span class="timer-text">${this.formatTime(elapsedSeconds)}</span>
+              ${isCurrentUserSession
+                    ? x `<span class="timer-label">(You)</span>`
+                    : x `<span class="timer-label">(${session.user_name})</span>`}
+            </div>
+            ${isCurrentUserSession
+                    ? x `
+                  <div class="arcade-buttons">
+                    <mwc-button
+                      class="arcade-button stop"
+                      @click=${() => this.stopArcade(session)}
+                    >
+                      Stop
+                    </mwc-button>
+                    <mwc-button
+                      class="arcade-button cancel"
+                      @click=${() => this.cancelArcade(session)}
+                    >
+                      Cancel
+                    </mwc-button>
+                  </div>
+                `
+                    : x ` <div class="arcade-status">Session in progress...</div> `}
+          </div>
+        `;
+            }
+            else if (session.status === "stopped" || session.status === "judging") {
+                return x `
+          <div class="arcade-controls judging">
+            <div class="arcade-status">
+              <ha-icon icon="mdi:gavel"></ha-icon>
+              <span>Awaiting judge approval</span>
+            </div>
+            <div class="arcade-timer">
+              Final time: ${this.formatTime(elapsedSeconds)}
+            </div>
+            ${this.config.show_judge_controls
+                    ? x `
+                  <mwc-button
+                    class="arcade-button judge"
+                    @click=${() => this.showJudgeDialog(session)}
+                  >
+                    <ha-icon icon="mdi:gavel"></ha-icon>
+                    Judge
+                  </mwc-button>
+                `
+                    : ""}
+          </div>
+        `;
+            }
+            else if (session.status === "denied") {
+                return x `
+          <div class="arcade-controls denied">
+            <div class="arcade-status">
+              <ha-icon icon="mdi:close-circle"></ha-icon>
+              <span>Judge denied - improvements needed</span>
+            </div>
+            ${isCurrentUserSession
+                    ? x `
+                  <mwc-button
+                    class="arcade-button continue"
+                    @click=${() => this.continueArcade(session)}
+                  >
+                    Continue Arcade
+                  </mwc-button>
+                `
+                    : ""}
+          </div>
+        `;
+            }
+        }
+        return x `
+      <div class="arcade-controls idle">
+        <mwc-button
+          class="arcade-button start"
+          @click=${() => this.startArcade(chore)}
+        >
+          <ha-icon icon="mdi:play-circle"></ha-icon>
+          Start Arcade
+        </mwc-button>
+      </div>
+    `;
+    }
     render() {
         if (!this.config || !this.hass) {
             return x ``;
@@ -408,7 +798,10 @@ let ChoreboardCard = class ChoreboardCard extends i {
                       <div class="chore-name">${chore.name}</div>
                       ${this.config.show_points && chore.points
             ? x `<div class="chore-points">
-                            ${typeof chore.points === "string" ? parseFloat(chore.points) : chore.points} ${this.getPointsName()}
+                            ${typeof chore.points === "string"
+                ? parseFloat(chore.points)
+                : chore.points}
+                            ${this.getPointsName()}
                           </div>`
             : ""}
                     </div>
@@ -426,6 +819,8 @@ let ChoreboardCard = class ChoreboardCard extends i {
                           >`
             : ""}
                     </div>
+                    ${this.renderArcadeControls(chore)}
+                    ${this.renderLeaderboard(chore)}
                   </div>
                   <div class="chore-action">
                     ${chore.status === "completed"
@@ -447,7 +842,9 @@ let ChoreboardCard = class ChoreboardCard extends i {
             : this.isPoolChore(chore)
                 ? x `
                             <div class="pool-actions">
-                              <mwc-button @click=${() => this.claimChore(chore)}>
+                              <mwc-button
+                                @click=${() => this.claimChore(chore)}
+                              >
                                 Claim
                               </mwc-button>
                               <mwc-button
@@ -458,7 +855,9 @@ let ChoreboardCard = class ChoreboardCard extends i {
                             </div>
                           `
                 : x `
-                            <mwc-button @click=${() => this.completeChore(chore)}>
+                            <mwc-button
+                              @click=${() => this.completeChore(chore)}
+                            >
                               Complete
                             </mwc-button>
                           `}
@@ -699,6 +1098,235 @@ let ChoreboardCard = class ChoreboardCard extends i {
         font-size: 14px;
         font-weight: 600;
       }
+
+      /* Arcade mode styles */
+      .arcade-controls {
+        margin-top: 12px;
+        padding: 12px;
+        background: var(--secondary-background-color, #f5f5f5);
+        border-radius: 8px;
+        border-left: 4px solid var(--info-color, #2196f3);
+      }
+
+      .arcade-controls.active {
+        border-left-color: var(--success-color, #4caf50);
+        background: rgba(76, 175, 80, 0.1);
+      }
+
+      .arcade-controls.judging {
+        border-left-color: var(--warning-color, #ff9800);
+        background: rgba(255, 152, 0, 0.1);
+      }
+
+      .arcade-controls.denied {
+        border-left-color: var(--error-color, #f44336);
+        background: rgba(244, 67, 54, 0.1);
+      }
+
+      .arcade-controls.idle {
+        border-left-color: var(--primary-color);
+        background: rgba(3, 155, 229, 0.05);
+        padding: 8px;
+      }
+
+      .arcade-timer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--primary-text-color);
+        margin-bottom: 8px;
+      }
+
+      .arcade-controls.active .arcade-timer {
+        color: var(--success-color, #4caf50);
+      }
+
+      .arcade-timer ha-icon {
+        --mdc-icon-size: 20px;
+      }
+
+      .timer-text {
+        font-family: monospace;
+        font-size: 18px;
+      }
+
+      .timer-label {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--secondary-text-color);
+      }
+
+      .arcade-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .arcade-button {
+        min-width: 80px;
+      }
+
+      .arcade-button.start {
+        --mdc-theme-primary: var(--primary-color);
+      }
+
+      .arcade-button.stop {
+        --mdc-theme-primary: var(--warning-color, #ff9800);
+      }
+
+      .arcade-button.cancel {
+        --mdc-theme-primary: var(--error-color, #f44336);
+      }
+
+      .arcade-button.continue {
+        --mdc-theme-primary: var(--success-color, #4caf50);
+      }
+
+      .arcade-button.judge {
+        --mdc-theme-primary: var(--warning-color, #ff9800);
+        margin-top: 8px;
+        width: 100%;
+      }
+
+      .arcade-button ha-icon {
+        --mdc-icon-size: 18px;
+        margin-right: 4px;
+      }
+
+      .arcade-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--secondary-text-color);
+        margin-bottom: 8px;
+      }
+
+      .arcade-status ha-icon {
+        --mdc-icon-size: 18px;
+      }
+
+      .arcade-controls.judging .arcade-status {
+        color: var(--warning-color, #ff9800);
+        font-weight: 600;
+      }
+
+      .arcade-controls.denied .arcade-status {
+        color: var(--error-color, #f44336);
+        font-weight: 600;
+      }
+
+      /* Leaderboard styles */
+      .leaderboard-section {
+        margin-top: 12px;
+        border: 1px solid var(--divider-color);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .leaderboard-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        background: var(--secondary-background-color, #f5f5f5);
+        cursor: pointer;
+        transition: background 0.2s ease;
+        user-select: none;
+      }
+
+      .leaderboard-header:hover {
+        background: var(--divider-color);
+      }
+
+      .leaderboard-header ha-icon:first-child {
+        --mdc-icon-size: 18px;
+        color: var(--warning-color, #ff9800);
+      }
+
+      .leaderboard-header ha-icon:last-child {
+        --mdc-icon-size: 20px;
+        margin-left: auto;
+        color: var(--secondary-text-color);
+      }
+
+      .leaderboard-header span {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary-text-color);
+        flex: 1;
+      }
+
+      .leaderboard-list {
+        display: flex;
+        flex-direction: column;
+        background: var(--card-background-color);
+      }
+
+      .leaderboard-entry {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-top: 1px solid var(--divider-color);
+        transition: background 0.2s ease;
+      }
+
+      .leaderboard-entry:hover {
+        background: var(--secondary-background-color, #f5f5f5);
+      }
+
+      .leaderboard-entry.current-user {
+        background: rgba(3, 155, 229, 0.1);
+        font-weight: 600;
+      }
+
+      .leaderboard-entry.current-user:hover {
+        background: rgba(3, 155, 229, 0.15);
+      }
+
+      .leaderboard-entry .rank {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--warning-color, #ff9800);
+        min-width: 32px;
+      }
+
+      .leaderboard-entry:nth-child(1) .rank {
+        color: #ffd700; /* Gold */
+      }
+
+      .leaderboard-entry:nth-child(2) .rank {
+        color: #c0c0c0; /* Silver */
+      }
+
+      .leaderboard-entry:nth-child(3) .rank {
+        color: #cd7f32; /* Bronze */
+      }
+
+      .leaderboard-entry .user-name {
+        flex: 1;
+        font-size: 14px;
+        color: var(--primary-text-color);
+      }
+
+      .leaderboard-entry .time {
+        font-size: 14px;
+        font-weight: 600;
+        font-family: monospace;
+        color: var(--success-color, #4caf50);
+      }
+
+      .leaderboard-more {
+        padding: 8px 12px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--secondary-text-color);
+        border-top: 1px solid var(--divider-color);
+        font-style: italic;
+      }
     `;
     }
 };
@@ -708,6 +1336,12 @@ __decorate([
 __decorate([
     r()
 ], ChoreboardCard.prototype, "config", void 0);
+__decorate([
+    r()
+], ChoreboardCard.prototype, "arcadeSession", void 0);
+__decorate([
+    r()
+], ChoreboardCard.prototype, "expandedLeaderboards", void 0);
 ChoreboardCard = __decorate([
     t("choreboard-card")
 ], ChoreboardCard);
@@ -725,7 +1359,8 @@ let ChoreboardCardEditor = class ChoreboardCardEditor extends i {
             entityId === "sensor.choreboard_outstanding_chores" ||
             entityId === "sensor.choreboard_late_chores" ||
             (entityId.startsWith("sensor.") && entityId.endsWith("_my_chores")) ||
-            (entityId.startsWith("sensor.") && entityId.endsWith("_my_immediate_chores")) ||
+            (entityId.startsWith("sensor.") &&
+                entityId.endsWith("_my_immediate_chores")) ||
             (entityId.startsWith("sensor.") && entityId.endsWith("_chores")));
     }
     render() {
@@ -856,6 +1491,68 @@ let ChoreboardCardEditor = class ChoreboardCardEditor extends i {
           </label>
         </div>
 
+        <div class="section-header">
+          <ha-icon icon="mdi:gamepad-variant"></ha-icon>
+          <span>Arcade Mode Settings</span>
+        </div>
+
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_arcade !== false}
+              @change=${this.showArcadeChanged}
+            />
+            Enable Arcade Mode Controls
+          </label>
+          <p class="hint">
+            Show arcade mode buttons and timer for competitive chore completion
+          </p>
+        </div>
+
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_arcade_leaderboards !== false}
+              @change=${this.showArcadeLeaderboardsChanged}
+            />
+            Show Arcade Leaderboards
+          </label>
+          <p class="hint">Display high scores for each chore (expandable)</p>
+        </div>
+
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_judge_controls !== false}
+              @change=${this.showJudgeControlsChanged}
+            />
+            Show Judge Controls
+          </label>
+          <p class="hint">
+            Display judge button for approving/denying arcade completions
+          </p>
+        </div>
+
+        <div class="option">
+          <label for="arcade_poll_interval"
+            >Timer Update Interval (seconds):</label
+          >
+          <input
+            id="arcade_poll_interval"
+            type="number"
+            min="5"
+            max="120"
+            .value=${this.config.arcade_poll_interval || 30}
+            @input=${this.arcadePollIntervalChanged}
+          />
+          <p class="hint">
+            How often to update the arcade timer (5-120 seconds, default: 30)
+          </p>
+        </div>
+
         <div class="info">
           <ha-icon icon="mdi:information"></ha-icon>
           <div>
@@ -950,6 +1647,41 @@ let ChoreboardCardEditor = class ChoreboardCardEditor extends i {
         this.config = { ...this.config, show_user_points: target.checked };
         this.configChanged();
     }
+    showArcadeChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_arcade: target.checked };
+        this.configChanged();
+    }
+    showArcadeLeaderboardsChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_arcade_leaderboards: target.checked };
+        this.configChanged();
+    }
+    showJudgeControlsChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_judge_controls: target.checked };
+        this.configChanged();
+    }
+    arcadePollIntervalChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        const value = parseInt(target.value, 10);
+        if (!isNaN(value) && value >= 5 && value <= 120) {
+            this.config = { ...this.config, arcade_poll_interval: value };
+            this.configChanged();
+        }
+    }
     configChanged() {
         const event = new CustomEvent("config-changed", {
             detail: { config: this.config },
@@ -964,6 +1696,22 @@ let ChoreboardCardEditor = class ChoreboardCardEditor extends i {
         display: flex;
         flex-direction: column;
         gap: 16px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 0;
+        margin-top: 16px;
+        border-top: 2px solid var(--divider-color);
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--primary-color);
+      }
+
+      .section-header ha-icon {
+        --mdc-icon-size: 22px;
       }
 
       .option {
@@ -1488,5 +2236,335 @@ CompleteChoreDialog = __decorate([
 var completeDialog = /*#__PURE__*/Object.freeze({
     __proto__: null,
     get CompleteChoreDialog () { return CompleteChoreDialog; }
+});
+
+let ArcadeJudgeDialog = class ArcadeJudgeDialog extends i {
+    constructor() {
+        super(...arguments);
+        this.users = [];
+        this.selectedJudgeId = null;
+        this.notes = "";
+        this.action = null;
+    }
+    render() {
+        const elapsedTime = this.formatTime(this.session.elapsed_seconds);
+        return x `
+      <ha-dialog open @closed=${this._handleClosed}>
+        <div slot="heading">Judge Arcade Session</div>
+
+        <div class="dialog-content">
+          <!-- Session details -->
+          <div class="session-info">
+            <h3>Session Details</h3>
+            <div class="info-row">
+              <span class="label">Chore:</span>
+              <span class="value">${this.session.chore_name}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Completed by:</span>
+              <span class="value">${this.session.user_name}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Time:</span>
+              <span class="value time">${elapsedTime}</span>
+            </div>
+          </div>
+
+          <!-- Judge selection -->
+          ${this.users.length > 1
+            ? x `
+                <div class="section">
+                  <h3>Select Judge <span class="optional">(optional)</span></h3>
+                  <div class="user-list">
+                    ${this.users.map((user) => x `
+                        <div
+                          class="user-option ${this.selectedJudgeId === user.id
+                ? "selected"
+                : ""}"
+                          @click=${() => this._selectJudge(user.id)}
+                        >
+                          <ha-icon icon="mdi:account"></ha-icon>
+                          <span>${user.display_name}</span>
+                          ${this.selectedJudgeId === user.id
+                ? x `<ha-icon
+                                icon="mdi:check"
+                                class="check-icon"
+                              ></ha-icon>`
+                : ""}
+                        </div>
+                      `)}
+                  </div>
+                </div>
+              `
+            : ""}
+
+          <!-- Notes section -->
+          <div class="section">
+            <h3>Judge Notes <span class="optional">(optional)</span></h3>
+            <textarea
+              class="notes-textarea"
+              placeholder="Add notes about the completion quality, issues found, etc."
+              .value=${this.notes}
+              @input=${this._notesChanged}
+              rows="4"
+            ></textarea>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="action-section">
+            <mwc-button
+              class="approve-button"
+              @click=${() => this._setAction("approve")}
+              raised
+            >
+              <ha-icon icon="mdi:check-circle"></ha-icon>
+              Approve
+            </mwc-button>
+            <mwc-button
+              class="deny-button"
+              @click=${() => this._setAction("deny")}
+              raised
+            >
+              <ha-icon icon="mdi:close-circle"></ha-icon>
+              Deny
+            </mwc-button>
+          </div>
+        </div>
+
+        <mwc-button slot="secondaryAction" @click=${this._cancel}>
+          Cancel
+        </mwc-button>
+      </ha-dialog>
+    `;
+    }
+    formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        if (hours > 0) {
+            return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        }
+        return `${minutes}:${secs.toString().padStart(2, "0")}`;
+    }
+    _selectJudge(userId) {
+        this.selectedJudgeId = userId;
+    }
+    _notesChanged(e) {
+        this.notes = e.target.value;
+    }
+    _setAction(action) {
+        this.action = action;
+        this._confirm();
+    }
+    _handleClosed() {
+        this._cancel();
+    }
+    _cancel() {
+        this.dispatchEvent(new CustomEvent("dialog-closed"));
+    }
+    _confirm() {
+        if (!this.action) {
+            return;
+        }
+        const eventName = this.action === "approve" ? "judge-approved" : "judge-denied";
+        this.dispatchEvent(new CustomEvent(eventName, {
+            detail: {
+                judgeId: this.selectedJudgeId,
+                notes: this.notes || undefined,
+            },
+        }));
+    }
+    static get styles() {
+        return i$3 `
+      .dialog-content {
+        padding: 16px 24px;
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+
+      .session-info {
+        background: var(--secondary-background-color, #f5f5f5);
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+      }
+
+      .session-info h3 {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary-text-color);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--divider-color);
+      }
+
+      .info-row:last-child {
+        border-bottom: none;
+      }
+
+      .info-row .label {
+        font-size: 14px;
+        color: var(--secondary-text-color);
+        font-weight: 500;
+      }
+
+      .info-row .value {
+        font-size: 14px;
+        color: var(--primary-text-color);
+        font-weight: 600;
+      }
+
+      .info-row .value.time {
+        font-family: monospace;
+        font-size: 16px;
+        color: var(--success-color, #4caf50);
+      }
+
+      .section {
+        margin-bottom: 24px;
+      }
+
+      .section:last-child {
+        margin-bottom: 0;
+      }
+
+      .section h3 {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--primary-text-color);
+      }
+
+      .optional {
+        color: var(--secondary-text-color);
+        font-weight: 400;
+        font-size: 12px;
+      }
+
+      .user-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .user-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: var(--card-background-color);
+        border: 2px solid var(--divider-color);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .user-option:hover {
+        border-color: var(--primary-color);
+        background: var(--secondary-background-color);
+      }
+
+      .user-option.selected {
+        border-color: var(--primary-color);
+        background: var(--primary-color);
+        color: var(--text-primary-color);
+      }
+
+      .user-option ha-icon {
+        --mdc-icon-size: 24px;
+      }
+
+      .user-option .check-icon {
+        margin-left: auto;
+        --mdc-icon-size: 20px;
+      }
+
+      .user-option span {
+        flex: 1;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .notes-textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--divider-color);
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--primary-text-color);
+        background: var(--card-background-color);
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .notes-textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
+
+      .notes-textarea::placeholder {
+        color: var(--secondary-text-color);
+        opacity: 0.7;
+      }
+
+      .action-section {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .approve-button {
+        flex: 1;
+        --mdc-theme-primary: var(--success-color, #4caf50);
+      }
+
+      .approve-button ha-icon {
+        --mdc-icon-size: 20px;
+        margin-right: 8px;
+      }
+
+      .deny-button {
+        flex: 1;
+        --mdc-theme-primary: var(--error-color, #f44336);
+      }
+
+      .deny-button ha-icon {
+        --mdc-icon-size: 20px;
+        margin-right: 8px;
+      }
+    `;
+    }
+};
+__decorate([
+    n({ type: Array })
+], ArcadeJudgeDialog.prototype, "users", void 0);
+__decorate([
+    n({ type: Object })
+], ArcadeJudgeDialog.prototype, "session", void 0);
+__decorate([
+    r()
+], ArcadeJudgeDialog.prototype, "selectedJudgeId", void 0);
+__decorate([
+    r()
+], ArcadeJudgeDialog.prototype, "notes", void 0);
+__decorate([
+    r()
+], ArcadeJudgeDialog.prototype, "action", void 0);
+ArcadeJudgeDialog = __decorate([
+    t("arcade-judge-dialog")
+], ArcadeJudgeDialog);
+
+var arcadeJudgeDialog = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    get ArcadeJudgeDialog () { return ArcadeJudgeDialog; }
 });
 //# sourceMappingURL=choreboard-ha-card.js.map

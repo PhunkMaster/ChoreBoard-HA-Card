@@ -8,12 +8,19 @@ import {
   User,
   CARD_NAME,
   CARD_VERSION,
+  ArcadeSession,
+  ChoreLeaderboard,
 } from "./common";
 
 @customElement("choreboard-card")
 export class ChoreboardCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private config!: ChoreboardCardConfig;
+
+  // Arcade mode state
+  @state() private arcadeSession: ArcadeSession | null = null;
+  @state() private expandedLeaderboards: Set<number> = new Set();
+  private arcadeTimerInterval: number | null = null;
 
   public setConfig(config: ChoreboardCardConfig): void {
     if (!config) {
@@ -33,6 +40,10 @@ export class ChoreboardCard extends LitElement {
       show_overdue_only: false,
       show_undo: false,
       show_user_points: false,
+      show_arcade: true,
+      show_arcade_leaderboards: true,
+      show_judge_controls: true,
+      arcade_poll_interval: 30,
       ...config,
     };
   }
@@ -55,6 +66,62 @@ export class ChoreboardCard extends LitElement {
 
   public static getConfigElement(): HTMLElement {
     return document.createElement("choreboard-card-editor");
+  }
+
+  // Lifecycle methods for arcade polling
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.startArcadePolling();
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.stopArcadePolling();
+  }
+
+  private startArcadePolling(): void {
+    if (!this.config?.show_arcade) {
+      return;
+    }
+
+    this.stopArcadePolling(); // Clear existing interval
+    this.arcadeTimerInterval = window.setInterval(
+      () => this.fetchArcadeStatus(),
+      (this.config.arcade_poll_interval || 30) * 1000,
+    );
+
+    // Fetch immediately on start
+    this.fetchArcadeStatus();
+  }
+
+  private stopArcadePolling(): void {
+    if (this.arcadeTimerInterval !== null) {
+      clearInterval(this.arcadeTimerInterval);
+      this.arcadeTimerInterval = null;
+    }
+  }
+
+  private async fetchArcadeStatus(): Promise<void> {
+    // This will fetch arcade session status from integration
+    // For now, we'll implement a basic version that reads from sensor attributes
+    // Later this can be enhanced to call the integration API directly
+    if (!this.hass) {
+      return;
+    }
+
+    // Try to get arcade session from any ChoreBoard sensor attributes
+    for (const entityId of Object.keys(this.hass.states)) {
+      if (entityId.startsWith("sensor.choreboard_")) {
+        const state = this.hass.states[entityId];
+        if (state.attributes.arcade_session) {
+          this.arcadeSession = state.attributes.arcade_session as ArcadeSession;
+          return;
+        }
+      }
+    }
+
+    // No active session found
+    this.arcadeSession = null;
   }
 
   private getChores(): Chore[] {
@@ -341,6 +408,398 @@ export class ChoreboardCard extends LitElement {
     document.body.appendChild(dialog);
   }
 
+  // Arcade mode methods
+  private async startArcade(chore: Chore): Promise<void> {
+    if (!this.hass) return;
+
+    // Check if there's already an active arcade session
+    if (this.arcadeSession && this.arcadeSession.status === "active") {
+      this.showToast("An arcade session is already in progress", true);
+      return;
+    }
+
+    try {
+      await this.hass.callService("choreboard", "start_arcade", {
+        instance_id: chore.id,
+      });
+      this.showToast(`Started arcade mode for "${chore.name}"`);
+      // Fetch status immediately after starting
+      await this.fetchArcadeStatus();
+    } catch (error) {
+      console.error("Error starting arcade mode:", error);
+      this.showToast("Failed to start arcade mode", true);
+    }
+  }
+
+  private async stopArcade(session: ArcadeSession): Promise<void> {
+    if (!this.hass) return;
+
+    try {
+      await this.hass.callService("choreboard", "stop_arcade", {
+        session_id: session.id,
+      });
+      this.showToast("Arcade session stopped - awaiting judge approval");
+      // Fetch status immediately after stopping
+      await this.fetchArcadeStatus();
+    } catch (error) {
+      console.error("Error stopping arcade mode:", error);
+      this.showToast("Failed to stop arcade mode", true);
+    }
+  }
+
+  private async cancelArcade(session: ArcadeSession): Promise<void> {
+    if (!this.hass) return;
+
+    const confirmed = confirm(
+      `Are you sure you want to cancel the arcade session for "${session.chore_name}"?`,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.hass.callService("choreboard", "cancel_arcade", {
+        session_id: session.id,
+      });
+      this.showToast("Arcade session cancelled");
+      // Fetch status immediately after cancelling
+      await this.fetchArcadeStatus();
+    } catch (error) {
+      console.error("Error cancelling arcade mode:", error);
+      this.showToast("Failed to cancel arcade mode", true);
+    }
+  }
+
+  private async continueArcade(session: ArcadeSession): Promise<void> {
+    if (!this.hass) return;
+
+    try {
+      await this.hass.callService("choreboard", "continue_arcade", {
+        session_id: session.id,
+      });
+      this.showToast("Arcade session resumed");
+      // Fetch status immediately after continuing
+      await this.fetchArcadeStatus();
+    } catch (error) {
+      console.error("Error continuing arcade mode:", error);
+      this.showToast("Failed to continue arcade mode", true);
+    }
+  }
+
+  private async showJudgeDialog(session: ArcadeSession): Promise<void> {
+    if (!this.hass) return;
+
+    const users = this.getUsers();
+
+    // Dynamically import and create dialog
+    await import("./arcade-judge-dialog");
+    const dialog = document.createElement(
+      "arcade-judge-dialog",
+    ) as HTMLElement & {
+      users: User[];
+      session: ArcadeSession;
+    };
+    dialog.users = users;
+    dialog.session = session;
+
+    dialog.addEventListener("judge-approved", async (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const judgeId = customEvent.detail.judgeId;
+      const notes = customEvent.detail.notes;
+
+      try {
+        const serviceData: Record<string, any> = {
+          session_id: session.id,
+        };
+        if (judgeId) {
+          serviceData.judge_id = judgeId;
+        }
+        if (notes) {
+          serviceData.notes = notes;
+        }
+
+        await this.hass.callService(
+          "choreboard",
+          "approve_arcade",
+          serviceData,
+        );
+        this.showToast("Arcade session approved - points awarded!");
+        await this.fetchArcadeStatus();
+      } catch (error) {
+        console.error("Error approving arcade session:", error);
+        this.showToast("Failed to approve arcade session", true);
+      } finally {
+        dialog.remove();
+      }
+    });
+
+    dialog.addEventListener("judge-denied", async (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const judgeId = customEvent.detail.judgeId;
+      const notes = customEvent.detail.notes;
+
+      try {
+        const serviceData: Record<string, any> = {
+          session_id: session.id,
+        };
+        if (judgeId) {
+          serviceData.judge_id = judgeId;
+        }
+        if (notes) {
+          serviceData.notes = notes;
+        }
+
+        await this.hass.callService("choreboard", "deny_arcade", serviceData);
+        this.showToast("Arcade session denied - user can continue");
+        await this.fetchArcadeStatus();
+      } catch (error) {
+        console.error("Error denying arcade session:", error);
+        this.showToast("Failed to deny arcade session", true);
+      } finally {
+        dialog.remove();
+      }
+    });
+
+    dialog.addEventListener("dialog-closed", () => {
+      dialog.remove();
+    });
+
+    document.body.appendChild(dialog);
+  }
+
+  private formatTime(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, "0")}`;
+  }
+
+  private getCurrentElapsedTime(session: ArcadeSession): number {
+    // Calculate current elapsed time
+    const startTime = new Date(session.start_time).getTime();
+    const now = Date.now();
+    const elapsedMs = now - startTime;
+    return session.elapsed_seconds + Math.floor(elapsedMs / 1000);
+  }
+
+  private getLeaderboardForChore(choreId: number): ChoreLeaderboard | null {
+    if (!this.hass) return null;
+
+    // Try to get leaderboard from ChoreBoard sensor attributes
+    for (const entityId of Object.keys(this.hass.states)) {
+      if (entityId.startsWith("sensor.choreboard_")) {
+        const state = this.hass.states[entityId];
+        const leaderboards = state.attributes.chore_leaderboards;
+        if (Array.isArray(leaderboards)) {
+          const leaderboard = leaderboards.find(
+            (lb: ChoreLeaderboard) => lb.chore_id === choreId,
+          );
+          if (leaderboard) {
+            return leaderboard;
+          }
+        }
+      }
+    }
+
+    // Try dedicated leaderboard sensor for this chore
+    const leaderboardEntity = `sensor.arcade_${choreId}`;
+    const state = this.hass.states[leaderboardEntity];
+    if (state && state.attributes.high_scores) {
+      return {
+        chore_id: choreId,
+        chore_name: state.attributes.chore_name || "",
+        high_scores: state.attributes.high_scores,
+      };
+    }
+
+    return null;
+  }
+
+  private toggleLeaderboard(choreId: number): void {
+    if (this.expandedLeaderboards.has(choreId)) {
+      this.expandedLeaderboards.delete(choreId);
+    } else {
+      this.expandedLeaderboards.add(choreId);
+    }
+    this.requestUpdate();
+  }
+
+  private getCurrentUserId(): number | null {
+    const username = this.getUsername();
+    if (!username) return null;
+
+    const users = this.getUsers();
+    const user = users.find((u) => u.username === username);
+    return user ? user.id : null;
+  }
+
+  private renderLeaderboard(chore: Chore): TemplateResult {
+    if (!this.config.show_arcade_leaderboards) {
+      return html``;
+    }
+
+    const leaderboard = this.getLeaderboardForChore(chore.id);
+    if (!leaderboard || leaderboard.high_scores.length === 0) {
+      return html``;
+    }
+
+    const expanded = this.expandedLeaderboards.has(chore.id);
+    const displayScores = expanded
+      ? leaderboard.high_scores
+      : leaderboard.high_scores.slice(0, 3);
+    const currentUserId = this.getCurrentUserId();
+
+    return html`
+      <div class="leaderboard-section">
+        <div
+          class="leaderboard-header"
+          @click=${() => this.toggleLeaderboard(chore.id)}
+        >
+          <ha-icon icon="mdi:trophy"></ha-icon>
+          <span>High Scores (${leaderboard.high_scores.length})</span>
+          <ha-icon
+            icon="${expanded ? "mdi:chevron-up" : "mdi:chevron-down"}"
+          ></ha-icon>
+        </div>
+        ${expanded
+          ? html`
+              <div class="leaderboard-list">
+                ${displayScores.map(
+                  (score, idx) => html`
+                    <div
+                      class="leaderboard-entry ${currentUserId === score.user_id
+                        ? "current-user"
+                        : ""}"
+                    >
+                      <span class="rank">#${idx + 1}</span>
+                      <span class="user-name">${score.display_name}</span>
+                      <span class="time"
+                        >${this.formatTime(score.time_seconds)}</span
+                      >
+                    </div>
+                  `,
+                )}
+                ${leaderboard.high_scores.length > 3 && !expanded
+                  ? html`
+                      <div class="leaderboard-more">
+                        +${leaderboard.high_scores.length - 3} more
+                      </div>
+                    `
+                  : ""}
+              </div>
+            `
+          : ""}
+      </div>
+    `;
+  }
+
+  private renderArcadeControls(chore: Chore): TemplateResult {
+    if (!this.config.show_arcade || chore.status === "completed") {
+      return html``;
+    }
+
+    // Check if this chore has an active arcade session
+    const session = this.arcadeSession;
+    const isActiveForThisChore = session && session.chore_id === chore.id;
+
+    if (isActiveForThisChore && session) {
+      const username = this.getUsername();
+      const isCurrentUserSession = session.user_name === username;
+      const elapsedSeconds = this.getCurrentElapsedTime(session);
+
+      if (session.status === "active") {
+        return html`
+          <div class="arcade-controls active">
+            <div class="arcade-timer">
+              <ha-icon icon="mdi:timer"></ha-icon>
+              <span class="timer-text">${this.formatTime(elapsedSeconds)}</span>
+              ${isCurrentUserSession
+                ? html`<span class="timer-label">(You)</span>`
+                : html`<span class="timer-label">(${session.user_name})</span>`}
+            </div>
+            ${isCurrentUserSession
+              ? html`
+                  <div class="arcade-buttons">
+                    <mwc-button
+                      class="arcade-button stop"
+                      @click=${() => this.stopArcade(session)}
+                    >
+                      Stop
+                    </mwc-button>
+                    <mwc-button
+                      class="arcade-button cancel"
+                      @click=${() => this.cancelArcade(session)}
+                    >
+                      Cancel
+                    </mwc-button>
+                  </div>
+                `
+              : html` <div class="arcade-status">Session in progress...</div> `}
+          </div>
+        `;
+      } else if (session.status === "stopped" || session.status === "judging") {
+        return html`
+          <div class="arcade-controls judging">
+            <div class="arcade-status">
+              <ha-icon icon="mdi:gavel"></ha-icon>
+              <span>Awaiting judge approval</span>
+            </div>
+            <div class="arcade-timer">
+              Final time: ${this.formatTime(elapsedSeconds)}
+            </div>
+            ${this.config.show_judge_controls
+              ? html`
+                  <mwc-button
+                    class="arcade-button judge"
+                    @click=${() => this.showJudgeDialog(session)}
+                  >
+                    <ha-icon icon="mdi:gavel"></ha-icon>
+                    Judge
+                  </mwc-button>
+                `
+              : ""}
+          </div>
+        `;
+      } else if (session.status === "denied") {
+        return html`
+          <div class="arcade-controls denied">
+            <div class="arcade-status">
+              <ha-icon icon="mdi:close-circle"></ha-icon>
+              <span>Judge denied - improvements needed</span>
+            </div>
+            ${isCurrentUserSession
+              ? html`
+                  <mwc-button
+                    class="arcade-button continue"
+                    @click=${() => this.continueArcade(session)}
+                  >
+                    Continue Arcade
+                  </mwc-button>
+                `
+              : ""}
+          </div>
+        `;
+      }
+    }
+
+    // No active session - show start button
+    return html`
+      <div class="arcade-controls idle">
+        <mwc-button
+          class="arcade-button start"
+          @click=${() => this.startArcade(chore)}
+        >
+          <ha-icon icon="mdi:play-circle"></ha-icon>
+          Start Arcade
+        </mwc-button>
+      </div>
+    `;
+  }
+
   protected render(): TemplateResult {
     if (!this.config || !this.hass) {
       return html``;
@@ -424,7 +883,10 @@ export class ChoreboardCard extends LitElement {
                       <div class="chore-name">${chore.name}</div>
                       ${this.config.show_points && chore.points
                         ? html`<div class="chore-points">
-                            ${typeof chore.points === "string" ? parseFloat(chore.points) : chore.points} ${this.getPointsName()}
+                            ${typeof chore.points === "string"
+                              ? parseFloat(chore.points)
+                              : chore.points}
+                            ${this.getPointsName()}
                           </div>`
                         : ""}
                     </div>
@@ -442,6 +904,8 @@ export class ChoreboardCard extends LitElement {
                           >`
                         : ""}
                     </div>
+                    ${this.renderArcadeControls(chore)}
+                    ${this.renderLeaderboard(chore)}
                   </div>
                   <div class="chore-action">
                     ${chore.status === "completed"
@@ -463,7 +927,9 @@ export class ChoreboardCard extends LitElement {
                       : this.isPoolChore(chore)
                         ? html`
                             <div class="pool-actions">
-                              <mwc-button @click=${() => this.claimChore(chore)}>
+                              <mwc-button
+                                @click=${() => this.claimChore(chore)}
+                              >
                                 Claim
                               </mwc-button>
                               <mwc-button
@@ -474,7 +940,9 @@ export class ChoreboardCard extends LitElement {
                             </div>
                           `
                         : html`
-                            <mwc-button @click=${() => this.completeChore(chore)}>
+                            <mwc-button
+                              @click=${() => this.completeChore(chore)}
+                            >
                               Complete
                             </mwc-button>
                           `}
@@ -716,6 +1184,235 @@ export class ChoreboardCard extends LitElement {
         border-radius: 8px;
         font-size: 14px;
         font-weight: 600;
+      }
+
+      /* Arcade mode styles */
+      .arcade-controls {
+        margin-top: 12px;
+        padding: 12px;
+        background: var(--secondary-background-color, #f5f5f5);
+        border-radius: 8px;
+        border-left: 4px solid var(--info-color, #2196f3);
+      }
+
+      .arcade-controls.active {
+        border-left-color: var(--success-color, #4caf50);
+        background: rgba(76, 175, 80, 0.1);
+      }
+
+      .arcade-controls.judging {
+        border-left-color: var(--warning-color, #ff9800);
+        background: rgba(255, 152, 0, 0.1);
+      }
+
+      .arcade-controls.denied {
+        border-left-color: var(--error-color, #f44336);
+        background: rgba(244, 67, 54, 0.1);
+      }
+
+      .arcade-controls.idle {
+        border-left-color: var(--primary-color);
+        background: rgba(3, 155, 229, 0.05);
+        padding: 8px;
+      }
+
+      .arcade-timer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--primary-text-color);
+        margin-bottom: 8px;
+      }
+
+      .arcade-controls.active .arcade-timer {
+        color: var(--success-color, #4caf50);
+      }
+
+      .arcade-timer ha-icon {
+        --mdc-icon-size: 20px;
+      }
+
+      .timer-text {
+        font-family: monospace;
+        font-size: 18px;
+      }
+
+      .timer-label {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--secondary-text-color);
+      }
+
+      .arcade-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .arcade-button {
+        min-width: 80px;
+      }
+
+      .arcade-button.start {
+        --mdc-theme-primary: var(--primary-color);
+      }
+
+      .arcade-button.stop {
+        --mdc-theme-primary: var(--warning-color, #ff9800);
+      }
+
+      .arcade-button.cancel {
+        --mdc-theme-primary: var(--error-color, #f44336);
+      }
+
+      .arcade-button.continue {
+        --mdc-theme-primary: var(--success-color, #4caf50);
+      }
+
+      .arcade-button.judge {
+        --mdc-theme-primary: var(--warning-color, #ff9800);
+        margin-top: 8px;
+        width: 100%;
+      }
+
+      .arcade-button ha-icon {
+        --mdc-icon-size: 18px;
+        margin-right: 4px;
+      }
+
+      .arcade-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--secondary-text-color);
+        margin-bottom: 8px;
+      }
+
+      .arcade-status ha-icon {
+        --mdc-icon-size: 18px;
+      }
+
+      .arcade-controls.judging .arcade-status {
+        color: var(--warning-color, #ff9800);
+        font-weight: 600;
+      }
+
+      .arcade-controls.denied .arcade-status {
+        color: var(--error-color, #f44336);
+        font-weight: 600;
+      }
+
+      /* Leaderboard styles */
+      .leaderboard-section {
+        margin-top: 12px;
+        border: 1px solid var(--divider-color);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .leaderboard-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        background: var(--secondary-background-color, #f5f5f5);
+        cursor: pointer;
+        transition: background 0.2s ease;
+        user-select: none;
+      }
+
+      .leaderboard-header:hover {
+        background: var(--divider-color);
+      }
+
+      .leaderboard-header ha-icon:first-child {
+        --mdc-icon-size: 18px;
+        color: var(--warning-color, #ff9800);
+      }
+
+      .leaderboard-header ha-icon:last-child {
+        --mdc-icon-size: 20px;
+        margin-left: auto;
+        color: var(--secondary-text-color);
+      }
+
+      .leaderboard-header span {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary-text-color);
+        flex: 1;
+      }
+
+      .leaderboard-list {
+        display: flex;
+        flex-direction: column;
+        background: var(--card-background-color);
+      }
+
+      .leaderboard-entry {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-top: 1px solid var(--divider-color);
+        transition: background 0.2s ease;
+      }
+
+      .leaderboard-entry:hover {
+        background: var(--secondary-background-color, #f5f5f5);
+      }
+
+      .leaderboard-entry.current-user {
+        background: rgba(3, 155, 229, 0.1);
+        font-weight: 600;
+      }
+
+      .leaderboard-entry.current-user:hover {
+        background: rgba(3, 155, 229, 0.15);
+      }
+
+      .leaderboard-entry .rank {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--warning-color, #ff9800);
+        min-width: 32px;
+      }
+
+      .leaderboard-entry:nth-child(1) .rank {
+        color: #ffd700; /* Gold */
+      }
+
+      .leaderboard-entry:nth-child(2) .rank {
+        color: #c0c0c0; /* Silver */
+      }
+
+      .leaderboard-entry:nth-child(3) .rank {
+        color: #cd7f32; /* Bronze */
+      }
+
+      .leaderboard-entry .user-name {
+        flex: 1;
+        font-size: 14px;
+        color: var(--primary-text-color);
+      }
+
+      .leaderboard-entry .time {
+        font-size: 14px;
+        font-weight: 600;
+        font-family: monospace;
+        color: var(--success-color, #4caf50);
+      }
+
+      .leaderboard-more {
+        padding: 8px 12px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--secondary-text-color);
+        border-top: 1px solid var(--divider-color);
+        font-style: italic;
       }
     `;
   }

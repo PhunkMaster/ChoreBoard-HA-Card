@@ -25,7 +25,8 @@ export class ChoreboardCardEditor extends LitElement {
         entityId === "sensor.choreboard_outstanding_chores" ||
         entityId === "sensor.choreboard_late_chores" ||
         (entityId.startsWith("sensor.") && entityId.endsWith("_my_chores")) ||
-        (entityId.startsWith("sensor.") && entityId.endsWith("_my_immediate_chores")) ||
+        (entityId.startsWith("sensor.") &&
+          entityId.endsWith("_my_immediate_chores")) ||
         (entityId.startsWith("sensor.") && entityId.endsWith("_chores")),
     );
   }
@@ -162,6 +163,68 @@ export class ChoreboardCardEditor extends LitElement {
           </label>
         </div>
 
+        <div class="section-header">
+          <ha-icon icon="mdi:gamepad-variant"></ha-icon>
+          <span>Arcade Mode Settings</span>
+        </div>
+
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_arcade !== false}
+              @change=${this.showArcadeChanged}
+            />
+            Enable Arcade Mode Controls
+          </label>
+          <p class="hint">
+            Show arcade mode buttons and timer for competitive chore completion
+          </p>
+        </div>
+
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_arcade_leaderboards !== false}
+              @change=${this.showArcadeLeaderboardsChanged}
+            />
+            Show Arcade Leaderboards
+          </label>
+          <p class="hint">Display high scores for each chore (expandable)</p>
+        </div>
+
+        <div class="option">
+          <label>
+            <input
+              type="checkbox"
+              ?checked=${this.config.show_judge_controls !== false}
+              @change=${this.showJudgeControlsChanged}
+            />
+            Show Judge Controls
+          </label>
+          <p class="hint">
+            Display judge button for approving/denying arcade completions
+          </p>
+        </div>
+
+        <div class="option">
+          <label for="arcade_poll_interval"
+            >Timer Update Interval (seconds):</label
+          >
+          <input
+            id="arcade_poll_interval"
+            type="number"
+            min="5"
+            max="120"
+            .value=${this.config.arcade_poll_interval || 30}
+            @input=${this.arcadePollIntervalChanged}
+          />
+          <p class="hint">
+            How often to update the arcade timer (5-120 seconds, default: 30)
+          </p>
+        </div>
+
         <div class="info">
           <ha-icon icon="mdi:information"></ha-icon>
           <div>
@@ -269,6 +332,45 @@ export class ChoreboardCardEditor extends LitElement {
     this.configChanged();
   }
 
+  private showArcadeChanged(ev: Event): void {
+    const target = ev.target as HTMLInputElement;
+    if (!this.config || !this.hass) {
+      return;
+    }
+    this.config = { ...this.config, show_arcade: target.checked };
+    this.configChanged();
+  }
+
+  private showArcadeLeaderboardsChanged(ev: Event): void {
+    const target = ev.target as HTMLInputElement;
+    if (!this.config || !this.hass) {
+      return;
+    }
+    this.config = { ...this.config, show_arcade_leaderboards: target.checked };
+    this.configChanged();
+  }
+
+  private showJudgeControlsChanged(ev: Event): void {
+    const target = ev.target as HTMLInputElement;
+    if (!this.config || !this.hass) {
+      return;
+    }
+    this.config = { ...this.config, show_judge_controls: target.checked };
+    this.configChanged();
+  }
+
+  private arcadePollIntervalChanged(ev: Event): void {
+    const target = ev.target as HTMLInputElement;
+    if (!this.config || !this.hass) {
+      return;
+    }
+    const value = parseInt(target.value, 10);
+    if (!isNaN(value) && value >= 5 && value <= 120) {
+      this.config = { ...this.config, arcade_poll_interval: value };
+      this.configChanged();
+    }
+  }
+
   private configChanged(): void {
     const event = new CustomEvent("config-changed", {
       detail: { config: this.config },
@@ -284,6 +386,22 @@ export class ChoreboardCardEditor extends LitElement {
         display: flex;
         flex-direction: column;
         gap: 16px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 0;
+        margin-top: 16px;
+        border-top: 2px solid var(--divider-color);
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--primary-color);
+      }
+
+      .section-header ha-icon {
+        --mdc-icon-size: 22px;
       }
 
       .option {
