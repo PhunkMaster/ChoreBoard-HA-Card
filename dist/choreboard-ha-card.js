@@ -186,8 +186,14 @@ let ChoreboardCard = class ChoreboardCard extends i {
             return;
         }
         try {
+            const choreId = typeof chore.id === "number" ? chore.id : parseInt(String(chore.id), 10);
+            if (isNaN(choreId)) {
+                this.showToast(`Invalid chore ID: ${chore.id}`, true);
+                console.error("Invalid chore ID:", chore.id);
+                return;
+            }
             await this.hass.callService("choreboard", "mark_complete", {
-                chore_id: chore.id,
+                chore_id: choreId,
             });
             this.showToast(`Marked "${chore.name}" as complete`);
         }
@@ -385,15 +391,34 @@ let ChoreboardCard = class ChoreboardCard extends i {
             return;
         }
         try {
+            const instanceId = typeof chore.id === "number" ? chore.id : parseInt(String(chore.id), 10);
+            if (isNaN(instanceId)) {
+                this.showToast(`Invalid chore ID: ${chore.id}`, true);
+                console.error("Invalid chore ID:", chore.id);
+                return;
+            }
+            console.log("Starting arcade mode for chore:", {
+                chore_id: instanceId,
+                chore_name: chore.name,
+                chore_status: chore.status,
+                original_id: chore.id,
+                id_type: typeof chore.id,
+            });
             await this.hass.callService("choreboard", "start_arcade", {
-                instance_id: chore.id,
+                instance_id: instanceId,
             });
             this.showToast(`Started arcade mode for "${chore.name}"`);
             await this.fetchArcadeStatus();
         }
         catch (error) {
             console.error("Error starting arcade mode:", error);
-            this.showToast("Failed to start arcade mode", true);
+            console.error("Error details:", {
+                message: error?.message,
+                code: error?.code,
+                data: error,
+            });
+            const errorMsg = error?.message || "Failed to start arcade mode - check console for details";
+            this.showToast(errorMsg, true);
         }
     }
     async stopArcade(session) {
@@ -533,7 +558,8 @@ let ChoreboardCard = class ChoreboardCard extends i {
                 const state = this.hass.states[entityId];
                 const leaderboards = state.attributes.chore_leaderboards;
                 if (Array.isArray(leaderboards)) {
-                    const leaderboard = leaderboards.find((lb) => lb.chore_id === choreId);
+                    const leaderboard = leaderboards.find((lb) => lb.chore_id === choreId ||
+                        String(lb.chore_id) === String(choreId));
                     if (leaderboard) {
                         return leaderboard;
                     }
@@ -627,7 +653,9 @@ let ChoreboardCard = class ChoreboardCard extends i {
             return x ``;
         }
         const session = this.arcadeSession;
-        const isActiveForThisChore = session && session.chore_id === chore.id;
+        const isActiveForThisChore = session &&
+            (session.chore_id === chore.id ||
+                String(session.chore_id) === String(chore.id));
         if (isActiveForThisChore && session) {
             const username = this.getUsername();
             const isCurrentUserSession = session.user_name === username;

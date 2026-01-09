@@ -22,7 +22,7 @@ export interface ChoreboardCardConfig {
 
 // Chore object from the sensor's attributes.chores list
 export interface Chore {
-  id: number; // Instance ID for API calls
+  id: number | string; // Instance ID for API calls (may be string or number)
   name: string;
   due_date: string;
   points: string | number; // Integration may return string or number
@@ -62,7 +62,7 @@ export interface HomeAssistantExtended extends HomeAssistant {
 // Arcade mode interfaces
 export interface ArcadeSession {
   id: number; // Session ID for service calls
-  chore_id: number; // Instance ID of chore
+  chore_id: number | string; // Instance ID of chore
   chore_name: string;
   user_id: number;
   user_name: string;
@@ -81,7 +81,7 @@ export interface HighScore {
 }
 
 export interface ChoreLeaderboard {
-  chore_id: number;
+  chore_id: number | string;
   chore_name: string;
   high_scores: HighScore[];
 }
