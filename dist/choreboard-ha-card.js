@@ -31,7 +31,7 @@ function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
               </div>
             `:""}
       </div>
-    `}renderArcadeControls(e){if(!this.config.show_arcade||"completed"===e.status)return B``;const t=this.arcadeSession;if(t&&t.chore_id===e.id&&t){const e=this.getUsername(),o=t.user_name===e,s=this.getCurrentElapsedTime(t);if("active"===t.status)return B`
+    `}renderArcadeControls(e){if(!this.config.show_arcade)return B``;const t=this.arcadeSession,o=t&&t.chore_id===e.id;if("completed"===e.status&&!o)return B``;if(o&&t){const e=this.getUsername(),o=t.user_name===e,s=this.getCurrentElapsedTime(t);if("active"===t.status)return B`
           <div class="arcade-controls active">
             <div class="arcade-timer">
               <ha-icon icon="mdi:timer"></ha-icon>

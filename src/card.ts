@@ -705,13 +705,18 @@ export class ChoreboardCard extends LitElement {
   }
 
   private renderArcadeControls(chore: Chore): TemplateResult {
-    if (!this.config.show_arcade || chore.status === "completed") {
+    if (!this.config.show_arcade) {
       return html``;
     }
 
     // Check if this chore has an active arcade session
     const session = this.arcadeSession;
     const isActiveForThisChore = session && session.chore_id === chore.id;
+
+    // Hide arcade controls for completed chores UNLESS there's an active session needing judgment
+    if (chore.status === "completed" && !isActiveForThisChore) {
+      return html``;
+    }
 
     if (isActiveForThisChore && session) {
       const username = this.getUsername();
