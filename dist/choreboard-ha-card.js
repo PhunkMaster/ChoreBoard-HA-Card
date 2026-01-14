@@ -997,7 +997,7 @@ function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
         color: var(--text-primary-color, white);
         text-decoration: underline;
       }
-    `}};e([he({attribute:!1})],ge.prototype,"hass",void 0),e([pe()],ge.prototype,"config",void 0),ge=e([ce("choreboard-card-editor")],ge),window.customCards=window.customCards||[],window.customCards.push({type:"choreboard-card",name:"ChoreBoard Card",description:"A custom card for managing and tracking chores in Home Assistant",preview:!0,documentationURL:"https://github.com/yourusername/choreboard-ha-card"}),customElements.define("choreboard-card",ue),customElements.define("choreboard-card-editor",ge),console.info("ChoreBoard Card has been loaded");let me=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedUserId=null}render(){return B`
+    `}};e([he({attribute:!1})],ge.prototype,"hass",void 0),e([pe()],ge.prototype,"config",void 0),ge=e([ce("choreboard-card-editor")],ge),window.customCards=window.customCards||[],window.customCards.push({type:"choreboard-card",name:"ChoreBoard Card",description:"A custom card for managing and tracking chores in Home Assistant",preview:!0,documentationURL:"https://github.com/yourusername/choreboard-ha-card"}),customElements.get("choreboard-card")||customElements.define("choreboard-card",ue),customElements.get("choreboard-card-editor")||customElements.define("choreboard-card-editor",ge),console.info("ChoreBoard Card has been loaded");let me=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedUserId=null}render(){return B`
       <ha-dialog open @closed=${this._handleClosed}>
         <div slot="heading">Claim: ${this.chore.name}</div>
 
