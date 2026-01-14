@@ -45,15 +45,7 @@ if (isWatch) {
 }
 
 export default {
-  input: {
-    'src/arcade-judge-dialog.ts',
-    'src/card.ts',
-    'src/claim-dialog.ts',
-    'src/common.ts',
-    'src/complete-dialog.ts',
-    'src/editor.ts',
-    'src/main.ts'
-  },
+  input: 'src/main.ts',
   output: {
     file: `dist/${outputFile}`,
     format: 'es',
