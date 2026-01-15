@@ -75,12 +75,22 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
 
   private getUsers(): User[] {
     if (!this.hass) {
+      console.error("Arcade Judge: this.hass is not available");
       return [];
     }
+
+    console.log("Arcade Judge: Checking for sensor.users...");
+    console.log("Arcade Judge: this.hass.states exists?", !!this.hass.states);
+    console.log("Arcade Judge: sensor.users exists?", !!this.hass.states["sensor.users"]);
 
     // First try the dedicated users sensor
     if (this.hass.states["sensor.users"]) {
       const state = this.hass.states["sensor.users"];
+      console.log("Arcade Judge: sensor.users state:", state);
+      console.log("Arcade Judge: sensor.users attributes:", state.attributes);
+      console.log("Arcade Judge: sensor.users has users attribute?", !!state.attributes.users);
+      console.log("Arcade Judge: sensor.users users is array?", Array.isArray(state.attributes.users));
+
       if (state.attributes.users && Array.isArray(state.attributes.users)) {
         console.log("Arcade Judge: Found users in sensor.users:", state.attributes.users);
         return state.attributes.users as User[];
@@ -88,6 +98,7 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
     }
 
     // Fallback: try to get users from any ChoreBoard entity attributes
+    console.log("Arcade Judge: Searching other sensors...");
     for (const entityId of Object.keys(this.hass.states)) {
       if (entityId.startsWith("sensor.choreboard_") || entityId.includes("pending_arcade")) {
         const state = this.hass.states[entityId];
