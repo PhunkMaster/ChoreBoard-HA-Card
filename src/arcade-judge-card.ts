@@ -80,14 +80,16 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
 
     // Try to get users from any ChoreBoard entity attributes
     for (const entityId of Object.keys(this.hass.states)) {
-      if (entityId.startsWith("sensor.choreboard_")) {
+      if (entityId.startsWith("sensor.choreboard_") || entityId.includes("pending_arcade")) {
         const state = this.hass.states[entityId];
         if (state.attributes.users && Array.isArray(state.attributes.users)) {
+          console.log(`Arcade Judge: Found users in ${entityId}:`, state.attributes.users);
           return state.attributes.users as User[];
         }
       }
     }
 
+    console.warn("Arcade Judge: No users found in any ChoreBoard sensor attributes");
     return [];
   }
 
@@ -127,6 +129,17 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
     if (!this.hass) return;
 
     const users = this.getUsers();
+    console.log("Arcade Judge: Retrieved users for dialog:", users);
+
+    // Check if users are available
+    if (users.length === 0) {
+      console.error("Arcade Judge: No users found for judge selection");
+      this.showToast(
+        "No users available. Make sure ChoreBoard integration is properly configured.",
+        true,
+      );
+      return;
+    }
 
     // In auto mode, use the logged-in HA user without showing dialog
     if (this.config.judge_mode === "auto") {
@@ -155,6 +168,7 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
     };
     dialog.users = users;
     dialog.session = session;
+    console.log("Arcade Judge: Created dialog with", users.length, "users");
 
     dialog.addEventListener("judge-approved", async (e: Event) => {
       const customEvent = e as CustomEvent;
