@@ -78,7 +78,16 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
       return [];
     }
 
-    // Try to get users from any ChoreBoard entity attributes
+    // First try the dedicated users sensor
+    if (this.hass.states["sensor.users"]) {
+      const state = this.hass.states["sensor.users"];
+      if (state.attributes.users && Array.isArray(state.attributes.users)) {
+        console.log("Arcade Judge: Found users in sensor.users:", state.attributes.users);
+        return state.attributes.users as User[];
+      }
+    }
+
+    // Fallback: try to get users from any ChoreBoard entity attributes
     for (const entityId of Object.keys(this.hass.states)) {
       if (entityId.startsWith("sensor.choreboard_") || entityId.includes("pending_arcade")) {
         const state = this.hass.states[entityId];
