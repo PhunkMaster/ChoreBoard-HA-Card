@@ -1228,7 +1228,10 @@ function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
               Select a sensor...
             </option>
             ${e.map(e=>B`
-                <option value="${e}" ?selected=${this.config.entity===e}>
+                <option
+                  value="${e}"
+                  ?selected=${this.config.entity===e}
+                >
                   ${e}
                 </option>
               `)}
