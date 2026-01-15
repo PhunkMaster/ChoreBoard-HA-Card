@@ -1229,10 +1229,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
                     Select a sensor...
                   </option>
                   ${e.map(e=>B`
-                      <option
-                        value="${e}"
-                        ?selected=${this.config.entity===e}
-                      >
+                      <option value="${e}" ?selected=${this.config.entity===e}>
                         ${e}
                       </option>
                     `)}
@@ -1249,8 +1246,8 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
                   <ha-icon icon="mdi:information"></ha-icon>
                   <span>
                     Enter the entity ID manually. The sensor should be named
-                    <code>sensor.pending_arcade_sessions</code> if the
-                    ChoreBoard integration is properly installed.
+                    <code>sensor.pending_arcade_sessions</code> if the ChoreBoard
+                    integration is properly installed.
                   </span>
                 </div>
               `}
@@ -1306,10 +1303,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
         <div class="option">
           <label for="judge_mode">Judge Selection Mode</label>
           <select id="judge_mode" @change=${this.judgeModeChanged}>
-            <option
-              value="ask"
-              ?selected=${"ask"===(this.config.judge_mode||"ask")}
-            >
+            <option value="ask" ?selected=${"ask"===(this.config.judge_mode||"ask")}>
               Ask who is judging (Show user selector)
             </option>
             <option value="auto" ?selected=${"auto"===this.config.judge_mode}>
@@ -1319,8 +1313,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <div class="help-text">
             <strong>Ask mode:</strong> Shows user selector dialog when judging.
             <br />
-            <strong>Auto mode:</strong> Automatically uses the currently
-            logged-in Home Assistant user as the judge.
+            <strong>Auto mode:</strong> Automatically uses the currently logged-in Home Assistant user as the judge.
           </div>
         </div>
       </div>
@@ -1712,26 +1705,24 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           </div>
 
           <!-- Judge selection -->
-          ${this.users.length>1?B`
-                <div class="section">
-                  <h3>Select Judge <span class="optional">(optional)</span></h3>
-                  <div class="user-list">
-                    ${this.users.map(e=>B`
-                        <div
-                          class="user-option ${this.selectedJudgeId===e.id?"selected":""}"
-                          @click=${()=>this._selectJudge(e.id)}
-                        >
-                          <ha-icon icon="mdi:account"></ha-icon>
-                          <span>${e.display_name}</span>
-                          ${this.selectedJudgeId===e.id?B`<ha-icon
-                                icon="mdi:check"
-                                class="check-icon"
-                              ></ha-icon>`:""}
-                        </div>
-                      `)}
+          <div class="section">
+            <h3>Who is judging? <span class="required">*</span></h3>
+            <div class="user-list">
+              ${this.users.map(e=>B`
+                  <div
+                    class="user-option ${this.selectedJudgeId===e.id?"selected":""}"
+                    @click=${()=>this._selectJudge(e.id)}
+                  >
+                    <ha-icon icon="mdi:account"></ha-icon>
+                    <span>${e.display_name}</span>
+                    ${this.selectedJudgeId===e.id?B`<ha-icon
+                          icon="mdi:check"
+                          class="check-icon"
+                        ></ha-icon>`:""}
                   </div>
-                </div>
-              `:""}
+                `)}
+            </div>
+          </div>
 
           <!-- Notes section -->
           <div class="section">
@@ -1750,6 +1741,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
             <mwc-button
               class="approve-button"
               @click=${()=>this._setAction("approve")}
+              ?disabled=${!this.selectedJudgeId}
               raised
             >
               <ha-icon icon="mdi:check-circle"></ha-icon>
@@ -1758,6 +1750,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
             <mwc-button
               class="deny-button"
               @click=${()=>this._setAction("deny")}
+              ?disabled=${!this.selectedJudgeId}
               raised
             >
               <ha-icon icon="mdi:close-circle"></ha-icon>
@@ -1842,6 +1835,12 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
         color: var(--secondary-text-color);
         font-weight: 400;
         font-size: 12px;
+      }
+
+      .required {
+        color: var(--error-color, #f44336);
+        font-weight: 700;
+        margin-left: 4px;
       }
 
       .user-list {
