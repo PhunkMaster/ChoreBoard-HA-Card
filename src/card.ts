@@ -169,9 +169,17 @@ export class ChoreboardCard extends LitElement {
       return;
     }
 
+    // Get the user ID of whose chore list this is (not the HA logged-in user)
+    const userId = this.getCurrentUserId();
+    if (!userId) {
+      this.showToast("Unable to determine user for completion", true);
+      return;
+    }
+
     try {
       await this.hass.callService("choreboard", "mark_complete", {
         chore_id: chore.id,
+        completed_by_user_id: userId,
       });
       this.showToast(`Marked "${chore.name}" as complete`);
     } catch (error) {
