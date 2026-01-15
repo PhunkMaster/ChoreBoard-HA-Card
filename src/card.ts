@@ -171,7 +171,7 @@ export class ChoreboardCard extends LitElement {
 
     try {
       await this.hass.callService("choreboard", "mark_complete", {
-        instance_id: chore.id,
+        chore_id: chore.id,
       });
       this.showToast(`Marked "${chore.name}" as complete`);
     } catch (error) {
