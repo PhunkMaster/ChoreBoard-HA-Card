@@ -29,6 +29,7 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
       show_header: true,
       auto_refresh: true,
       refresh_interval: 30,
+      judge_mode: "ask",
       ...config,
     };
   }
@@ -90,11 +91,60 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
     return [];
   }
 
+  private getCurrentJudgeId(): number | null {
+    if (!this.hass || !this.hass.user) {
+      return null;
+    }
+
+    // Get current Home Assistant user
+    const haUser = this.hass.user;
+    const haUsername = haUser.name?.toLowerCase();
+
+    if (!haUsername) {
+      return null;
+    }
+
+    // Find matching ChoreBoard user by username
+    const users = this.getUsers();
+    const choregboardUser = users.find(
+      (u) => u.username.toLowerCase() === haUsername,
+    );
+
+    if (choregboardUser) {
+      console.log(
+        `Arcade Judge: Mapped HA user "${haUsername}" to ChoreBoard user ID ${choregboardUser.id}`,
+      );
+      return choregboardUser.id;
+    }
+
+    console.warn(
+      `Arcade Judge: Could not find ChoreBoard user matching HA username "${haUsername}"`,
+    );
+    return null;
+  }
+
   private async showJudgeDialog(session: ArcadeSession): Promise<void> {
     if (!this.hass) return;
 
     const users = this.getUsers();
 
+    // In auto mode, use the logged-in HA user without showing dialog
+    if (this.config.judge_mode === "auto") {
+      const judgeId = this.getCurrentJudgeId();
+      if (!judgeId) {
+        this.showToast(
+          "Cannot determine current user. Please select a judge manually.",
+          true,
+        );
+        // Fall through to show dialog
+      } else {
+        // Show quick action selection without user selector
+        await this.showQuickJudgeDialog(session, judgeId);
+        return;
+      }
+    }
+
+    // Ask mode - show full dialog with user selector
     // Dynamically import and create dialog
     await import("./arcade-judge-dialog");
     const dialog = document.createElement(
@@ -167,6 +217,52 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
     });
 
     document.body.appendChild(dialog);
+  }
+
+  private async showQuickJudgeDialog(
+    session: ArcadeSession,
+    judgeId: number,
+  ): Promise<void> {
+    if (!this.hass) return;
+
+    // Get judge user info for display
+    const users = this.getUsers();
+    const judge = users.find((u) => u.id === judgeId);
+    const judgeName = judge
+      ? judge.display_name || judge.username
+      : "Current User";
+
+    // Create simple confirmation dialog
+    const action = confirm(
+      `Judge arcade session for "${session.chore_name}" by ${session.user_display_name || session.user_name}?\n\n` +
+        `Time: ${this.formatTime(session.elapsed_seconds)}\n` +
+        `Judge: ${judgeName}\n\n` +
+        `Click OK to APPROVE or Cancel to DENY.`,
+    );
+
+    try {
+      const serviceData: Record<string, any> = {
+        session_id: session.id,
+        judge_id: judgeId,
+      };
+
+      if (action) {
+        // Approved
+        await this.hass.callService(
+          "choreboard",
+          "approve_arcade",
+          serviceData,
+        );
+        this.showToast("Arcade session approved - points awarded!");
+      } else {
+        // Denied
+        await this.hass.callService("choreboard", "deny_arcade", serviceData);
+        this.showToast("Arcade session denied - user can continue");
+      }
+    } catch (error) {
+      console.error("Error judging arcade session:", error);
+      this.showToast("Failed to judge arcade session", true);
+    }
   }
 
   private showToast(message: string, isError = false): void {

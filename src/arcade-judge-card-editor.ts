@@ -45,6 +45,12 @@ export class ChoreboardArcadeJudgeCardEditor extends LitElement {
     }
   }
 
+  private judgeModeChanged(ev: Event): void {
+    const target = ev.target as HTMLSelectElement;
+    this.config = { ...this.config, judge_mode: target.value as "auto" | "ask" };
+    this.configChanged();
+  }
+
   private configChanged(): void {
     const event = new CustomEvent("config-changed", {
       detail: { config: this.config },
@@ -175,6 +181,23 @@ export class ChoreboardArcadeJudgeCardEditor extends LitElement {
               </div>
             `
           : ""}
+
+        <div class="option">
+          <label for="judge_mode">Judge Selection Mode</label>
+          <select id="judge_mode" @change=${this.judgeModeChanged}>
+            <option value="ask" ?selected=${(this.config.judge_mode || "ask") === "ask"}>
+              Ask who is judging (Show user selector)
+            </option>
+            <option value="auto" ?selected=${this.config.judge_mode === "auto"}>
+              Use logged-in Home Assistant user
+            </option>
+          </select>
+          <div class="help-text">
+            <strong>Ask mode:</strong> Shows user selector dialog when judging.
+            <br />
+            <strong>Auto mode:</strong> Automatically uses the currently logged-in Home Assistant user as the judge.
+          </div>
+        </div>
       </div>
     `;
   }
@@ -272,6 +295,17 @@ export class ChoreboardArcadeJudgeCardEditor extends LitElement {
         border-radius: 3px;
         font-family: monospace;
         font-size: 12px;
+      }
+
+      .help-text {
+        font-size: 12px;
+        color: var(--secondary-text-color);
+        line-height: 1.5;
+        margin-top: 4px;
+      }
+
+      .help-text strong {
+        color: var(--primary-text-color);
       }
     `;
   }

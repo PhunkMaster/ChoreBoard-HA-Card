@@ -27,6 +27,7 @@ export interface ChoreboardArcadeJudgeCardConfig {
   show_header?: boolean; // Show card header (default: true)
   auto_refresh?: boolean; // Auto-refresh pending sessions (default: true)
   refresh_interval?: number; // Refresh interval in seconds (default: 30)
+  judge_mode?: "auto" | "ask"; // Auto-use logged-in HA user or ask (default: "ask")
 }
 
 // Chore object from the sensor's attributes.chores list
