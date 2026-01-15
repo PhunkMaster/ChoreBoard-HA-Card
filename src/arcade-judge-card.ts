@@ -75,41 +75,27 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
 
   private getUsers(): User[] {
     if (!this.hass) {
-      console.error("Arcade Judge: this.hass is not available");
       return [];
     }
-
-    console.log("Arcade Judge: Checking for sensor.users...");
-    console.log("Arcade Judge: this.hass.states exists?", !!this.hass.states);
-    console.log("Arcade Judge: sensor.users exists?", !!this.hass.states["sensor.users"]);
 
     // First try the dedicated users sensor
     if (this.hass.states["sensor.users"]) {
       const state = this.hass.states["sensor.users"];
-      console.log("Arcade Judge: sensor.users state:", state);
-      console.log("Arcade Judge: sensor.users attributes:", state.attributes);
-      console.log("Arcade Judge: sensor.users has users attribute?", !!state.attributes.users);
-      console.log("Arcade Judge: sensor.users users is array?", Array.isArray(state.attributes.users));
-
       if (state.attributes.users && Array.isArray(state.attributes.users)) {
-        console.log("Arcade Judge: Found users in sensor.users:", state.attributes.users);
         return state.attributes.users as User[];
       }
     }
 
     // Fallback: try to get users from any ChoreBoard entity attributes
-    console.log("Arcade Judge: Searching other sensors...");
     for (const entityId of Object.keys(this.hass.states)) {
       if (entityId.startsWith("sensor.choreboard_") || entityId.includes("pending_arcade")) {
         const state = this.hass.states[entityId];
         if (state.attributes.users && Array.isArray(state.attributes.users)) {
-          console.log(`Arcade Judge: Found users in ${entityId}:`, state.attributes.users);
           return state.attributes.users as User[];
         }
       }
     }
 
-    console.warn("Arcade Judge: No users found in any ChoreBoard sensor attributes");
     return [];
   }
 
@@ -149,11 +135,9 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
     if (!this.hass) return;
 
     const users = this.getUsers();
-    console.log("Arcade Judge: Retrieved users for dialog:", users);
 
     // Check if users are available
     if (users.length === 0) {
-      console.error("Arcade Judge: No users found for judge selection");
       this.showToast(
         "No users available. Make sure ChoreBoard integration is properly configured.",
         true,
@@ -188,7 +172,6 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
     };
     dialog.users = users;
     dialog.session = session;
-    console.log("Arcade Judge: Created dialog with", users.length, "users");
 
     dialog.addEventListener("judge-approved", async (e: Event) => {
       const customEvent = e as CustomEvent;

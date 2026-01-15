@@ -958,11 +958,13 @@ export class ChoreboardCard extends LitElement {
                               <mwc-button
                                 @click=${() => this.claimChore(chore)}
                               >
+                                <ha-icon icon="mdi:hand-extended"></ha-icon>
                                 Claim
                               </mwc-button>
                               <mwc-button
                                 @click=${() => this.completePoolChore(chore)}
                               >
+                                <ha-icon icon="mdi:check-circle"></ha-icon>
                                 Complete
                               </mwc-button>
                             </div>
@@ -971,6 +973,7 @@ export class ChoreboardCard extends LitElement {
                             <mwc-button
                               @click=${() => this.completeChore(chore)}
                             >
+                              <ha-icon icon="mdi:check-circle"></ha-icon>
                               Complete
                             </mwc-button>
                           `}

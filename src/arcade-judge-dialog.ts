@@ -13,7 +13,6 @@ export class ArcadeJudgeDialog extends LitElement {
 
   protected render(): TemplateResult {
     const elapsedTime = this.formatTime(this.session.elapsed_seconds);
-    console.log("Arcade Judge Dialog: Rendering with", this.users.length, "users:", this.users);
 
     return html`
       <ha-dialog open @closed=${this._handleClosed}>
