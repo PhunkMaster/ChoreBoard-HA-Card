@@ -23,7 +23,7 @@ export interface ChoreboardCardConfig {
 export interface ChoreboardArcadeJudgeCardConfig {
   type: string;
   title?: string;
-  entity: string; // ChoreBoard pending arcade sensor entity ID (e.g., sensor.choreboard_pending_arcade)
+  entity: string; // ChoreBoard pending arcade sensor entity ID (e.g., sensor.pending_arcade_sessions)
   show_header?: boolean; // Show card header (default: true)
   auto_refresh?: boolean; // Auto-refresh pending sessions (default: true)
   refresh_interval?: number; // Refresh interval in seconds (default: 30)

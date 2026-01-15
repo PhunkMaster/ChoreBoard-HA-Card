@@ -21,7 +21,7 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
 
     if (!config.entity) {
       throw new Error(
-        'You must specify an "entity" (e.g., sensor.choreboard_pending_arcade)',
+        'You must specify an "entity" (e.g., sensor.pending_arcade_sessions)',
       );
     }
 
@@ -42,7 +42,7 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
     return {
       type: "custom:choreboard-arcade-judge-card",
       title: "Arcade Judge Panel",
-      entity: "sensor.choreboard_pending_arcade",
+      entity: "sensor.pending_arcade_sessions",
       show_header: true,
     };
   }
@@ -59,7 +59,8 @@ export class ChoreboardArcadeJudgeCard extends LitElement {
     const stateObj = this.hass.states[this.config.entity];
     if (!stateObj) {
       console.warn(
-        `ChoreBoard Pending Arcade entity not found: ${this.config.entity}`,
+        `ChoreBoard Pending Arcade entity not found: ${this.config.entity}. ` +
+        `Make sure the ChoreBoard integration is installed and the pending arcade sensor exists.`,
       );
       return [];
     }

@@ -61,11 +61,13 @@ export class ChoreboardArcadeJudgeCardEditor extends LitElement {
 
     const entities: string[] = [];
 
-    // Find pending arcade sensor
+    // Find pending arcade sensor - try multiple naming patterns
     for (const entityId of Object.keys(this.hass.states)) {
       if (
+        entityId === "sensor.pending_arcade_sessions" ||
+        entityId === "sensor.choreboard_pending_arcade" ||
         entityId.startsWith("sensor.choreboard_pending_arcade") ||
-        entityId === "sensor.choreboard_pending_arcade"
+        entityId.includes("pending_arcade")
       ) {
         entities.push(entityId);
       }
