@@ -20,6 +20,15 @@ export interface ChoreboardCardConfig {
   arcade_poll_interval?: number; // Timer update interval in seconds (default: 30)
 }
 
+export interface ChoreboardArcadeJudgeCardConfig {
+  type: string;
+  title?: string;
+  entity: string; // ChoreBoard pending arcade sensor entity ID (e.g., sensor.choreboard_pending_arcade)
+  show_header?: boolean; // Show card header (default: true)
+  auto_refresh?: boolean; // Auto-refresh pending sessions (default: true)
+  refresh_interval?: number; // Refresh interval in seconds (default: 30)
+}
+
 // Chore object from the sensor's attributes.chores list
 export interface Chore {
   id: number; // Instance ID for API calls
@@ -66,6 +75,7 @@ export interface ArcadeSession {
   chore_name: string;
   user_id: number;
   user_name: string;
+  user_display_name?: string; // Optional friendly display name
   start_time: string; // ISO timestamp
   elapsed_seconds: number; // Current elapsed time
   status: "active" | "stopped" | "judging" | "approved" | "denied";

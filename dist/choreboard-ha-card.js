@@ -1,4 +1,4 @@
-function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPropertyDescriptor(t,o):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)a=Reflect.decorate(e,t,o,s);else for(var n=e.length-1;n>=0;n--)(i=e[n])&&(a=(r<3?i(a):r>3?i(t,o,a):i(t,o))||a);return r>3&&a&&Object.defineProperty(t,o,a),a}"function"==typeof SuppressedError&&SuppressedError;const t=globalThis,o=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),i=new WeakMap;let r=class{constructor(e,t,o){if(this._$cssResult$=!0,o!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(o&&void 0===e){const o=void 0!==t&&1===t.length;o&&(e=i.get(t)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),o&&i.set(t,e))}return e}toString(){return this.cssText}};const a=(e,...t)=>{const o=1===e.length?e[0]:t.reduce((t,o,s)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(o)+e[s+1],e[0]);return new r(o,e,s)},n=o?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const o of e.cssRules)t+=o.cssText;return(e=>new r("string"==typeof e?e:e+"",void 0,s))(t)})(e):e,{is:c,defineProperty:d,getOwnPropertyDescriptor:l,getOwnPropertyNames:h,getOwnPropertySymbols:p,getPrototypeOf:u}=Object,g=globalThis,m=g.trustedTypes,f=m?m.emptyScript:"",v=g.reactiveElementPolyfillSupport,b=(e,t)=>e,y={toAttribute(e,t){switch(t){case Boolean:e=e?f:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let o=e;switch(t){case Boolean:o=null!==e;break;case Number:o=null===e?null:Number(e);break;case Object:case Array:try{o=JSON.parse(e)}catch(e){o=null}}return o}},_=(e,t)=>!c(e,t),x={attribute:!0,type:String,converter:y,reflect:!1,useDefault:!1,hasChanged:_};Symbol.metadata??=Symbol("metadata"),g.litPropertyMetadata??=new WeakMap;let w=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=x){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const o=Symbol(),s=this.getPropertyDescriptor(e,o,t);void 0!==s&&d(this.prototype,e,s)}}static getPropertyDescriptor(e,t,o){const{get:s,set:i}=l(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:s,set(t){const r=s?.call(this);i?.call(this,t),this.requestUpdate(e,r,o)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??x}static _$Ei(){if(this.hasOwnProperty(b("elementProperties")))return;const e=u(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(b("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(b("properties"))){const e=this.properties,t=[...h(e),...p(e)];for(const o of t)this.createProperty(o,e[o])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,o]of t)this.elementProperties.set(e,o)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const o=this._$Eu(e,t);void 0!==o&&this._$Eh.set(o,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const o=new Set(e.flat(1/0).reverse());for(const e of o)t.unshift(n(e))}else void 0!==e&&t.push(n(e));return t}static _$Eu(e,t){const o=t.attribute;return!1===o?void 0:"string"==typeof o?o:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const o of t.keys())this.hasOwnProperty(o)&&(e.set(o,this[o]),delete this[o]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((e,s)=>{if(o)e.adoptedStyleSheets=s.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const o of s){const s=document.createElement("style"),i=t.litNonce;void 0!==i&&s.setAttribute("nonce",i),s.textContent=o.cssText,e.appendChild(s)}})(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,o){this._$AK(e,o)}_$ET(e,t){const o=this.constructor.elementProperties.get(e),s=this.constructor._$Eu(e,o);if(void 0!==s&&!0===o.reflect){const i=(void 0!==o.converter?.toAttribute?o.converter:y).toAttribute(t,o.type);this._$Em=e,null==i?this.removeAttribute(s):this.setAttribute(s,i),this._$Em=null}}_$AK(e,t){const o=this.constructor,s=o._$Eh.get(e);if(void 0!==s&&this._$Em!==s){const e=o.getPropertyOptions(s),i="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:y;this._$Em=s;const r=i.fromAttribute(t,e.type);this[s]=r??this._$Ej?.get(s)??r,this._$Em=null}}requestUpdate(e,t,o){if(void 0!==e){const s=this.constructor,i=this[e];if(o??=s.getPropertyOptions(e),!((o.hasChanged??_)(i,t)||o.useDefault&&o.reflect&&i===this._$Ej?.get(e)&&!this.hasAttribute(s._$Eu(e,o))))return;this.C(e,t,o)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:o,reflect:s,wrapped:i},r){o&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,r??t??this[e]),!0!==i||void 0!==r)||(this._$AL.has(e)||(this.hasUpdated||o||(t=void 0),this._$AL.set(e,t)),!0===s&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,o]of e){const{wrapped:e}=o,s=this[t];!0!==e||this._$AL.has(t)||void 0===s||this.C(t,void 0,o,s)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};w.elementStyles=[],w.shadowRootOptions={mode:"open"},w[b("elementProperties")]=new Map,w[b("finalized")]=new Map,v?.({ReactiveElement:w}),(g.reactiveElementVersions??=[]).push("2.1.1");const $=globalThis,C=$.trustedTypes,A=C?C.createPolicy("lit-html",{createHTML:e=>e}):void 0,k="$lit$",S=`lit$${Math.random().toFixed(9).slice(2)}$`,E="?"+S,U=`<${E}>`,T=document,P=()=>T.createComment(""),I=e=>null===e||"object"!=typeof e&&"function"!=typeof e,z=Array.isArray,O="[ \t\n\f\r]",H=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,j=/-->/g,M=/>/g,N=RegExp(`>|${O}(?:([^\\s"'>=/]+)(${O}*=${O}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),L=/'/g,R=/"/g,D=/^(?:script|style|textarea|title)$/i,B=(e=>(t,...o)=>({_$litType$:e,strings:t,values:o}))(1),W=Symbol.for("lit-noChange"),J=Symbol.for("lit-nothing"),F=new WeakMap,q=T.createTreeWalker(T,129);function V(e,t){if(!z(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==A?A.createHTML(t):t}const Y=(e,t)=>{const o=e.length-1,s=[];let i,r=2===t?"<svg>":3===t?"<math>":"",a=H;for(let t=0;t<o;t++){const o=e[t];let n,c,d=-1,l=0;for(;l<o.length&&(a.lastIndex=l,c=a.exec(o),null!==c);)l=a.lastIndex,a===H?"!--"===c[1]?a=j:void 0!==c[1]?a=M:void 0!==c[2]?(D.test(c[2])&&(i=RegExp("</"+c[2],"g")),a=N):void 0!==c[3]&&(a=N):a===N?">"===c[0]?(a=i??H,d=-1):void 0===c[1]?d=-2:(d=a.lastIndex-c[2].length,n=c[1],a=void 0===c[3]?N:'"'===c[3]?R:L):a===R||a===L?a=N:a===j||a===M?a=H:(a=N,i=void 0);const h=a===N&&e[t+1].startsWith("/>")?" ":"";r+=a===H?o+U:d>=0?(s.push(n),o.slice(0,d)+k+o.slice(d)+S+h):o+S+(-2===d?t:h)}return[V(e,r+(e[o]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),s]};class K{constructor({strings:e,_$litType$:t},o){let s;this.parts=[];let i=0,r=0;const a=e.length-1,n=this.parts,[c,d]=Y(e,t);if(this.el=K.createElement(c,o),q.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(s=q.nextNode())&&n.length<a;){if(1===s.nodeType){if(s.hasAttributes())for(const e of s.getAttributeNames())if(e.endsWith(k)){const t=d[r++],o=s.getAttribute(e).split(S),a=/([.?@])?(.*)/.exec(t);n.push({type:1,index:i,name:a[2],strings:o,ctor:"."===a[1]?ee:"?"===a[1]?te:"@"===a[1]?oe:X}),s.removeAttribute(e)}else e.startsWith(S)&&(n.push({type:6,index:i}),s.removeAttribute(e));if(D.test(s.tagName)){const e=s.textContent.split(S),t=e.length-1;if(t>0){s.textContent=C?C.emptyScript:"";for(let o=0;o<t;o++)s.append(e[o],P()),q.nextNode(),n.push({type:2,index:++i});s.append(e[t],P())}}}else if(8===s.nodeType)if(s.data===E)n.push({type:2,index:i});else{let e=-1;for(;-1!==(e=s.data.indexOf(S,e+1));)n.push({type:7,index:i}),e+=S.length-1}i++}}static createElement(e,t){const o=T.createElement("template");return o.innerHTML=e,o}}function Z(e,t,o=e,s){if(t===W)return t;let i=void 0!==s?o._$Co?.[s]:o._$Cl;const r=I(t)?void 0:t._$litDirective$;return i?.constructor!==r&&(i?._$AO?.(!1),void 0===r?i=void 0:(i=new r(e),i._$AT(e,o,s)),void 0!==s?(o._$Co??=[])[s]=i:o._$Cl=i),void 0!==i&&(t=Z(e,i._$AS(e,t.values),i,s)),t}class G{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:o}=this._$AD,s=(e?.creationScope??T).importNode(t,!0);q.currentNode=s;let i=q.nextNode(),r=0,a=0,n=o[0];for(;void 0!==n;){if(r===n.index){let t;2===n.type?t=new Q(i,i.nextSibling,this,e):1===n.type?t=new n.ctor(i,n.name,n.strings,this,e):6===n.type&&(t=new se(i,this,e)),this._$AV.push(t),n=o[++a]}r!==n?.index&&(i=q.nextNode(),r++)}return q.currentNode=T,s}p(e){let t=0;for(const o of this._$AV)void 0!==o&&(void 0!==o.strings?(o._$AI(e,o,t),t+=o.strings.length-2):o._$AI(e[t])),t++}}class Q{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,o,s){this.type=2,this._$AH=J,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=o,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=Z(this,e,t),I(e)?e===J||null==e||""===e?(this._$AH!==J&&this._$AR(),this._$AH=J):e!==this._$AH&&e!==W&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>z(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==J&&I(this._$AH)?this._$AA.nextSibling.data=e:this.T(T.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:o}=e,s="number"==typeof o?this._$AC(e):(void 0===o.el&&(o.el=K.createElement(V(o.h,o.h[0]),this.options)),o);if(this._$AH?._$AD===s)this._$AH.p(t);else{const e=new G(s,this),o=e.u(this.options);e.p(t),this.T(o),this._$AH=e}}_$AC(e){let t=F.get(e.strings);return void 0===t&&F.set(e.strings,t=new K(e)),t}k(e){z(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let o,s=0;for(const i of e)s===t.length?t.push(o=new Q(this.O(P()),this.O(P()),this,this.options)):o=t[s],o._$AI(i),s++;s<t.length&&(this._$AR(o&&o._$AB.nextSibling,s),t.length=s)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=e.nextSibling;e.remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class X{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,o,s,i){this.type=1,this._$AH=J,this._$AN=void 0,this.element=e,this.name=t,this._$AM=s,this.options=i,o.length>2||""!==o[0]||""!==o[1]?(this._$AH=Array(o.length-1).fill(new String),this.strings=o):this._$AH=J}_$AI(e,t=this,o,s){const i=this.strings;let r=!1;if(void 0===i)e=Z(this,e,t,0),r=!I(e)||e!==this._$AH&&e!==W,r&&(this._$AH=e);else{const s=e;let a,n;for(e=i[0],a=0;a<i.length-1;a++)n=Z(this,s[o+a],t,a),n===W&&(n=this._$AH[a]),r||=!I(n)||n!==this._$AH[a],n===J?e=J:e!==J&&(e+=(n??"")+i[a+1]),this._$AH[a]=n}r&&!s&&this.j(e)}j(e){e===J?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class ee extends X{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===J?void 0:e}}class te extends X{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==J)}}class oe extends X{constructor(e,t,o,s,i){super(e,t,o,s,i),this.type=5}_$AI(e,t=this){if((e=Z(this,e,t,0)??J)===W)return;const o=this._$AH,s=e===J&&o!==J||e.capture!==o.capture||e.once!==o.once||e.passive!==o.passive,i=e!==J&&(o===J||s);s&&this.element.removeEventListener(this.name,this,o),i&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class se{constructor(e,t,o){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=o}get _$AU(){return this._$AM._$AU}_$AI(e){Z(this,e)}}const ie=$.litHtmlPolyfillSupport;ie?.(K,Q),($.litHtmlVersions??=[]).push("3.3.1");const re=globalThis;class ae extends w{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,o)=>{const s=o?.renderBefore??t;let i=s._$litPart$;if(void 0===i){const e=o?.renderBefore??null;s._$litPart$=i=new Q(t.insertBefore(P(),e),e,void 0,o??{})}return i._$AI(e),i})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return W}}ae._$litElement$=!0,ae.finalized=!0,re.litElementHydrateSupport?.({LitElement:ae});const ne=re.litElementPolyfillSupport;ne?.({LitElement:ae}),(re.litElementVersions??=[]).push("4.2.1");const ce=e=>(t,o)=>{void 0!==o?o.addInitializer(()=>{customElements.define(e,t)}):customElements.define(e,t)},de={attribute:!0,type:String,converter:y,reflect:!1,hasChanged:_},le=(e=de,t,o)=>{const{kind:s,metadata:i}=o;let r=globalThis.litPropertyMetadata.get(i);if(void 0===r&&globalThis.litPropertyMetadata.set(i,r=new Map),"setter"===s&&((e=Object.create(e)).wrapped=!0),r.set(o.name,e),"accessor"===s){const{name:s}=o;return{set(o){const i=t.get.call(this);t.set.call(this,o),this.requestUpdate(s,i,e)},init(t){return void 0!==t&&this.C(s,void 0,e,t),t}}}if("setter"===s){const{name:s}=o;return function(o){const i=this[s];t.call(this,o),this.requestUpdate(s,i,e)}}throw Error("Unsupported decorator location: "+s)};function he(e){return(t,o)=>"object"==typeof o?le(e,t,o):((e,t,o)=>{const s=t.hasOwnProperty(o);return t.constructor.createProperty(o,e),s?Object.getOwnPropertyDescriptor(t,o):void 0})(e,t,o)}function pe(e){return he({...e,state:!0,attribute:!1})}let ue=class extends ae{constructor(){super(...arguments),this.arcadeSession=null,this.expandedLeaderboards=new Set,this.arcadeTimerInterval=null}setConfig(e){if(!e)throw new Error("Invalid configuration");if(!e.entity)throw new Error('You must specify an "entity" (e.g., sensor.choreboard_my_chores_ash). Please configure the ChoreBoard integration first.');this.config={show_header:!0,show_points:!0,show_completed:!0,show_overdue_only:!1,show_undo:!1,show_user_points:!1,show_arcade:!0,show_arcade_leaderboards:!0,show_judge_controls:!0,arcade_poll_interval:30,...e}}getCardSize(){const e=this.getChores();return Math.max(2,Math.ceil(e.length/2)+1)}static getStubConfig(){return{type:"custom:choreboard-card",title:"My Chores",entity:"sensor.choreboard_my_chores_ash",show_header:!0,show_points:!0,show_completed:!0}}static getConfigElement(){return document.createElement("choreboard-card-editor")}connectedCallback(){super.connectedCallback(),this.startArcadePolling()}disconnectedCallback(){super.disconnectedCallback(),this.stopArcadePolling()}startArcadePolling(){this.config?.show_arcade&&(this.stopArcadePolling(),this.arcadeTimerInterval=window.setInterval(()=>this.fetchArcadeStatus(),1e3*(this.config.arcade_poll_interval||30)),this.fetchArcadeStatus())}stopArcadePolling(){null!==this.arcadeTimerInterval&&(clearInterval(this.arcadeTimerInterval),this.arcadeTimerInterval=null)}async fetchArcadeStatus(){if(!this.hass||!this.config.entity)return;const e=this.hass.states[this.config.entity];if(e&&e.attributes.arcade_session)this.arcadeSession=e.attributes.arcade_session;else{for(const e of Object.keys(this.hass.states))if(e.startsWith("sensor.choreboard_")){const t=this.hass.states[e];if(t.attributes.arcade_session)return void(this.arcadeSession=t.attributes.arcade_session)}this.arcadeSession=null}}getChores(){if(!this.hass||!this.config.entity)return[];const e=this.hass.states[this.config.entity];if(!e)return console.warn(`ChoreBoard entity not found: ${this.config.entity}`),[];return(e.attributes.chores||[]).filter(e=>!(!this.config.show_completed&&"completed"===e.status)&&!(this.config.show_overdue_only&&!e.is_overdue))}async completeChore(e){if(!this.hass)return;if("completed"===e.status)return void this.showToast("This chore is already marked as completed");const t=this.getCurrentUserId();if(t)try{await this.hass.callService("choreboard","mark_complete",{chore_id:e.id,completed_by_user_id:t}),this.showToast(`Marked "${e.name}" as complete`)}catch(e){console.error("Error marking chore as complete:",e),this.showToast("Failed to mark chore as complete",!0)}else this.showToast("Unable to determine user for completion",!0)}async undoCompletion(e){if(!this.hass)return;if("completed"!==e.status)return void this.showToast("This chore is not marked as completed");if(confirm(`Are you sure you want to undo completion of "${e.name}"?`))try{await this.hass.callService("choreboard","undo_completion",{chore_id:e.id}),this.showToast(`Undid completion of "${e.name}"`)}catch(e){console.error("Error undoing chore completion:",e),this.showToast("Failed to undo completion",!0)}}showToast(e,t=!1){const o=new CustomEvent("hass-notification",{detail:{message:e,duration:t?5e3:3e3},bubbles:!0,composed:!0});this.dispatchEvent(o)}getChoreStateClass(e){return"completed"===e.status?"state-completed":e.is_overdue?"state-overdue":"state-pending"}getChoreStateIcon(e){return"completed"===e.status?"mdi:check-circle":e.is_overdue?"mdi:alert-circle":"mdi:circle-outline"}getUsername(){if(!this.hass||!this.config.entity)return"";const e=this.hass.states[this.config.entity];if(!e)return"";return e.attributes.username||""}getPointsName(){if(!this.hass||!this.config.entity)return"points";const e=this.hass.states[this.config.entity];if(!e)return"points";return e.attributes.points_label||"points"}getUserPoints(){if(!this.hass||!this.config.entity)return{weekly:null,allTime:null};const e=this.getUsername();if(!e)return{weekly:null,allTime:null};const t=`sensor.${e}_weekly_points`,o=`sensor.${e}_all_time_points`,s=this.hass.states[t],i=this.hass.states[o];return{weekly:s?parseFloat(s.state):null,allTime:i?parseFloat(i.state):null}}isPoolChore(e){return"pool"===e.status||this.config.entity.endsWith("_chores")&&!this.config.entity.includes("_my_chores")}getUsers(){if(!this.hass)return[];for(const e of Object.keys(this.hass.states))if(e.startsWith("sensor.choreboard_")){const t=this.hass.states[e];if(t.attributes.users&&Array.isArray(t.attributes.users))return t.attributes.users}return[]}async claimChore(e){if(!this.hass)return;const t=this.getUsers();if(0===t.length)return void this.showToast("Unable to load users list",!0);await Promise.resolve().then(function(){return fe});const o=document.createElement("claim-chore-dialog");o.users=t,o.chore=e,o.addEventListener("dialog-confirmed",async t=>{const s=t.detail.userId;try{await this.hass.callService("choreboard","claim_chore",{chore_id:e.id,assign_to_user_id:s}),this.showToast("Chore claimed successfully")}catch(e){console.error("Error claiming chore:",e),this.showToast("Failed to claim chore",!0)}finally{o.remove()}}),o.addEventListener("dialog-closed",()=>{o.remove()}),document.body.appendChild(o)}async completePoolChore(e){if(!this.hass)return;const t=this.getUsers();if(0===t.length)return void this.showToast("Unable to load users list",!0);await Promise.resolve().then(function(){return be});const o=document.createElement("complete-chore-dialog");o.users=t,o.chore=e,o.addEventListener("dialog-confirmed",async t=>{const s=t,i=s.detail.userId,r=s.detail.helperIds||[];try{await this.hass.callService("choreboard","mark_complete",{chore_id:e.id,completed_by_user_id:i,helpers:r}),this.showToast("Chore marked as complete")}catch(e){console.error("Error completing chore:",e),this.showToast("Failed to complete chore",!0)}finally{o.remove()}}),o.addEventListener("dialog-closed",()=>{o.remove()}),document.body.appendChild(o)}async startArcade(e){if(this.hass)if(this.arcadeSession&&"active"===this.arcadeSession.status)this.showToast("An arcade session is already in progress",!0);else try{await this.hass.callService("choreboard","start_arcade",{instance_id:e.id}),this.showToast(`Started arcade mode for "${e.name}"`),await this.fetchArcadeStatus()}catch(e){console.error("Error starting arcade mode:",e),this.showToast("Failed to start arcade mode",!0)}}async stopArcade(e){if(this.hass)try{await this.hass.callService("choreboard","stop_arcade",{session_id:e.id}),this.showToast("Arcade session stopped - awaiting judge approval"),await this.fetchArcadeStatus()}catch(e){console.error("Error stopping arcade mode:",e),this.showToast("Failed to stop arcade mode",!0)}}async cancelArcade(e){if(!this.hass)return;if(confirm(`Are you sure you want to cancel the arcade session for "${e.chore_name}"?`))try{await this.hass.callService("choreboard","cancel_arcade",{session_id:e.id}),this.showToast("Arcade session cancelled"),await this.fetchArcadeStatus()}catch(e){console.error("Error cancelling arcade mode:",e),this.showToast("Failed to cancel arcade mode",!0)}}async continueArcade(e){if(this.hass)try{await this.hass.callService("choreboard","continue_arcade",{session_id:e.id}),this.showToast("Arcade session resumed"),await this.fetchArcadeStatus()}catch(e){console.error("Error continuing arcade mode:",e),this.showToast("Failed to continue arcade mode",!0)}}async showJudgeDialog(e){if(!this.hass)return;const t=this.getUsers();await Promise.resolve().then(function(){return _e});const o=document.createElement("arcade-judge-dialog");o.users=t,o.session=e,o.addEventListener("judge-approved",async t=>{const s=t,i=s.detail.judgeId,r=s.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","approve_arcade",t),this.showToast("Arcade session approved - points awarded!"),await this.fetchArcadeStatus()}catch(e){console.error("Error approving arcade session:",e),this.showToast("Failed to approve arcade session",!0)}finally{o.remove()}}),o.addEventListener("judge-denied",async t=>{const s=t,i=s.detail.judgeId,r=s.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","deny_arcade",t),this.showToast("Arcade session denied - user can continue"),await this.fetchArcadeStatus()}catch(e){console.error("Error denying arcade session:",e),this.showToast("Failed to deny arcade session",!0)}finally{o.remove()}}),o.addEventListener("dialog-closed",()=>{o.remove()}),document.body.appendChild(o)}formatTime(e){const t=Math.floor(e/3600),o=Math.floor(e%3600/60),s=Math.floor(e%60);return t>0?`${t}:${o.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`:`${o}:${s.toString().padStart(2,"0")}`}getCurrentElapsedTime(e){const t=new Date(e.start_time).getTime(),o=Date.now()-t;return e.elapsed_seconds+Math.floor(o/1e3)}getLeaderboardForChore(e){if(!this.hass)return null;for(const t of Object.keys(this.hass.states))if(t.startsWith("sensor.choreboard_")){const o=this.hass.states[t].attributes.chore_leaderboards;if(Array.isArray(o)){const t=o.find(t=>t.chore_id===e);if(t)return t}}const t=`sensor.arcade_${e}`,o=this.hass.states[t];return o&&o.attributes.high_scores?{chore_id:e,chore_name:o.attributes.chore_name||"",high_scores:o.attributes.high_scores}:null}toggleLeaderboard(e){this.expandedLeaderboards.has(e)?this.expandedLeaderboards.delete(e):this.expandedLeaderboards.add(e),this.requestUpdate()}getCurrentUserId(){const e=this.getUsername();if(!e)return null;const t=this.getUsers().find(t=>t.username===e);return t?t.id:null}renderLeaderboard(e){if(!this.config.show_arcade_leaderboards)return B``;const t=this.getLeaderboardForChore(e.id);if(!t||0===t.high_scores.length)return B``;const o=this.expandedLeaderboards.has(e.id),s=o?t.high_scores:t.high_scores.slice(0,3),i=this.getCurrentUserId();return B`
+function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPropertyDescriptor(t,o):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)a=Reflect.decorate(e,t,o,s);else for(var n=e.length-1;n>=0;n--)(i=e[n])&&(a=(r<3?i(a):r>3?i(t,o,a):i(t,o))||a);return r>3&&a&&Object.defineProperty(t,o,a),a}"function"==typeof SuppressedError&&SuppressedError;const t=globalThis,o=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),i=new WeakMap;let r=class{constructor(e,t,o){if(this._$cssResult$=!0,o!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(o&&void 0===e){const o=void 0!==t&&1===t.length;o&&(e=i.get(t)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),o&&i.set(t,e))}return e}toString(){return this.cssText}};const a=(e,...t)=>{const o=1===e.length?e[0]:t.reduce((t,o,s)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(o)+e[s+1],e[0]);return new r(o,e,s)},n=o?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const o of e.cssRules)t+=o.cssText;return(e=>new r("string"==typeof e?e:e+"",void 0,s))(t)})(e):e,{is:c,defineProperty:d,getOwnPropertyDescriptor:l,getOwnPropertyNames:h,getOwnPropertySymbols:p,getPrototypeOf:u}=Object,g=globalThis,f=g.trustedTypes,m=f?f.emptyScript:"",v=g.reactiveElementPolyfillSupport,b=(e,t)=>e,y={toAttribute(e,t){switch(t){case Boolean:e=e?m:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let o=e;switch(t){case Boolean:o=null!==e;break;case Number:o=null===e?null:Number(e);break;case Object:case Array:try{o=JSON.parse(e)}catch(e){o=null}}return o}},x=(e,t)=>!c(e,t),_={attribute:!0,type:String,converter:y,reflect:!1,useDefault:!1,hasChanged:x};Symbol.metadata??=Symbol("metadata"),g.litPropertyMetadata??=new WeakMap;let w=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=_){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const o=Symbol(),s=this.getPropertyDescriptor(e,o,t);void 0!==s&&d(this.prototype,e,s)}}static getPropertyDescriptor(e,t,o){const{get:s,set:i}=l(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:s,set(t){const r=s?.call(this);i?.call(this,t),this.requestUpdate(e,r,o)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??_}static _$Ei(){if(this.hasOwnProperty(b("elementProperties")))return;const e=u(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(b("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(b("properties"))){const e=this.properties,t=[...h(e),...p(e)];for(const o of t)this.createProperty(o,e[o])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,o]of t)this.elementProperties.set(e,o)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const o=this._$Eu(e,t);void 0!==o&&this._$Eh.set(o,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const o=new Set(e.flat(1/0).reverse());for(const e of o)t.unshift(n(e))}else void 0!==e&&t.push(n(e));return t}static _$Eu(e,t){const o=t.attribute;return!1===o?void 0:"string"==typeof o?o:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const o of t.keys())this.hasOwnProperty(o)&&(e.set(o,this[o]),delete this[o]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((e,s)=>{if(o)e.adoptedStyleSheets=s.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const o of s){const s=document.createElement("style"),i=t.litNonce;void 0!==i&&s.setAttribute("nonce",i),s.textContent=o.cssText,e.appendChild(s)}})(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,o){this._$AK(e,o)}_$ET(e,t){const o=this.constructor.elementProperties.get(e),s=this.constructor._$Eu(e,o);if(void 0!==s&&!0===o.reflect){const i=(void 0!==o.converter?.toAttribute?o.converter:y).toAttribute(t,o.type);this._$Em=e,null==i?this.removeAttribute(s):this.setAttribute(s,i),this._$Em=null}}_$AK(e,t){const o=this.constructor,s=o._$Eh.get(e);if(void 0!==s&&this._$Em!==s){const e=o.getPropertyOptions(s),i="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:y;this._$Em=s;const r=i.fromAttribute(t,e.type);this[s]=r??this._$Ej?.get(s)??r,this._$Em=null}}requestUpdate(e,t,o){if(void 0!==e){const s=this.constructor,i=this[e];if(o??=s.getPropertyOptions(e),!((o.hasChanged??x)(i,t)||o.useDefault&&o.reflect&&i===this._$Ej?.get(e)&&!this.hasAttribute(s._$Eu(e,o))))return;this.C(e,t,o)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:o,reflect:s,wrapped:i},r){o&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,r??t??this[e]),!0!==i||void 0!==r)||(this._$AL.has(e)||(this.hasUpdated||o||(t=void 0),this._$AL.set(e,t)),!0===s&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,o]of e){const{wrapped:e}=o,s=this[t];!0!==e||this._$AL.has(t)||void 0===s||this.C(t,void 0,o,s)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};w.elementStyles=[],w.shadowRootOptions={mode:"open"},w[b("elementProperties")]=new Map,w[b("finalized")]=new Map,v?.({ReactiveElement:w}),(g.reactiveElementVersions??=[]).push("2.1.1");const $=globalThis,C=$.trustedTypes,A=C?C.createPolicy("lit-html",{createHTML:e=>e}):void 0,k="$lit$",S=`lit$${Math.random().toFixed(9).slice(2)}$`,E="?"+S,U=`<${E}>`,T=document,P=()=>T.createComment(""),z=e=>null===e||"object"!=typeof e&&"function"!=typeof e,I=Array.isArray,j="[ \t\n\f\r]",O=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,M=/-->/g,H=/>/g,N=RegExp(`>|${j}(?:([^\\s"'>=/]+)(${j}*=${j}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),L=/'/g,R=/"/g,D=/^(?:script|style|textarea|title)$/i,B=(e=>(t,...o)=>({_$litType$:e,strings:t,values:o}))(1),J=Symbol.for("lit-noChange"),W=Symbol.for("lit-nothing"),F=new WeakMap,q=T.createTreeWalker(T,129);function V(e,t){if(!I(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==A?A.createHTML(t):t}const Y=(e,t)=>{const o=e.length-1,s=[];let i,r=2===t?"<svg>":3===t?"<math>":"",a=O;for(let t=0;t<o;t++){const o=e[t];let n,c,d=-1,l=0;for(;l<o.length&&(a.lastIndex=l,c=a.exec(o),null!==c);)l=a.lastIndex,a===O?"!--"===c[1]?a=M:void 0!==c[1]?a=H:void 0!==c[2]?(D.test(c[2])&&(i=RegExp("</"+c[2],"g")),a=N):void 0!==c[3]&&(a=N):a===N?">"===c[0]?(a=i??O,d=-1):void 0===c[1]?d=-2:(d=a.lastIndex-c[2].length,n=c[1],a=void 0===c[3]?N:'"'===c[3]?R:L):a===R||a===L?a=N:a===M||a===H?a=O:(a=N,i=void 0);const h=a===N&&e[t+1].startsWith("/>")?" ":"";r+=a===O?o+U:d>=0?(s.push(n),o.slice(0,d)+k+o.slice(d)+S+h):o+S+(-2===d?t:h)}return[V(e,r+(e[o]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),s]};class K{constructor({strings:e,_$litType$:t},o){let s;this.parts=[];let i=0,r=0;const a=e.length-1,n=this.parts,[c,d]=Y(e,t);if(this.el=K.createElement(c,o),q.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(s=q.nextNode())&&n.length<a;){if(1===s.nodeType){if(s.hasAttributes())for(const e of s.getAttributeNames())if(e.endsWith(k)){const t=d[r++],o=s.getAttribute(e).split(S),a=/([.?@])?(.*)/.exec(t);n.push({type:1,index:i,name:a[2],strings:o,ctor:"."===a[1]?ee:"?"===a[1]?te:"@"===a[1]?oe:X}),s.removeAttribute(e)}else e.startsWith(S)&&(n.push({type:6,index:i}),s.removeAttribute(e));if(D.test(s.tagName)){const e=s.textContent.split(S),t=e.length-1;if(t>0){s.textContent=C?C.emptyScript:"";for(let o=0;o<t;o++)s.append(e[o],P()),q.nextNode(),n.push({type:2,index:++i});s.append(e[t],P())}}}else if(8===s.nodeType)if(s.data===E)n.push({type:2,index:i});else{let e=-1;for(;-1!==(e=s.data.indexOf(S,e+1));)n.push({type:7,index:i}),e+=S.length-1}i++}}static createElement(e,t){const o=T.createElement("template");return o.innerHTML=e,o}}function Z(e,t,o=e,s){if(t===J)return t;let i=void 0!==s?o._$Co?.[s]:o._$Cl;const r=z(t)?void 0:t._$litDirective$;return i?.constructor!==r&&(i?._$AO?.(!1),void 0===r?i=void 0:(i=new r(e),i._$AT(e,o,s)),void 0!==s?(o._$Co??=[])[s]=i:o._$Cl=i),void 0!==i&&(t=Z(e,i._$AS(e,t.values),i,s)),t}class G{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:o}=this._$AD,s=(e?.creationScope??T).importNode(t,!0);q.currentNode=s;let i=q.nextNode(),r=0,a=0,n=o[0];for(;void 0!==n;){if(r===n.index){let t;2===n.type?t=new Q(i,i.nextSibling,this,e):1===n.type?t=new n.ctor(i,n.name,n.strings,this,e):6===n.type&&(t=new se(i,this,e)),this._$AV.push(t),n=o[++a]}r!==n?.index&&(i=q.nextNode(),r++)}return q.currentNode=T,s}p(e){let t=0;for(const o of this._$AV)void 0!==o&&(void 0!==o.strings?(o._$AI(e,o,t),t+=o.strings.length-2):o._$AI(e[t])),t++}}class Q{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,o,s){this.type=2,this._$AH=W,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=o,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=Z(this,e,t),z(e)?e===W||null==e||""===e?(this._$AH!==W&&this._$AR(),this._$AH=W):e!==this._$AH&&e!==J&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>I(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==W&&z(this._$AH)?this._$AA.nextSibling.data=e:this.T(T.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:o}=e,s="number"==typeof o?this._$AC(e):(void 0===o.el&&(o.el=K.createElement(V(o.h,o.h[0]),this.options)),o);if(this._$AH?._$AD===s)this._$AH.p(t);else{const e=new G(s,this),o=e.u(this.options);e.p(t),this.T(o),this._$AH=e}}_$AC(e){let t=F.get(e.strings);return void 0===t&&F.set(e.strings,t=new K(e)),t}k(e){I(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let o,s=0;for(const i of e)s===t.length?t.push(o=new Q(this.O(P()),this.O(P()),this,this.options)):o=t[s],o._$AI(i),s++;s<t.length&&(this._$AR(o&&o._$AB.nextSibling,s),t.length=s)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=e.nextSibling;e.remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class X{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,o,s,i){this.type=1,this._$AH=W,this._$AN=void 0,this.element=e,this.name=t,this._$AM=s,this.options=i,o.length>2||""!==o[0]||""!==o[1]?(this._$AH=Array(o.length-1).fill(new String),this.strings=o):this._$AH=W}_$AI(e,t=this,o,s){const i=this.strings;let r=!1;if(void 0===i)e=Z(this,e,t,0),r=!z(e)||e!==this._$AH&&e!==J,r&&(this._$AH=e);else{const s=e;let a,n;for(e=i[0],a=0;a<i.length-1;a++)n=Z(this,s[o+a],t,a),n===J&&(n=this._$AH[a]),r||=!z(n)||n!==this._$AH[a],n===W?e=W:e!==W&&(e+=(n??"")+i[a+1]),this._$AH[a]=n}r&&!s&&this.j(e)}j(e){e===W?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class ee extends X{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===W?void 0:e}}class te extends X{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==W)}}class oe extends X{constructor(e,t,o,s,i){super(e,t,o,s,i),this.type=5}_$AI(e,t=this){if((e=Z(this,e,t,0)??W)===J)return;const o=this._$AH,s=e===W&&o!==W||e.capture!==o.capture||e.once!==o.once||e.passive!==o.passive,i=e!==W&&(o===W||s);s&&this.element.removeEventListener(this.name,this,o),i&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class se{constructor(e,t,o){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=o}get _$AU(){return this._$AM._$AU}_$AI(e){Z(this,e)}}const ie=$.litHtmlPolyfillSupport;ie?.(K,Q),($.litHtmlVersions??=[]).push("3.3.1");const re=globalThis;class ae extends w{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,o)=>{const s=o?.renderBefore??t;let i=s._$litPart$;if(void 0===i){const e=o?.renderBefore??null;s._$litPart$=i=new Q(t.insertBefore(P(),e),e,void 0,o??{})}return i._$AI(e),i})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return J}}ae._$litElement$=!0,ae.finalized=!0,re.litElementHydrateSupport?.({LitElement:ae});const ne=re.litElementPolyfillSupport;ne?.({LitElement:ae}),(re.litElementVersions??=[]).push("4.2.1");const ce=e=>(t,o)=>{void 0!==o?o.addInitializer(()=>{customElements.define(e,t)}):customElements.define(e,t)},de={attribute:!0,type:String,converter:y,reflect:!1,hasChanged:x},le=(e=de,t,o)=>{const{kind:s,metadata:i}=o;let r=globalThis.litPropertyMetadata.get(i);if(void 0===r&&globalThis.litPropertyMetadata.set(i,r=new Map),"setter"===s&&((e=Object.create(e)).wrapped=!0),r.set(o.name,e),"accessor"===s){const{name:s}=o;return{set(o){const i=t.get.call(this);t.set.call(this,o),this.requestUpdate(s,i,e)},init(t){return void 0!==t&&this.C(s,void 0,e,t),t}}}if("setter"===s){const{name:s}=o;return function(o){const i=this[s];t.call(this,o),this.requestUpdate(s,i,e)}}throw Error("Unsupported decorator location: "+s)};function he(e){return(t,o)=>"object"==typeof o?le(e,t,o):((e,t,o)=>{const s=t.hasOwnProperty(o);return t.constructor.createProperty(o,e),s?Object.getOwnPropertyDescriptor(t,o):void 0})(e,t,o)}function pe(e){return he({...e,state:!0,attribute:!1})}const ue="1.4.0",ge="ChoreBoard Card";let fe=class extends ae{constructor(){super(...arguments),this.arcadeSession=null,this.expandedLeaderboards=new Set,this.arcadeTimerInterval=null}setConfig(e){if(!e)throw new Error("Invalid configuration");if(!e.entity)throw new Error('You must specify an "entity" (e.g., sensor.choreboard_my_chores_ash). Please configure the ChoreBoard integration first.');this.config={show_header:!0,show_points:!0,show_completed:!0,show_overdue_only:!1,show_undo:!1,show_user_points:!1,show_arcade:!0,show_arcade_leaderboards:!0,show_judge_controls:!0,arcade_poll_interval:30,...e}}getCardSize(){const e=this.getChores();return Math.max(2,Math.ceil(e.length/2)+1)}static getStubConfig(){return{type:"custom:choreboard-card",title:"My Chores",entity:"sensor.choreboard_my_chores_ash",show_header:!0,show_points:!0,show_completed:!0}}static getConfigElement(){return document.createElement("choreboard-card-editor")}connectedCallback(){super.connectedCallback(),this.startArcadePolling()}disconnectedCallback(){super.disconnectedCallback(),this.stopArcadePolling()}startArcadePolling(){this.config?.show_arcade&&(this.stopArcadePolling(),this.arcadeTimerInterval=window.setInterval(()=>this.fetchArcadeStatus(),1e3*(this.config.arcade_poll_interval||30)),this.fetchArcadeStatus())}stopArcadePolling(){null!==this.arcadeTimerInterval&&(clearInterval(this.arcadeTimerInterval),this.arcadeTimerInterval=null)}async fetchArcadeStatus(){if(!this.hass||!this.config.entity)return;const e=this.hass.states[this.config.entity];if(e&&e.attributes.arcade_session)this.arcadeSession=e.attributes.arcade_session;else{for(const e of Object.keys(this.hass.states))if(e.startsWith("sensor.choreboard_")){const t=this.hass.states[e];if(t.attributes.arcade_session)return void(this.arcadeSession=t.attributes.arcade_session)}this.arcadeSession=null}}getChores(){if(!this.hass||!this.config.entity)return[];const e=this.hass.states[this.config.entity];if(!e)return console.warn(`ChoreBoard entity not found: ${this.config.entity}`),[];return(e.attributes.chores||[]).filter(e=>!(!this.config.show_completed&&"completed"===e.status)&&!(this.config.show_overdue_only&&!e.is_overdue))}async completeChore(e){if(!this.hass)return;if("completed"===e.status)return void this.showToast("This chore is already marked as completed");const t=this.getCurrentUserId();if(t)try{await this.hass.callService("choreboard","mark_complete",{chore_id:e.id,completed_by_user_id:t}),this.showToast(`Marked "${e.name}" as complete`)}catch(e){console.error("Error marking chore as complete:",e),this.showToast("Failed to mark chore as complete",!0)}else this.showToast("Unable to determine user for completion",!0)}async undoCompletion(e){if(!this.hass)return;if("completed"!==e.status)return void this.showToast("This chore is not marked as completed");if(confirm(`Are you sure you want to undo completion of "${e.name}"?`))try{await this.hass.callService("choreboard","undo_completion",{chore_id:e.id}),this.showToast(`Undid completion of "${e.name}"`)}catch(e){console.error("Error undoing chore completion:",e),this.showToast("Failed to undo completion",!0)}}showToast(e,t=!1){const o=new CustomEvent("hass-notification",{detail:{message:e,duration:t?5e3:3e3},bubbles:!0,composed:!0});this.dispatchEvent(o)}getChoreStateClass(e){return"completed"===e.status?"state-completed":e.is_overdue?"state-overdue":"state-pending"}getChoreStateIcon(e){return"completed"===e.status?"mdi:check-circle":e.is_overdue?"mdi:alert-circle":"mdi:circle-outline"}getUsername(){if(!this.hass||!this.config.entity)return"";const e=this.hass.states[this.config.entity];if(!e)return"";return e.attributes.username||""}getPointsName(){if(!this.hass||!this.config.entity)return"points";const e=this.hass.states[this.config.entity];if(!e)return"points";return e.attributes.points_label||"points"}getUserPoints(){if(!this.hass||!this.config.entity)return{weekly:null,allTime:null};const e=this.getUsername();if(!e)return{weekly:null,allTime:null};const t=`sensor.${e}_weekly_points`,o=`sensor.${e}_all_time_points`,s=this.hass.states[t],i=this.hass.states[o];return{weekly:s?parseFloat(s.state):null,allTime:i?parseFloat(i.state):null}}isPoolChore(e){return"pool"===e.status||this.config.entity.endsWith("_chores")&&!this.config.entity.includes("_my_chores")}getUsers(){if(!this.hass)return[];for(const e of Object.keys(this.hass.states))if(e.startsWith("sensor.choreboard_")){const t=this.hass.states[e];if(t.attributes.users&&Array.isArray(t.attributes.users))return t.attributes.users}return[]}async claimChore(e){if(!this.hass)return;const t=this.getUsers();if(0===t.length)return void this.showToast("Unable to load users list",!0);await Promise.resolve().then(function(){return xe});const o=document.createElement("claim-chore-dialog");o.users=t,o.chore=e,o.addEventListener("dialog-confirmed",async t=>{const s=t.detail.userId;try{await this.hass.callService("choreboard","claim_chore",{chore_id:e.id,assign_to_user_id:s}),this.showToast("Chore claimed successfully")}catch(e){console.error("Error claiming chore:",e),this.showToast("Failed to claim chore",!0)}finally{o.remove()}}),o.addEventListener("dialog-closed",()=>{o.remove()}),document.body.appendChild(o)}async completePoolChore(e){if(!this.hass)return;const t=this.getUsers();if(0===t.length)return void this.showToast("Unable to load users list",!0);await Promise.resolve().then(function(){return we});const o=document.createElement("complete-chore-dialog");o.users=t,o.chore=e,o.addEventListener("dialog-confirmed",async t=>{const s=t,i=s.detail.userId,r=s.detail.helperIds||[];try{await this.hass.callService("choreboard","mark_complete",{chore_id:e.id,completed_by_user_id:i,helpers:r}),this.showToast("Chore marked as complete")}catch(e){console.error("Error completing chore:",e),this.showToast("Failed to complete chore",!0)}finally{o.remove()}}),o.addEventListener("dialog-closed",()=>{o.remove()}),document.body.appendChild(o)}async startArcade(e){if(this.hass)if(this.arcadeSession&&"active"===this.arcadeSession.status)this.showToast("An arcade session is already in progress",!0);else try{await this.hass.callService("choreboard","start_arcade",{instance_id:e.id}),this.showToast(`Started arcade mode for "${e.name}"`),await this.fetchArcadeStatus()}catch(e){console.error("Error starting arcade mode:",e),this.showToast("Failed to start arcade mode",!0)}}async stopArcade(e){if(this.hass)try{await this.hass.callService("choreboard","stop_arcade",{session_id:e.id}),this.showToast("Arcade session stopped - awaiting judge approval"),await this.fetchArcadeStatus()}catch(e){console.error("Error stopping arcade mode:",e),this.showToast("Failed to stop arcade mode",!0)}}async cancelArcade(e){if(!this.hass)return;if(confirm(`Are you sure you want to cancel the arcade session for "${e.chore_name}"?`))try{await this.hass.callService("choreboard","cancel_arcade",{session_id:e.id}),this.showToast("Arcade session cancelled"),await this.fetchArcadeStatus()}catch(e){console.error("Error cancelling arcade mode:",e),this.showToast("Failed to cancel arcade mode",!0)}}async continueArcade(e){if(this.hass)try{await this.hass.callService("choreboard","continue_arcade",{session_id:e.id}),this.showToast("Arcade session resumed"),await this.fetchArcadeStatus()}catch(e){console.error("Error continuing arcade mode:",e),this.showToast("Failed to continue arcade mode",!0)}}async showJudgeDialog(e){if(!this.hass)return;const t=this.getUsers();await Promise.resolve().then(function(){return Ce});const o=document.createElement("arcade-judge-dialog");o.users=t,o.session=e,o.addEventListener("judge-approved",async t=>{const s=t,i=s.detail.judgeId,r=s.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","approve_arcade",t),this.showToast("Arcade session approved - points awarded!"),await this.fetchArcadeStatus()}catch(e){console.error("Error approving arcade session:",e),this.showToast("Failed to approve arcade session",!0)}finally{o.remove()}}),o.addEventListener("judge-denied",async t=>{const s=t,i=s.detail.judgeId,r=s.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","deny_arcade",t),this.showToast("Arcade session denied - user can continue"),await this.fetchArcadeStatus()}catch(e){console.error("Error denying arcade session:",e),this.showToast("Failed to deny arcade session",!0)}finally{o.remove()}}),o.addEventListener("dialog-closed",()=>{o.remove()}),document.body.appendChild(o)}formatTime(e){const t=Math.floor(e/3600),o=Math.floor(e%3600/60),s=Math.floor(e%60);return t>0?`${t}:${o.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`:`${o}:${s.toString().padStart(2,"0")}`}getCurrentElapsedTime(e){const t=new Date(e.start_time).getTime(),o=Date.now()-t;return e.elapsed_seconds+Math.floor(o/1e3)}getLeaderboardForChore(e){if(!this.hass)return null;for(const t of Object.keys(this.hass.states))if(t.startsWith("sensor.choreboard_")){const o=this.hass.states[t].attributes.chore_leaderboards;if(Array.isArray(o)){const t=o.find(t=>t.chore_id===e);if(t)return t}}const t=`sensor.arcade_${e}`,o=this.hass.states[t];return o&&o.attributes.high_scores?{chore_id:e,chore_name:o.attributes.chore_name||"",high_scores:o.attributes.high_scores}:null}toggleLeaderboard(e){this.expandedLeaderboards.has(e)?this.expandedLeaderboards.delete(e):this.expandedLeaderboards.add(e),this.requestUpdate()}getCurrentUserId(){const e=this.getUsername();if(!e)return null;const t=this.getUsers().find(t=>t.username===e);return t?t.id:null}renderLeaderboard(e){if(!this.config.show_arcade_leaderboards)return B``;const t=this.getLeaderboardForChore(e.id);if(!t||0===t.high_scores.length)return B``;const o=this.expandedLeaderboards.has(e.id),s=o?t.high_scores:t.high_scores.slice(0,3),i=this.getCurrentUserId();return B`
       <div class="leaderboard-section">
         <div
           class="leaderboard-header"
@@ -666,7 +666,7 @@ function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
         border-top: 1px solid var(--divider-color);
         font-style: italic;
       }
-    `}};e([he({attribute:!1})],ue.prototype,"hass",void 0),e([pe()],ue.prototype,"config",void 0),e([pe()],ue.prototype,"arcadeSession",void 0),e([pe()],ue.prototype,"expandedLeaderboards",void 0),ue=e([ce("choreboard-card")],ue),console.info("%c ChoreBoard Card %c 1.4.0 ","color: white; background: #039be5; font-weight: 700;","color: #039be5; background: white; font-weight: 700;");let ge=class extends ae{setConfig(e){this.config=e}getMyChoresSensors(){return this.hass?Object.keys(this.hass.states).filter(e=>e.startsWith("sensor.choreboard_my_chores_")||e.startsWith("sensor.choreboard_my_immediate_chores_")||"sensor.choreboard_outstanding_chores"===e||"sensor.choreboard_late_chores"===e||e.startsWith("sensor.")&&e.endsWith("_my_chores")||e.startsWith("sensor.")&&e.endsWith("_my_immediate_chores")||e.startsWith("sensor.")&&e.endsWith("_chores")):[]}render(){if(!this.hass||!this.config)return B``;const e=this.getMyChoresSensors();return B`
+    `}};e([he({attribute:!1})],fe.prototype,"hass",void 0),e([pe()],fe.prototype,"config",void 0),e([pe()],fe.prototype,"arcadeSession",void 0),e([pe()],fe.prototype,"expandedLeaderboards",void 0),fe=e([ce("choreboard-card")],fe),console.info(`%c ${ge} %c ${ue} `,"color: white; background: #039be5; font-weight: 700;","color: #039be5; background: white; font-weight: 700;");let me=class extends ae{setConfig(e){this.config=e}getMyChoresSensors(){return this.hass?Object.keys(this.hass.states).filter(e=>e.startsWith("sensor.choreboard_my_chores_")||e.startsWith("sensor.choreboard_my_immediate_chores_")||"sensor.choreboard_outstanding_chores"===e||"sensor.choreboard_late_chores"===e||e.startsWith("sensor.")&&e.endsWith("_my_chores")||e.startsWith("sensor.")&&e.endsWith("_my_immediate_chores")||e.startsWith("sensor.")&&e.endsWith("_chores")):[]}render(){if(!this.hass||!this.config)return B``;const e=this.getMyChoresSensors();return B`
       <div class="card-config">
         ${0===e.length?B`
               <div class="warning">
@@ -997,7 +997,369 @@ function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
         color: var(--text-primary-color, white);
         text-decoration: underline;
       }
-    `}};e([he({attribute:!1})],ge.prototype,"hass",void 0),e([pe()],ge.prototype,"config",void 0),ge=e([ce("choreboard-card-editor")],ge),window.customCards=window.customCards||[],window.customCards.push({type:"choreboard-card",name:"ChoreBoard Card",description:"A custom card for managing and tracking chores in Home Assistant",preview:!0,documentationURL:"https://github.com/yourusername/choreboard-ha-card"}),customElements.get("choreboard-card")||customElements.define("choreboard-card",ue),customElements.get("choreboard-card-editor")||customElements.define("choreboard-card-editor",ge),console.info("ChoreBoard Card has been loaded");let me=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedUserId=null}render(){return B`
+    `}};e([he({attribute:!1})],me.prototype,"hass",void 0),e([pe()],me.prototype,"config",void 0),me=e([ce("choreboard-card-editor")],me);let ve=class extends ae{setConfig(e){if(!e)throw new Error("Invalid configuration");if(!e.entity)throw new Error('You must specify an "entity" (e.g., sensor.choreboard_pending_arcade)');this.config={show_header:!0,auto_refresh:!0,refresh_interval:30,...e}}getCardSize(){const e=this.getSessions();return Math.max(2,Math.ceil(e.length/2)+2)}static getStubConfig(){return{type:"custom:choreboard-arcade-judge-card",title:"Arcade Judge Panel",entity:"sensor.choreboard_pending_arcade",show_header:!0}}static getConfigElement(){return document.createElement("choreboard-arcade-judge-card-editor")}getSessions(){if(!this.hass||!this.config.entity)return[];const e=this.hass.states[this.config.entity];if(!e)return console.warn(`ChoreBoard Pending Arcade entity not found: ${this.config.entity}`),[];return e.attributes.sessions||[]}getUsers(){if(!this.hass)return[];for(const e of Object.keys(this.hass.states))if(e.startsWith("sensor.choreboard_")){const t=this.hass.states[e];if(t.attributes.users&&Array.isArray(t.attributes.users))return t.attributes.users}return[]}async showJudgeDialog(e){if(!this.hass)return;const t=this.getUsers();await Promise.resolve().then(function(){return Ce});const o=document.createElement("arcade-judge-dialog");o.users=t,o.session=e,o.addEventListener("judge-approved",async t=>{const s=t,i=s.detail.judgeId,r=s.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","approve_arcade",t),this.showToast("Arcade session approved - points awarded!")}catch(e){console.error("Error approving arcade session:",e),this.showToast("Failed to approve arcade session",!0)}finally{o.remove()}}),o.addEventListener("judge-denied",async t=>{const s=t,i=s.detail.judgeId,r=s.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","deny_arcade",t),this.showToast("Arcade session denied - user can continue")}catch(e){console.error("Error denying arcade session:",e),this.showToast("Failed to deny arcade session",!0)}finally{o.remove()}}),o.addEventListener("dialog-closed",()=>{o.remove()}),document.body.appendChild(o)}showToast(e,t=!1){const o=new CustomEvent("hass-notification",{detail:{message:e,duration:t?5e3:3e3},bubbles:!0,composed:!0});this.dispatchEvent(o)}formatTime(e){const t=Math.floor(e/3600),o=Math.floor(e%3600/60),s=Math.floor(e%60);return t>0?`${t}:${o.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`:`${o}:${s.toString().padStart(2,"0")}`}render(){if(!this.config||!this.hass)return B``;const e=this.config.title||"Arcade Judge Panel",t=this.getSessions();return 0===t.length?B`
+        <ha-card>
+          ${this.config.show_header?B`
+                <div class="card-header">
+                  <div class="name">${e}</div>
+                  <div class="badge success">All clear!</div>
+                </div>
+              `:""}
+          <div class="card-content">
+            <div class="empty-state">
+              <ha-icon icon="mdi:check-circle"></ha-icon>
+              <div>
+                <strong>No pending arcade sessions</strong>
+                <p>All arcade sessions have been judged or completed.</p>
+              </div>
+            </div>
+          </div>
+        </ha-card>
+      `:B`
+      <ha-card>
+        ${this.config.show_header?B`
+              <div class="card-header">
+                <div class="name">${e}</div>
+                <div class="badge">${t.length} pending</div>
+              </div>
+            `:""}
+        <div class="card-content">
+          <div class="session-list">
+            ${t.map(e=>B`
+                <div class="session-item">
+                  <div class="session-icon">
+                    <ha-icon icon="mdi:gavel"></ha-icon>
+                  </div>
+                  <div class="session-details">
+                    <div class="session-header">
+                      <div class="session-chore">${e.chore_name}</div>
+                      <div class="session-time">
+                        ${this.formatTime(e.elapsed_seconds)}
+                      </div>
+                    </div>
+                    <div class="session-meta">
+                      <span class="meta-item">
+                        <ha-icon icon="mdi:account"></ha-icon>
+                        ${e.user_display_name||e.user_name}
+                      </span>
+                      <span class="meta-item status">
+                        <ha-icon icon="mdi:clock-alert"></ha-icon>
+                        Awaiting Approval
+                      </span>
+                    </div>
+                  </div>
+                  <div class="session-action">
+                    <mwc-button
+                      class="judge-button"
+                      @click=${()=>this.showJudgeDialog(e)}
+                      raised
+                    >
+                      <ha-icon icon="mdi:gavel"></ha-icon>
+                      Judge
+                    </mwc-button>
+                  </div>
+                </div>
+              `)}
+          </div>
+        </div>
+      </ha-card>
+    `}static get styles(){return a`
+      :host {
+        display: block;
+      }
+
+      ha-card {
+        padding: 16px;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .card-header .name {
+        font-size: 24px;
+        font-weight: 500;
+      }
+
+      .badge {
+        background: var(--warning-color, #ff9800);
+        color: var(--text-primary-color);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .badge.success {
+        background: var(--success-color, #4caf50);
+      }
+
+      .card-content {
+        padding: 0;
+      }
+
+      .empty-state {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        background: var(--success-color, #4caf50);
+        color: var(--text-primary-color, white);
+        border-radius: 8px;
+      }
+
+      .empty-state ha-icon {
+        --mdc-icon-size: 24px;
+        flex-shrink: 0;
+      }
+
+      .empty-state strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .empty-state p {
+        margin: 4px 0 0 0;
+        font-size: 14px;
+      }
+
+      .session-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .session-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: var(--card-background-color);
+        border: 2px solid var(--warning-color, #ff9800);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+      }
+
+      .session-item:hover {
+        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .session-icon {
+        flex-shrink: 0;
+      }
+
+      .session-icon ha-icon {
+        --mdc-icon-size: 28px;
+        color: var(--warning-color, #ff9800);
+      }
+
+      .session-details {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+
+      .session-chore {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--primary-text-color);
+      }
+
+      .session-time {
+        font-family: monospace;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--success-color, #4caf50);
+        white-space: nowrap;
+      }
+
+      .session-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 13px;
+        color: var(--secondary-text-color);
+      }
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .meta-item ha-icon {
+        --mdc-icon-size: 16px;
+      }
+
+      .meta-item.status {
+        color: var(--warning-color, #ff9800);
+        font-weight: 600;
+      }
+
+      .session-action {
+        flex-shrink: 0;
+      }
+
+      .judge-button {
+        --mdc-theme-primary: var(--warning-color, #ff9800);
+      }
+
+      .judge-button ha-icon {
+        --mdc-icon-size: 20px;
+        margin-right: 8px;
+      }
+    `}};e([he({attribute:!1})],ve.prototype,"hass",void 0),e([pe()],ve.prototype,"config",void 0),ve=e([ce("choreboard-arcade-judge-card")],ve),console.info(`%c ${ge} - Arcade Judge %c ${ue} `,"color: white; background: #ff9800; font-weight: 700;","color: #ff9800; background: white; font-weight: 700;");let be=class extends ae{setConfig(e){this.config=e}entityChanged(e){const t=e.target;this.config={...this.config,entity:t.value},this.configChanged()}titleChanged(e){const t=e.target;this.config={...this.config,title:t.value},this.configChanged()}showHeaderChanged(e){const t=e.target;this.config={...this.config,show_header:t.checked},this.configChanged()}autoRefreshChanged(e){const t=e.target;this.config={...this.config,auto_refresh:t.checked},this.configChanged()}refreshIntervalChanged(e){const t=e.target,o=parseInt(t.value);o>0&&(this.config={...this.config,refresh_interval:o},this.configChanged())}configChanged(){const e=new CustomEvent("config-changed",{detail:{config:this.config},bubbles:!0,composed:!0});this.dispatchEvent(e)}getAvailableEntities(){if(!this.hass)return[];const e=[];for(const t of Object.keys(this.hass.states))(t.startsWith("sensor.choreboard_pending_arcade")||"sensor.choreboard_pending_arcade"===t)&&e.push(t);return e}render(){if(!this.hass||!this.config)return B``;const e=this.getAvailableEntities();return B`
+      <div class="card-config">
+        <div class="option">
+          <label for="entity">Pending Arcade Sensor (Required)</label>
+          <select id="entity" @change=${this.entityChanged}>
+            <option value="" ?selected=${!this.config.entity}>
+              Select a sensor...
+            </option>
+            ${e.map(e=>B`
+                <option value="${e}" ?selected=${this.config.entity===e}>
+                  ${e}
+                </option>
+              `)}
+          </select>
+          ${0===e.length?B`
+                <div class="warning">
+                  <ha-icon icon="mdi:alert"></ha-icon>
+                  <span>
+                    No pending arcade sensor found. Make sure the ChoreBoard
+                    integration is installed and configured.
+                  </span>
+                </div>
+              `:""}
+        </div>
+
+        <div class="option">
+          <label for="title">Card Title (Optional)</label>
+          <input
+            type="text"
+            id="title"
+            .value=${this.config.title||""}
+            @input=${this.titleChanged}
+            placeholder="Arcade Judge Panel"
+          />
+        </div>
+
+        <div class="option">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              ?checked=${!1!==this.config.show_header}
+              @change=${this.showHeaderChanged}
+            />
+            <span>Show card header</span>
+          </label>
+        </div>
+
+        <div class="option">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              ?checked=${!1!==this.config.auto_refresh}
+              @change=${this.autoRefreshChanged}
+            />
+            <span>Auto-refresh pending sessions</span>
+          </label>
+        </div>
+
+        ${!1!==this.config.auto_refresh?B`
+              <div class="option">
+                <label for="refresh_interval">Refresh Interval (seconds)</label>
+                <input
+                  type="number"
+                  id="refresh_interval"
+                  min="10"
+                  max="300"
+                  .value=${(this.config.refresh_interval||30).toString()}
+                  @input=${this.refreshIntervalChanged}
+                />
+              </div>
+            `:""}
+      </div>
+    `}static get styles(){return a`
+      .card-config {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .option {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .option label {
+        font-weight: 500;
+        color: var(--primary-text-color);
+      }
+
+      .option select,
+      .option input[type="text"],
+      .option input[type="number"] {
+        padding: 8px;
+        border: 1px solid var(--divider-color);
+        border-radius: 4px;
+        background: var(--card-background-color);
+        color: var(--primary-text-color);
+        font-family: inherit;
+        font-size: 14px;
+      }
+
+      .option select:focus,
+      .option input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .checkbox-label input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .checkbox-label span {
+        font-weight: normal;
+      }
+
+      .warning {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        background: var(--warning-color, #ff9800);
+        color: var(--text-primary-color, white);
+        border-radius: 4px;
+        font-size: 13px;
+      }
+
+      .warning ha-icon {
+        --mdc-icon-size: 20px;
+        flex-shrink: 0;
+      }
+    `}};e([he({attribute:!1})],be.prototype,"hass",void 0),e([pe()],be.prototype,"config",void 0),be=e([ce("choreboard-arcade-judge-card-editor")],be),window.customCards=window.customCards||[],window.customCards.push({type:"choreboard-card",name:"ChoreBoard Card",description:"A custom card for managing and tracking chores in Home Assistant",preview:!0,documentationURL:"https://github.com/yourusername/choreboard-ha-card"}),window.customCards.push({type:"choreboard-arcade-judge-card",name:"ChoreBoard Arcade Judge Card",description:"A custom card for judging pending arcade sessions in ChoreBoard",preview:!0,documentationURL:"https://github.com/yourusername/choreboard-ha-card"}),customElements.get("choreboard-card")||customElements.define("choreboard-card",fe),customElements.get("choreboard-card-editor")||customElements.define("choreboard-card-editor",me),customElements.get("choreboard-arcade-judge-card")||customElements.define("choreboard-arcade-judge-card",ve),customElements.get("choreboard-arcade-judge-card-editor")||customElements.define("choreboard-arcade-judge-card-editor",be),console.info("ChoreBoard Card has been loaded"),console.info("ChoreBoard Arcade Judge Card has been loaded");let ye=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedUserId=null}render(){return B`
       <ha-dialog open @closed=${this._handleClosed}>
         <div slot="heading">Claim: ${this.chore.name}</div>
 
@@ -1096,7 +1458,7 @@ function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
         font-size: 16px;
         font-weight: 500;
       }
-    `}};e([he({type:Array})],me.prototype,"users",void 0),e([he({type:Object})],me.prototype,"chore",void 0),e([pe()],me.prototype,"selectedUserId",void 0),me=e([ce("claim-chore-dialog")],me);var fe=Object.freeze({__proto__:null,get ClaimChoreDialog(){return me}});let ve=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedUserId=null,this.selectedHelperIds=[]}render(){const e=this.users.filter(e=>e.id!==this.selectedUserId);return B`
+    `}};e([he({type:Array})],ye.prototype,"users",void 0),e([he({type:Object})],ye.prototype,"chore",void 0),e([pe()],ye.prototype,"selectedUserId",void 0),ye=e([ce("claim-chore-dialog")],ye);var xe=Object.freeze({__proto__:null,get ClaimChoreDialog(){return ye}});let _e=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedUserId=null,this.selectedHelperIds=[]}render(){const e=this.users.filter(e=>e.id!==this.selectedUserId);return B`
       <ha-dialog open @closed=${this._handleClosed}>
         <div slot="heading">Complete: ${this.chore.name}</div>
 
@@ -1258,7 +1620,7 @@ function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
       ha-checkbox {
         --mdc-checkbox-size: 20px;
       }
-    `}};e([he({type:Array})],ve.prototype,"users",void 0),e([he({type:Object})],ve.prototype,"chore",void 0),e([pe()],ve.prototype,"selectedUserId",void 0),e([pe()],ve.prototype,"selectedHelperIds",void 0),ve=e([ce("complete-chore-dialog")],ve);var be=Object.freeze({__proto__:null,get CompleteChoreDialog(){return ve}});let ye=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedJudgeId=null,this.notes="",this.action=null}render(){const e=this.formatTime(this.session.elapsed_seconds);return B`
+    `}};e([he({type:Array})],_e.prototype,"users",void 0),e([he({type:Object})],_e.prototype,"chore",void 0),e([pe()],_e.prototype,"selectedUserId",void 0),e([pe()],_e.prototype,"selectedHelperIds",void 0),_e=e([ce("complete-chore-dialog")],_e);var we=Object.freeze({__proto__:null,get CompleteChoreDialog(){return _e}});let $e=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedJudgeId=null,this.notes="",this.action=null}render(){const e=this.formatTime(this.session.elapsed_seconds);return B`
       <ha-dialog open @closed=${this._handleClosed}>
         <div slot="heading">Judge Arcade Session</div>
 
@@ -1505,5 +1867,5 @@ function e(e,t,o,s){var i,r=arguments.length,a=r<3?t:null===s?s=Object.getOwnPro
         --mdc-icon-size: 20px;
         margin-right: 8px;
       }
-    `}};e([he({type:Array})],ye.prototype,"users",void 0),e([he({type:Object})],ye.prototype,"session",void 0),e([pe()],ye.prototype,"selectedJudgeId",void 0),e([pe()],ye.prototype,"notes",void 0),e([pe()],ye.prototype,"action",void 0),ye=e([ce("arcade-judge-dialog")],ye);var _e=Object.freeze({__proto__:null,get ArcadeJudgeDialog(){return ye}});
+    `}};e([he({type:Array})],$e.prototype,"users",void 0),e([he({type:Object})],$e.prototype,"session",void 0),e([pe()],$e.prototype,"selectedJudgeId",void 0),e([pe()],$e.prototype,"notes",void 0),e([pe()],$e.prototype,"action",void 0),$e=e([ce("arcade-judge-dialog")],$e);var Ce=Object.freeze({__proto__:null,get ArcadeJudgeDialog(){return $e}});
 //# sourceMappingURL=choreboard-ha-card.js.map
