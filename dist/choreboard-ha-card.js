@@ -1229,7 +1229,10 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
                     Select a sensor...
                   </option>
                   ${e.map(e=>D`
-                      <option value="${e}" ?selected=${this.config.entity===e}>
+                      <option
+                        value="${e}"
+                        ?selected=${this.config.entity===e}
+                      >
                         ${e}
                       </option>
                     `)}
@@ -1246,8 +1249,8 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
                   <ha-icon icon="mdi:information"></ha-icon>
                   <span>
                     Enter the entity ID manually. The sensor should be named
-                    <code>sensor.pending_arcade_sessions</code> if the ChoreBoard
-                    integration is properly installed.
+                    <code>sensor.pending_arcade_sessions</code> if the
+                    ChoreBoard integration is properly installed.
                   </span>
                 </div>
               `}
