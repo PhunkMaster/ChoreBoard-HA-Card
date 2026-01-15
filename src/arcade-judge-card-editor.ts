@@ -13,7 +13,7 @@ export class ChoreboardArcadeJudgeCardEditor extends LitElement {
   }
 
   private entityChanged(ev: Event): void {
-    const target = ev.target as HTMLSelectElement;
+    const target = ev.target as HTMLSelectElement | HTMLInputElement;
     this.config = { ...this.config, entity: target.value };
     this.configChanged();
   }
@@ -56,6 +56,7 @@ export class ChoreboardArcadeJudgeCardEditor extends LitElement {
 
   private getAvailableEntities(): string[] {
     if (!this.hass) {
+      console.warn("ChoreBoard Arcade Judge Editor: hass not available yet");
       return [];
     }
 
@@ -69,8 +70,13 @@ export class ChoreboardArcadeJudgeCardEditor extends LitElement {
         entityId.startsWith("sensor.choreboard_pending_arcade") ||
         entityId.includes("pending_arcade")
       ) {
+        console.log("ChoreBoard Arcade Judge Editor: Found pending arcade sensor:", entityId);
         entities.push(entityId);
       }
+    }
+
+    if (entities.length === 0) {
+      console.warn("ChoreBoard Arcade Judge Editor: No pending arcade sensors found in", Object.keys(this.hass.states).length, "entities");
     }
 
     return entities;
@@ -87,29 +93,38 @@ export class ChoreboardArcadeJudgeCardEditor extends LitElement {
       <div class="card-config">
         <div class="option">
           <label for="entity">Pending Arcade Sensor (Required)</label>
-          <select id="entity" @change=${this.entityChanged}>
-            <option value="" ?selected=${!this.config.entity}>
-              Select a sensor...
-            </option>
-            ${entities.map(
-              (entity) => html`
-                <option value="${entity}" ?selected=${this.config.entity === entity}>
-                  ${entity}
-                </option>
-              `,
-            )}
-          </select>
-          ${entities.length === 0
+          ${entities.length > 0
             ? html`
-                <div class="warning">
-                  <ha-icon icon="mdi:alert"></ha-icon>
+                <select id="entity" @change=${this.entityChanged}>
+                  <option value="" ?selected=${!this.config.entity}>
+                    Select a sensor...
+                  </option>
+                  ${entities.map(
+                    (entity) => html`
+                      <option value="${entity}" ?selected=${this.config.entity === entity}>
+                        ${entity}
+                      </option>
+                    `,
+                  )}
+                </select>
+              `
+            : html`
+                <input
+                  type="text"
+                  id="entity"
+                  .value=${this.config.entity || ""}
+                  @input=${this.entityChanged}
+                  placeholder="sensor.pending_arcade_sessions"
+                />
+                <div class="info">
+                  <ha-icon icon="mdi:information"></ha-icon>
                   <span>
-                    No pending arcade sensor found. Make sure the ChoreBoard
-                    integration is installed and configured.
+                    Enter the entity ID manually. The sensor should be named
+                    <code>sensor.pending_arcade_sessions</code> if the ChoreBoard
+                    integration is properly installed.
                   </span>
                 </div>
-              `
-            : ""}
+              `}
         </div>
 
         <div class="option">
@@ -232,6 +247,31 @@ export class ChoreboardArcadeJudgeCardEditor extends LitElement {
       .warning ha-icon {
         --mdc-icon-size: 20px;
         flex-shrink: 0;
+      }
+
+      .info {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px;
+        background: var(--info-color, #2196f3);
+        color: var(--text-primary-color, white);
+        border-radius: 4px;
+        font-size: 13px;
+      }
+
+      .info ha-icon {
+        --mdc-icon-size: 20px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .info code {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 12px;
       }
     `;
   }
