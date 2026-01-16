@@ -37,34 +37,30 @@ export class ArcadeJudgeDialog extends LitElement {
           </div>
 
           <!-- Judge selection -->
-          ${this.users.length > 1
-            ? html`
-                <div class="section">
-                  <h3>Select Judge <span class="optional">(optional)</span></h3>
-                  <div class="user-list">
-                    ${this.users.map(
-                      (user) => html`
-                        <div
-                          class="user-option ${this.selectedJudgeId === user.id
-                            ? "selected"
-                            : ""}"
-                          @click=${() => this._selectJudge(user.id)}
-                        >
-                          <ha-icon icon="mdi:account"></ha-icon>
-                          <span>${user.display_name}</span>
-                          ${this.selectedJudgeId === user.id
-                            ? html`<ha-icon
-                                icon="mdi:check"
-                                class="check-icon"
-                              ></ha-icon>`
-                            : ""}
-                        </div>
-                      `,
-                    )}
+          <div class="section">
+            <h3>Who is judging? <span class="required">*</span></h3>
+            <div class="user-list">
+              ${this.users.map(
+                (user) => html`
+                  <div
+                    class="user-option ${this.selectedJudgeId === user.id
+                      ? "selected"
+                      : ""}"
+                    @click=${() => this._selectJudge(user.id)}
+                  >
+                    <ha-icon icon="mdi:account"></ha-icon>
+                    <span>${user.display_name}</span>
+                    ${this.selectedJudgeId === user.id
+                      ? html`<ha-icon
+                          icon="mdi:check"
+                          class="check-icon"
+                        ></ha-icon>`
+                      : ""}
                   </div>
-                </div>
-              `
-            : ""}
+                `,
+              )}
+            </div>
+          </div>
 
           <!-- Notes section -->
           <div class="section">
@@ -83,6 +79,7 @@ export class ArcadeJudgeDialog extends LitElement {
             <mwc-button
               class="approve-button"
               @click=${() => this._setAction("approve")}
+              ?disabled=${!this.selectedJudgeId}
               raised
             >
               <ha-icon icon="mdi:check-circle"></ha-icon>
@@ -91,6 +88,7 @@ export class ArcadeJudgeDialog extends LitElement {
             <mwc-button
               class="deny-button"
               @click=${() => this._setAction("deny")}
+              ?disabled=${!this.selectedJudgeId}
               raised
             >
               <ha-icon icon="mdi:close-circle"></ha-icon>
@@ -229,6 +227,12 @@ export class ArcadeJudgeDialog extends LitElement {
         color: var(--secondary-text-color);
         font-weight: 400;
         font-size: 12px;
+      }
+
+      .required {
+        color: var(--error-color, #f44336);
+        font-weight: 700;
+        margin-left: 4px;
       }
 
       .user-list {

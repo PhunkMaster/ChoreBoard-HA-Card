@@ -1,7 +1,7 @@
 import { LitElement, html, css, TemplateResult, CSSResultGroup } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant } from "custom-card-helpers";
-import { ChoreboardCardConfig } from "./common";
+import { ChoreboardCardConfig, User } from "./common";
 
 @customElement("choreboard-card-editor")
 export class ChoreboardCardEditor extends LitElement {
@@ -95,6 +95,45 @@ export class ChoreboardCardEditor extends LitElement {
             Select the "My Chores" sensor for the user you want to display. The
             card will show all chores from that sensor.
           </p>
+        </div>
+
+        <div class="option">
+          <label for="actor">Who completes chores from this card?</label>
+          <select
+            id="actor"
+            .value=${this.config.actor_user_id?.toString() || ""}
+            @change=${this.actorChanged}
+          >
+            <option value="">Use sensor's user (auto-detect)</option>
+            ${this.getUsers().map(
+              (user) => html`
+                <option
+                  value=${user.id.toString()}
+                  ?selected=${this.config.actor_user_id === user.id}
+                >
+                  ${user.display_name} (@${user.username})
+                </option>
+              `,
+            )}
+          </select>
+          <p class="hint">
+            Select which ChoreBoard user will be recorded as completing chores when
+            you click the "Complete" button. Leave as "auto-detect" to use the
+            user from the selected sensor.
+          </p>
+          ${this.config.actor_user_id &&
+          this.getUsers().find((u) => u.id === this.config.actor_user_id) ===
+            undefined
+            ? html`
+                <div class="validation-warning">
+                  <ha-icon icon="mdi:alert"></ha-icon>
+                  <span
+                    >Warning: Selected user no longer exists. Please choose
+                    another or use auto-detect.</span
+                  >
+                </div>
+              `
+            : ""}
         </div>
 
         <div class="option">
@@ -235,8 +274,13 @@ export class ChoreboardCardEditor extends LitElement {
               assigned chores.
             </p>
             <p>
-              Mark chores as complete directly from the card using the
-              "Complete" button.
+              Configure which ChoreBoard user will be recorded as completing chores
+              when you click the "Complete" button. By default, it uses the user
+              associated with the selected sensor.
+            </p>
+            <p>
+              Pool chores will always prompt you to select who is completing them,
+              regardless of this setting.
             </p>
           </div>
         </div>
@@ -258,6 +302,32 @@ export class ChoreboardCardEditor extends LitElement {
     }
 
     return entityId;
+  }
+
+  private getUsers(): User[] {
+    if (!this.hass) {
+      return [];
+    }
+
+    // First try the dedicated users sensor
+    if (this.hass.states["sensor.users"]) {
+      const state = this.hass.states["sensor.users"];
+      if (state.attributes.users && Array.isArray(state.attributes.users)) {
+        return state.attributes.users as User[];
+      }
+    }
+
+    // Fallback: try to get users from any ChoreBoard entity attributes
+    for (const entityId of Object.keys(this.hass.states)) {
+      if (entityId.startsWith("sensor.choreboard_")) {
+        const state = this.hass.states[entityId];
+        if (state.attributes.users && Array.isArray(state.attributes.users)) {
+          return state.attributes.users as User[];
+        }
+      }
+    }
+
+    return [];
   }
 
   private entityChanged(ev: Event): void {
@@ -378,6 +448,28 @@ export class ChoreboardCardEditor extends LitElement {
       composed: true,
     });
     this.dispatchEvent(event);
+  }
+
+  private actorChanged(ev: Event): void {
+    const target = ev.target as HTMLSelectElement;
+    if (!this.config || !this.hass) {
+      return;
+    }
+
+    const value = target.value;
+    if (value === "") {
+      // Remove actor_user_id from config (use auto-detect)
+      const { actor_user_id, ...rest } = this.config;
+      this.config = rest as ChoreboardCardConfig;
+    } else {
+      // Set actor_user_id
+      const userId = parseInt(value, 10);
+      if (!isNaN(userId)) {
+        this.config = { ...this.config, actor_user_id: userId };
+      }
+    }
+
+    this.configChanged();
   }
 
   static get styles(): CSSResultGroup {
@@ -512,6 +604,24 @@ export class ChoreboardCardEditor extends LitElement {
       .warning a {
         color: var(--text-primary-color, white);
         text-decoration: underline;
+      }
+
+      .validation-warning {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: rgba(255, 152, 0, 0.1);
+        border-left: 3px solid var(--warning-color, #ff9800);
+        border-radius: 4px;
+        font-size: 13px;
+        color: var(--warning-color, #ff9800);
+        margin-top: 8px;
+      }
+
+      .validation-warning ha-icon {
+        --mdc-icon-size: 18px;
+        flex-shrink: 0;
       }
     `;
   }

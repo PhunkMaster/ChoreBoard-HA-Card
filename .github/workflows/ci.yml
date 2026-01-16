@@ -12,10 +12,16 @@ jobs:
   build:
     name: Build and Validate
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref || github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -34,6 +40,28 @@ jobs:
 
       - name: Build production
         run: npm run build:prod
+
+      - name: Commit built files to PR
+        if: github.event_name == 'pull_request'
+        run: |
+          # Check if dist files changed
+          if git diff --quiet dist/; then
+            echo "No changes to dist/ files"
+            exit 0
+          fi
+
+          echo "Dist files changed, committing to PR branch"
+
+          # Configure git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add and commit
+          git add dist/choreboard-ha-card.js dist/choreboard-ha-card.js.map
+          git commit -m "chore: rebuild dist files [skip ci]"
+
+          # Push to PR branch
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Check build output exists
         run: |

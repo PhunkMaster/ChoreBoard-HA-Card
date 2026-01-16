@@ -35,9 +35,11 @@ For detailed integration setup instructions, see the [ChoreBoard Integration doc
 
 - Display chores from ChoreBoard integration's "My Chores" sensors
 - Automatically shows all chores for a specific user
+- **Actor Configuration (v1.5.0+)**: Configure which user completes chores from this card
 - **Pool Chores Support (v1.1.0+)**: Claim and complete shared chores with user selection
 - Mark chores as complete directly from the card with one click
 - Select who completed pool chores and who helped for accurate point distribution
+- Visual indicator when acting as a different user than the sensor owner
 - Color-coded status indicators (pending, completed, overdue)
 - Show/hide completed chores
 - Filter to show only overdue chores
@@ -130,6 +132,7 @@ show_completed: false
 | `type` | string | **Required** | Must be `custom:choreboard-card` |
 | `entity` | string | **Required** | ChoreBoard "My Chores" sensor entity ID (e.g., `sensor.choreboard_my_chores_ash`) |
 | `title` | string | `"{username}'s Chores"` | Card title (auto-generated from username if not specified) |
+| `actor_user_id` | number | Auto-detect | ChoreBoard user ID who completes chores from this card. Leave unset to auto-detect from sensor (v1.5.0+) |
 | `show_header` | boolean | `true` | Show/hide the card header |
 | `show_points` | boolean | `true` | Show/hide point values |
 | `show_completed` | boolean | `true` | Show/hide completed chores |
@@ -223,6 +226,25 @@ show_completed: false
 
 Displays shared pool chores that anyone can claim. Each pool chore shows "Claim" and "Complete" buttons.
 
+### Example 7: Actor Configuration - Parent Completing Child's Chores (v1.5.0+)
+
+```yaml
+type: custom:choreboard-card
+title: "Alex's Chores"
+entity: sensor.choreboard_my_chores_alex
+actor_user_id: 5  # Mom's ChoreBoard user ID
+```
+
+Shows Alex's chores, but when the "Complete" button is clicked, the completion is recorded as done by Mom (user ID 5). The card displays an orange "Acting as: Mom" badge in the header to indicate this configuration.
+
+**Use cases:**
+- Parents marking chores complete on behalf of children
+- Guardians or caretakers managing chores
+- Shared household kiosk displays
+- Multi-user tablet interfaces
+
+To find user IDs, check the integration's sensor attributes in Developer Tools → States → `sensor.users` or any `sensor.choreboard_*` entity's `users` attribute.
+
 ## Usage
 
 ### Assigned Chores
@@ -268,6 +290,40 @@ Pool chores display two buttons:
 - **Claim**: Assign the chore to someone
 - **Complete**: Mark complete with user selection and optional helpers
 
+### Actor Configuration (v1.5.0+)
+
+**What is Actor Configuration?**
+
+Actor configuration allows you to specify which ChoreBoard user will be recorded as completing chores when you click the "Complete" button on assigned chores. This is useful when one person is managing chores on behalf of another.
+
+**How to Configure:**
+
+1. **Visual Editor Method:**
+   - Edit your dashboard and open the card configuration
+   - Find the "Who completes chores from this card?" dropdown
+   - Select a specific user or leave as "Auto-detect from sensor (default)"
+   - Save the card
+
+2. **YAML Method:**
+   ```yaml
+   type: custom:choreboard-card
+   entity: sensor.choreboard_my_chores_child
+   actor_user_id: 12  # Parent's user ID
+   ```
+
+**Visual Indicators:**
+
+When actor configuration is active (actor is different from the sensor owner):
+- **Orange badge** appears in the card header: "🔄 Acting as: [Name]"
+- **Enhanced completion messages**: "Marked 'Dishes' as complete (by Mom)"
+
+**Important Notes:**
+
+- Actor configuration only affects **assigned chores**, not pool chores
+- Pool chores always prompt for user selection regardless of this setting
+- If the configured actor user is deleted, the card automatically falls back to the sensor's user
+- Validation warnings appear in the editor if the selected user no longer exists
+
 ### Status Indicators
 
 The card uses color-coding to show chore status:
@@ -275,6 +331,7 @@ The card uses color-coding to show chore status:
 - **Green border**: Completed chores
 - **Red border**: Overdue chores
 - **Alert icon**: Appears next to overdue chores with due date
+- **Orange badge**: Actor configuration active (completion by different user)
 
 ## Troubleshooting
 
@@ -325,6 +382,25 @@ If clicking "Claim" or "Complete" on pool chores doesn't show a dialog:
 3. Look for `users` array in any `sensor.choreboard_*` entity attributes
 4. Clear browser cache and refresh Home Assistant
 5. Check that you're using card version 1.1.0 or later
+
+### Actor Configuration Not Working (v1.5.0+)
+
+If the configured actor is not being used when completing chores:
+
+1. **Verify user ID is correct**: Check `sensor.users` or any `sensor.choreboard_*` entity in Developer Tools → States for the `users` array
+2. **Check for validation warning**: Open the card editor - if a warning appears, the selected user no longer exists
+3. **Look for fallback message**: Check Home Assistant logs or browser console for "Configured actor not found" warnings
+4. **Verify card version**: Ensure you're using version 1.5.0 or later
+5. **Check actor badge**: The card header should show an orange "Acting as: [Name]" badge if actor differs from sensor owner
+
+### Actor Badge Not Appearing
+
+If you configured an actor but don't see the orange badge:
+
+1. The actor badge only appears when the configured actor is **different** from the sensor's user
+2. Check if `actor_user_id` matches the sensor's username's user ID
+3. If they match, this is expected behavior (no badge needed)
+4. Verify `show_header: true` in your configuration (badge only shows in header)
 
 ## Development
 

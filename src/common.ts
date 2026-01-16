@@ -18,6 +18,17 @@ export interface ChoreboardCardConfig {
   show_arcade_leaderboards?: boolean; // Show expandable leaderboards (default: true)
   show_judge_controls?: boolean; // Show judge approval controls (default: true)
   arcade_poll_interval?: number; // Timer update interval in seconds (default: 30)
+  actor_user_id?: number; // ChoreBoard user ID who completes chores (optional, falls back to sensor's username)
+}
+
+export interface ChoreboardArcadeJudgeCardConfig {
+  type: string;
+  title?: string;
+  entity: string; // ChoreBoard pending arcade sensor entity ID (e.g., sensor.pending_arcade_sessions)
+  show_header?: boolean; // Show card header (default: true)
+  auto_refresh?: boolean; // Auto-refresh pending sessions (default: true)
+  refresh_interval?: number; // Refresh interval in seconds (default: 30)
+  judge_mode?: "auto" | "ask"; // Auto-use logged-in HA user or ask (default: "ask")
 }
 
 // Chore object from the sensor's attributes.chores list
@@ -66,6 +77,7 @@ export interface ArcadeSession {
   chore_name: string;
   user_id: number;
   user_name: string;
+  user_display_name?: string; // Optional friendly display name
   start_time: string; // ISO timestamp
   elapsed_seconds: number; // Current elapsed time
   status: "active" | "stopped" | "judging" | "approved" | "denied";

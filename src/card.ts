@@ -105,11 +105,18 @@ export class ChoreboardCard extends LitElement {
     // This will fetch arcade session status from integration
     // For now, we'll implement a basic version that reads from sensor attributes
     // Later this can be enhanced to call the integration API directly
-    if (!this.hass) {
+    if (!this.hass || !this.config.entity) {
       return;
     }
 
-    // Try to get arcade session from any ChoreBoard sensor attributes
+    // First check the configured entity (My Chores sensor)
+    const configuredEntity = this.hass.states[this.config.entity];
+    if (configuredEntity && configuredEntity.attributes.arcade_session) {
+      this.arcadeSession = configuredEntity.attributes.arcade_session as ArcadeSession;
+      return;
+    }
+
+    // If not found in the configured entity, try other ChoreBoard sensors
     for (const entityId of Object.keys(this.hass.states)) {
       if (entityId.startsWith("sensor.choreboard_")) {
         const state = this.hass.states[entityId];
@@ -162,11 +169,26 @@ export class ChoreboardCard extends LitElement {
       return;
     }
 
+    // Use configured actor_user_id if available, otherwise fall back to current user
+    const userId = this.getActorUserId();
+    if (!userId) {
+      this.showToast("Unable to determine user for completion. Please configure an actor in card settings.", true);
+      return;
+    }
+
     try {
-      await this.hass.callService("choreboard", "complete_chore", {
-        instance_id: chore.id,
+      await this.hass.callService("choreboard", "mark_complete", {
+        chore_id: chore.id,
+        completed_by_user_id: userId,
       });
-      this.showToast(`Marked "${chore.name}" as complete`);
+
+      // Enhanced feedback message showing actor name if using custom actor
+      const actorName = this.getActorDisplayName();
+      const message = actorName && this.isUsingCustomActor()
+        ? `Marked "${chore.name}" as complete (by ${actorName})`
+        : `Marked "${chore.name}" as complete`;
+
+      this.showToast(message);
     } catch (error) {
       console.error("Error marking chore as complete:", error);
       this.showToast("Failed to mark chore as complete", true);
@@ -302,7 +324,15 @@ export class ChoreboardCard extends LitElement {
       return [];
     }
 
-    // Try to get users from any ChoreBoard entity attributes
+    // First try the dedicated users sensor
+    if (this.hass.states["sensor.users"]) {
+      const state = this.hass.states["sensor.users"];
+      if (state.attributes.users && Array.isArray(state.attributes.users)) {
+        return state.attributes.users as User[];
+      }
+    }
+
+    // Fallback: try to get users from any ChoreBoard entity attributes
     // The coordinator stores users in the entity attributes
     for (const entityId of Object.keys(this.hass.states)) {
       if (entityId.startsWith("sensor.choreboard_")) {
@@ -637,6 +667,42 @@ export class ChoreboardCard extends LitElement {
     return user ? user.id : null;
   }
 
+  private getActorUserId(): number | null {
+    // If actor is explicitly configured, use that
+    if (this.config.actor_user_id) {
+      // Validate that the configured actor still exists
+      const users = this.getUsers();
+      const actorExists = users.some((u) => u.id === this.config.actor_user_id);
+
+      if (!actorExists) {
+        console.warn(
+          `Configured actor user ID ${this.config.actor_user_id} not found in users list. Falling back to sensor user.`
+        );
+        return this.getCurrentUserId();
+      }
+
+      return this.config.actor_user_id;
+    }
+
+    // Fall back to sensor's username (backwards compatibility)
+    return this.getCurrentUserId();
+  }
+
+  private getActorDisplayName(): string | null {
+    if (!this.config.actor_user_id) return null;
+
+    const users = this.getUsers();
+    const actor = users.find((u) => u.id === this.config.actor_user_id);
+    return actor ? actor.display_name : null;
+  }
+
+  private isUsingCustomActor(): boolean {
+    if (!this.config.actor_user_id) return false;
+
+    const sensorUserId = this.getCurrentUserId();
+    return sensorUserId !== null && this.config.actor_user_id !== sensorUserId;
+  }
+
   private renderLeaderboard(chore: Chore): TemplateResult {
     if (!this.config.show_arcade_leaderboards) {
       return html``;
@@ -698,13 +764,18 @@ export class ChoreboardCard extends LitElement {
   }
 
   private renderArcadeControls(chore: Chore): TemplateResult {
-    if (!this.config.show_arcade || chore.status === "completed") {
+    if (!this.config.show_arcade) {
       return html``;
     }
 
     // Check if this chore has an active arcade session
     const session = this.arcadeSession;
     const isActiveForThisChore = session && session.chore_id === chore.id;
+
+    // Hide arcade controls for completed chores UNLESS there's an active session needing judgment
+    if (chore.status === "completed" && !isActiveForThisChore) {
+      return html``;
+    }
 
     if (isActiveForThisChore && session) {
       const username = this.getUsername();
@@ -866,6 +937,12 @@ export class ChoreboardCard extends LitElement {
                         ${userPoints.allTime} ${this.getPointsName()} total
                       </div>`
                     : ""}
+                  ${this.isUsingCustomActor()
+                    ? html`<div class="badge actor-badge">
+                        <ha-icon icon="mdi:account-switch"></ha-icon>
+                        Acting as: ${this.getActorDisplayName()}
+                      </div>`
+                    : ""}
                 </div>
               </div>
             `
@@ -930,11 +1007,13 @@ export class ChoreboardCard extends LitElement {
                               <mwc-button
                                 @click=${() => this.claimChore(chore)}
                               >
+                                <ha-icon icon="mdi:hand-extended"></ha-icon>
                                 Claim
                               </mwc-button>
                               <mwc-button
                                 @click=${() => this.completePoolChore(chore)}
                               >
+                                <ha-icon icon="mdi:check-circle"></ha-icon>
                                 Complete
                               </mwc-button>
                             </div>
@@ -943,6 +1022,7 @@ export class ChoreboardCard extends LitElement {
                             <mwc-button
                               @click=${() => this.completeChore(chore)}
                             >
+                              <ha-icon icon="mdi:check-circle"></ha-icon>
                               Complete
                             </mwc-button>
                           `}
@@ -996,6 +1076,17 @@ export class ChoreboardCard extends LitElement {
 
       .points-badge {
         background: var(--info-color, #2196f3);
+      }
+
+      .actor-badge {
+        background: var(--warning-color, #ff9800);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .actor-badge ha-icon {
+        --mdc-icon-size: 14px;
       }
 
       .card-content {

@@ -559,6 +559,7 @@ Card configuration is stored in dashboard YAML files. Users can configure via:
 type: custom:choreboard-card
 title: "Ash's Chores"
 entity: sensor.choreboard_my_chores_ash
+actor_user_id: 5  # Optional: ChoreBoard user ID who completes chores
 show_completed: false
 show_overdue_only: false
 show_points: true
@@ -570,6 +571,7 @@ show_header: true
 
 **Optional Fields:**
 - `title`: Card title (auto-generated from username if not specified)
+- `actor_user_id`: ChoreBoard user ID who completes chores (default: auto-detect from sensor) (v1.5.0+)
 - `show_completed`: Show/hide completed chores (default: true)
 - `show_overdue_only`: Filter to only overdue chores (default: false)
 - `show_points`: Show/hide point values (default: true)
@@ -737,6 +739,93 @@ After every successful build on CI:
 - Artifacts are uploaded with 7-day retention
 - Can be downloaded from Actions tab → Workflow run → Artifacts section
 - Useful for testing builds from pull requests
+
+## Actor Configuration Feature (v1.5.0+)
+
+### Overview
+
+The actor configuration feature allows users to specify which ChoreBoard user will be recorded as completing chores when clicking the "Complete" button on assigned chores. This is useful for scenarios where one person manages chores on behalf of another (e.g., parents managing children's chores).
+
+### Implementation Details
+
+**Configuration Field:**
+- `actor_user_id?: number` in `ChoreboardCardConfig` (src/common.ts:21)
+- Optional field storing the ChoreBoard user ID who will complete chores
+- Defaults to undefined (auto-detect from sensor)
+
+**Core Logic (src/card.ts):**
+
+1. **getActorUserId()** (lines 663-682):
+   - Returns configured `actor_user_id` if set and valid
+   - Validates actor exists in users list
+   - Falls back to `getCurrentUserId()` if actor invalid or not configured
+   - Logs warning if configured actor not found
+
+2. **getActorDisplayName()** (lines 684-690):
+   - Returns display name of configured actor
+   - Used for toast messages and badge display
+   - Returns null if no actor configured
+
+3. **isUsingCustomActor()** (lines 692-697):
+   - Determines if actor differs from sensor owner
+   - Controls visibility of actor badge
+   - Returns false if no actor or actor matches sensor user
+
+4. **completeChore()** (lines 164-196):
+   - Calls `getActorUserId()` instead of `getCurrentUserId()`
+   - Shows enhanced toast message with actor name
+   - Format: "Marked '[chore]' as complete (by [actor])"
+
+**Visual Editor (src/editor.ts):**
+
+1. **Actor Dropdown** (lines 100-137):
+   - Populated with all ChoreBoard users via `getUsers()`
+   - Shows "Use sensor's user (auto-detect)" as default option
+   - Displays `user.display_name (@username)` for clarity
+   - Validation warning if selected user no longer exists
+
+2. **actorChanged() Handler** (lines 435-455):
+   - Removes `actor_user_id` from config when "auto-detect" selected
+   - Sets `actor_user_id` when specific user selected
+   - Triggers `configChanged()` to persist
+
+**Visual Indicators:**
+
+1. **Actor Badge** (src/card.ts:940-945):
+   - Orange badge in card header: "Acting as: [Name]"
+   - Only visible when `isUsingCustomActor()` returns true
+   - Uses `--warning-color` theme variable
+
+2. **Validation Warning** (src/editor.ts:124-136):
+   - Appears in editor if configured actor no longer exists
+   - Orange border with alert icon
+   - Prompts user to choose another or use auto-detect
+
+### Use Cases
+
+1. **Parent/Guardian Management**: Parents can complete chores on behalf of children while viewing the child's chore list
+2. **Shared Kiosks**: Tablet devices configured with specific actors for multi-user households
+3. **Caretaker Interfaces**: Guardians managing chores for those they care for
+4. **Multi-User Devices**: Shared devices where one person manages multiple users' chores
+
+### Backwards Compatibility
+
+- `actor_user_id` is optional - existing configurations work unchanged
+- Falls back to `getCurrentUserId()` when not configured (preserves existing behavior)
+- Graceful degradation if configured actor is deleted
+- No breaking changes to existing functionality
+
+### Testing Checklist
+
+- [ ] Actor dropdown populates with all ChoreBoard users
+- [ ] "Auto-detect" option removes `actor_user_id` from config
+- [ ] Selecting a user sets `actor_user_id` correctly
+- [ ] Actor badge appears only when actor differs from sensor owner
+- [ ] Completion toast shows actor name when using custom actor
+- [ ] Validation warning appears for invalid/deleted actors
+- [ ] Fallback to sensor user works when actor invalid
+- [ ] Pool chores unaffected (still show user selection dialogs)
+- [ ] Builds successfully (development and production)
 
 ## Common Development Tasks
 
