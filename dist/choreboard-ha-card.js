@@ -1,118 +1,800 @@
-function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPropertyDescriptor(t,s):o;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)a=Reflect.decorate(e,t,s,o);else for(var n=e.length-1;n>=0;n--)(i=e[n])&&(a=(r<3?i(a):r>3?i(t,s,a):i(t,s))||a);return r>3&&a&&Object.defineProperty(t,s,a),a}"function"==typeof SuppressedError&&SuppressedError;const t=globalThis,s=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,o=Symbol(),i=new WeakMap;let r=class{constructor(e,t,s){if(this._$cssResult$=!0,s!==o)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(s&&void 0===e){const s=void 0!==t&&1===t.length;s&&(e=i.get(t)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),s&&i.set(t,e))}return e}toString(){return this.cssText}};const a=(e,...t)=>{const s=1===e.length?e[0]:t.reduce((t,s,o)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+e[o+1],e[0]);return new r(s,e,o)},n=s?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const s of e.cssRules)t+=s.cssText;return(e=>new r("string"==typeof e?e:e+"",void 0,o))(t)})(e):e,{is:c,defineProperty:d,getOwnPropertyDescriptor:l,getOwnPropertyNames:h,getOwnPropertySymbols:p,getPrototypeOf:u}=Object,g=globalThis,f=g.trustedTypes,m=f?f.emptyScript:"",v=g.reactiveElementPolyfillSupport,b=(e,t)=>e,y={toAttribute(e,t){switch(t){case Boolean:e=e?m:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let s=e;switch(t){case Boolean:s=null!==e;break;case Number:s=null===e?null:Number(e);break;case Object:case Array:try{s=JSON.parse(e)}catch(e){s=null}}return s}},x=(e,t)=>!c(e,t),_={attribute:!0,type:String,converter:y,reflect:!1,useDefault:!1,hasChanged:x};Symbol.metadata??=Symbol("metadata"),g.litPropertyMetadata??=new WeakMap;let w=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=_){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const s=Symbol(),o=this.getPropertyDescriptor(e,s,t);void 0!==o&&d(this.prototype,e,o)}}static getPropertyDescriptor(e,t,s){const{get:o,set:i}=l(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:o,set(t){const r=o?.call(this);i?.call(this,t),this.requestUpdate(e,r,s)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??_}static _$Ei(){if(this.hasOwnProperty(b("elementProperties")))return;const e=u(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(b("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(b("properties"))){const e=this.properties,t=[...h(e),...p(e)];for(const s of t)this.createProperty(s,e[s])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,s]of t)this.elementProperties.set(e,s)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const s=this._$Eu(e,t);void 0!==s&&this._$Eh.set(s,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const s=new Set(e.flat(1/0).reverse());for(const e of s)t.unshift(n(e))}else void 0!==e&&t.push(n(e));return t}static _$Eu(e,t){const s=t.attribute;return!1===s?void 0:"string"==typeof s?s:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const s of t.keys())this.hasOwnProperty(s)&&(e.set(s,this[s]),delete this[s]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((e,o)=>{if(s)e.adoptedStyleSheets=o.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const s of o){const o=document.createElement("style"),i=t.litNonce;void 0!==i&&o.setAttribute("nonce",i),o.textContent=s.cssText,e.appendChild(o)}})(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,s){this._$AK(e,s)}_$ET(e,t){const s=this.constructor.elementProperties.get(e),o=this.constructor._$Eu(e,s);if(void 0!==o&&!0===s.reflect){const i=(void 0!==s.converter?.toAttribute?s.converter:y).toAttribute(t,s.type);this._$Em=e,null==i?this.removeAttribute(o):this.setAttribute(o,i),this._$Em=null}}_$AK(e,t){const s=this.constructor,o=s._$Eh.get(e);if(void 0!==o&&this._$Em!==o){const e=s.getPropertyOptions(o),i="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:y;this._$Em=o;const r=i.fromAttribute(t,e.type);this[o]=r??this._$Ej?.get(o)??r,this._$Em=null}}requestUpdate(e,t,s){if(void 0!==e){const o=this.constructor,i=this[e];if(s??=o.getPropertyOptions(e),!((s.hasChanged??x)(i,t)||s.useDefault&&s.reflect&&i===this._$Ej?.get(e)&&!this.hasAttribute(o._$Eu(e,s))))return;this.C(e,t,s)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:s,reflect:o,wrapped:i},r){s&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,r??t??this[e]),!0!==i||void 0!==r)||(this._$AL.has(e)||(this.hasUpdated||s||(t=void 0),this._$AL.set(e,t)),!0===o&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,s]of e){const{wrapped:e}=s,o=this[t];!0!==e||this._$AL.has(t)||void 0===o||this.C(t,void 0,s,o)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};w.elementStyles=[],w.shadowRootOptions={mode:"open"},w[b("elementProperties")]=new Map,w[b("finalized")]=new Map,v?.({ReactiveElement:w}),(g.reactiveElementVersions??=[]).push("2.1.1");const $=globalThis,C=$.trustedTypes,A=C?C.createPolicy("lit-html",{createHTML:e=>e}):void 0,k="$lit$",S=`lit$${Math.random().toFixed(9).slice(2)}$`,E="?"+S,T=`<${E}>`,U=document,j=()=>U.createComment(""),z=e=>null===e||"object"!=typeof e&&"function"!=typeof e,P=Array.isArray,I="[ \t\n\f\r]",M=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,O=/-->/g,H=/>/g,N=RegExp(`>|${I}(?:([^\\s"'>=/]+)(${I}*=${I}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),L=/'/g,J=/"/g,B=/^(?:script|style|textarea|title)$/i,R=(e=>(t,...s)=>({_$litType$:e,strings:t,values:s}))(1),D=Symbol.for("lit-noChange"),W=Symbol.for("lit-nothing"),F=new WeakMap,q=U.createTreeWalker(U,129);function V(e,t){if(!P(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==A?A.createHTML(t):t}const Y=(e,t)=>{const s=e.length-1,o=[];let i,r=2===t?"<svg>":3===t?"<math>":"",a=M;for(let t=0;t<s;t++){const s=e[t];let n,c,d=-1,l=0;for(;l<s.length&&(a.lastIndex=l,c=a.exec(s),null!==c);)l=a.lastIndex,a===M?"!--"===c[1]?a=O:void 0!==c[1]?a=H:void 0!==c[2]?(B.test(c[2])&&(i=RegExp("</"+c[2],"g")),a=N):void 0!==c[3]&&(a=N):a===N?">"===c[0]?(a=i??M,d=-1):void 0===c[1]?d=-2:(d=a.lastIndex-c[2].length,n=c[1],a=void 0===c[3]?N:'"'===c[3]?J:L):a===J||a===L?a=N:a===O||a===H?a=M:(a=N,i=void 0);const h=a===N&&e[t+1].startsWith("/>")?" ":"";r+=a===M?s+T:d>=0?(o.push(n),s.slice(0,d)+k+s.slice(d)+S+h):s+S+(-2===d?t:h)}return[V(e,r+(e[s]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),o]};class K{constructor({strings:e,_$litType$:t},s){let o;this.parts=[];let i=0,r=0;const a=e.length-1,n=this.parts,[c,d]=Y(e,t);if(this.el=K.createElement(c,s),q.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(o=q.nextNode())&&n.length<a;){if(1===o.nodeType){if(o.hasAttributes())for(const e of o.getAttributeNames())if(e.endsWith(k)){const t=d[r++],s=o.getAttribute(e).split(S),a=/([.?@])?(.*)/.exec(t);n.push({type:1,index:i,name:a[2],strings:s,ctor:"."===a[1]?ee:"?"===a[1]?te:"@"===a[1]?se:X}),o.removeAttribute(e)}else e.startsWith(S)&&(n.push({type:6,index:i}),o.removeAttribute(e));if(B.test(o.tagName)){const e=o.textContent.split(S),t=e.length-1;if(t>0){o.textContent=C?C.emptyScript:"";for(let s=0;s<t;s++)o.append(e[s],j()),q.nextNode(),n.push({type:2,index:++i});o.append(e[t],j())}}}else if(8===o.nodeType)if(o.data===E)n.push({type:2,index:i});else{let e=-1;for(;-1!==(e=o.data.indexOf(S,e+1));)n.push({type:7,index:i}),e+=S.length-1}i++}}static createElement(e,t){const s=U.createElement("template");return s.innerHTML=e,s}}function Q(e,t,s=e,o){if(t===D)return t;let i=void 0!==o?s._$Co?.[o]:s._$Cl;const r=z(t)?void 0:t._$litDirective$;return i?.constructor!==r&&(i?._$AO?.(!1),void 0===r?i=void 0:(i=new r(e),i._$AT(e,s,o)),void 0!==o?(s._$Co??=[])[o]=i:s._$Cl=i),void 0!==i&&(t=Q(e,i._$AS(e,t.values),i,o)),t}class Z{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:s}=this._$AD,o=(e?.creationScope??U).importNode(t,!0);q.currentNode=o;let i=q.nextNode(),r=0,a=0,n=s[0];for(;void 0!==n;){if(r===n.index){let t;2===n.type?t=new G(i,i.nextSibling,this,e):1===n.type?t=new n.ctor(i,n.name,n.strings,this,e):6===n.type&&(t=new oe(i,this,e)),this._$AV.push(t),n=s[++a]}r!==n?.index&&(i=q.nextNode(),r++)}return q.currentNode=U,o}p(e){let t=0;for(const s of this._$AV)void 0!==s&&(void 0!==s.strings?(s._$AI(e,s,t),t+=s.strings.length-2):s._$AI(e[t])),t++}}class G{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,s,o){this.type=2,this._$AH=W,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=s,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=Q(this,e,t),z(e)?e===W||null==e||""===e?(this._$AH!==W&&this._$AR(),this._$AH=W):e!==this._$AH&&e!==D&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>P(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==W&&z(this._$AH)?this._$AA.nextSibling.data=e:this.T(U.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:s}=e,o="number"==typeof s?this._$AC(e):(void 0===s.el&&(s.el=K.createElement(V(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===o)this._$AH.p(t);else{const e=new Z(o,this),s=e.u(this.options);e.p(t),this.T(s),this._$AH=e}}_$AC(e){let t=F.get(e.strings);return void 0===t&&F.set(e.strings,t=new K(e)),t}k(e){P(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let s,o=0;for(const i of e)o===t.length?t.push(s=new G(this.O(j()),this.O(j()),this,this.options)):s=t[o],s._$AI(i),o++;o<t.length&&(this._$AR(s&&s._$AB.nextSibling,o),t.length=o)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=e.nextSibling;e.remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class X{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,s,o,i){this.type=1,this._$AH=W,this._$AN=void 0,this.element=e,this.name=t,this._$AM=o,this.options=i,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=W}_$AI(e,t=this,s,o){const i=this.strings;let r=!1;if(void 0===i)e=Q(this,e,t,0),r=!z(e)||e!==this._$AH&&e!==D,r&&(this._$AH=e);else{const o=e;let a,n;for(e=i[0],a=0;a<i.length-1;a++)n=Q(this,o[s+a],t,a),n===D&&(n=this._$AH[a]),r||=!z(n)||n!==this._$AH[a],n===W?e=W:e!==W&&(e+=(n??"")+i[a+1]),this._$AH[a]=n}r&&!o&&this.j(e)}j(e){e===W?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class ee extends X{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===W?void 0:e}}class te extends X{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==W)}}class se extends X{constructor(e,t,s,o,i){super(e,t,s,o,i),this.type=5}_$AI(e,t=this){if((e=Q(this,e,t,0)??W)===D)return;const s=this._$AH,o=e===W&&s!==W||e.capture!==s.capture||e.once!==s.once||e.passive!==s.passive,i=e!==W&&(s===W||o);o&&this.element.removeEventListener(this.name,this,s),i&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class oe{constructor(e,t,s){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=s}get _$AU(){return this._$AM._$AU}_$AI(e){Q(this,e)}}const ie=$.litHtmlPolyfillSupport;ie?.(K,G),($.litHtmlVersions??=[]).push("3.3.1");const re=globalThis;class ae extends w{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,s)=>{const o=s?.renderBefore??t;let i=o._$litPart$;if(void 0===i){const e=s?.renderBefore??null;o._$litPart$=i=new G(t.insertBefore(j(),e),e,void 0,s??{})}return i._$AI(e),i})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return D}}ae._$litElement$=!0,ae.finalized=!0,re.litElementHydrateSupport?.({LitElement:ae});const ne=re.litElementPolyfillSupport;ne?.({LitElement:ae}),(re.litElementVersions??=[]).push("4.2.1");const ce=e=>(t,s)=>{void 0!==s?s.addInitializer(()=>{customElements.define(e,t)}):customElements.define(e,t)},de={attribute:!0,type:String,converter:y,reflect:!1,hasChanged:x},le=(e=de,t,s)=>{const{kind:o,metadata:i}=s;let r=globalThis.litPropertyMetadata.get(i);if(void 0===r&&globalThis.litPropertyMetadata.set(i,r=new Map),"setter"===o&&((e=Object.create(e)).wrapped=!0),r.set(s.name,e),"accessor"===o){const{name:o}=s;return{set(s){const i=t.get.call(this);t.set.call(this,s),this.requestUpdate(o,i,e)},init(t){return void 0!==t&&this.C(o,void 0,e,t),t}}}if("setter"===o){const{name:o}=s;return function(s){const i=this[o];t.call(this,s),this.requestUpdate(o,i,e)}}throw Error("Unsupported decorator location: "+o)};function he(e){return(t,s)=>"object"==typeof s?le(e,t,s):((e,t,s)=>{const o=t.hasOwnProperty(s);return t.constructor.createProperty(s,e),o?Object.getOwnPropertyDescriptor(t,s):void 0})(e,t,s)}function pe(e){return he({...e,state:!0,attribute:!1})}const ue="1.4.0",ge="ChoreBoard Card";let fe=class extends ae{constructor(){super(...arguments),this.arcadeSession=null,this.expandedLeaderboards=new Set,this.arcadeTimerInterval=null}setConfig(e){if(!e)throw new Error("Invalid configuration");if(!e.entity)throw new Error('You must specify an "entity" (e.g., sensor.choreboard_my_chores_ash). Please configure the ChoreBoard integration first.');this.config={show_header:!0,show_points:!0,show_completed:!0,show_overdue_only:!1,show_undo:!1,show_user_points:!1,show_arcade:!0,show_arcade_leaderboards:!0,show_judge_controls:!0,arcade_poll_interval:30,...e}}getCardSize(){const e=this.getChores();return Math.max(2,Math.ceil(e.length/2)+1)}static getStubConfig(){return{type:"custom:choreboard-card",title:"My Chores",entity:"sensor.choreboard_my_chores_ash",show_header:!0,show_points:!0,show_completed:!0}}static getConfigElement(){return document.createElement("choreboard-card-editor")}connectedCallback(){super.connectedCallback(),this.startArcadePolling()}disconnectedCallback(){super.disconnectedCallback(),this.stopArcadePolling()}startArcadePolling(){this.config?.show_arcade&&(this.stopArcadePolling(),this.arcadeTimerInterval=window.setInterval(()=>this.fetchArcadeStatus(),1e3*(this.config.arcade_poll_interval||30)),this.fetchArcadeStatus())}stopArcadePolling(){null!==this.arcadeTimerInterval&&(clearInterval(this.arcadeTimerInterval),this.arcadeTimerInterval=null)}async fetchArcadeStatus(){if(!this.hass||!this.config.entity)return;const e=this.hass.states[this.config.entity];if(e&&e.attributes.arcade_session)this.arcadeSession=e.attributes.arcade_session;else{for(const e of Object.keys(this.hass.states))if(e.startsWith("sensor.choreboard_")){const t=this.hass.states[e];if(t.attributes.arcade_session)return void(this.arcadeSession=t.attributes.arcade_session)}this.arcadeSession=null}}getChores(){if(!this.hass||!this.config.entity)return[];const e=this.hass.states[this.config.entity];if(!e)return console.warn(`ChoreBoard entity not found: ${this.config.entity}`),[];return(e.attributes.chores||[]).filter(e=>!(!this.config.show_completed&&"completed"===e.status)&&!(this.config.show_overdue_only&&!e.is_overdue))}async completeChore(e){if(!this.hass)return;if("completed"===e.status)return void this.showToast("This chore is already marked as completed");const t=this.getCurrentUserId();if(t)try{await this.hass.callService("choreboard","mark_complete",{chore_id:e.id,completed_by_user_id:t}),this.showToast(`Marked "${e.name}" as complete`)}catch(e){console.error("Error marking chore as complete:",e),this.showToast("Failed to mark chore as complete",!0)}else this.showToast("Unable to determine user for completion",!0)}async undoCompletion(e){if(!this.hass)return;if("completed"!==e.status)return void this.showToast("This chore is not marked as completed");if(confirm(`Are you sure you want to undo completion of "${e.name}"?`))try{await this.hass.callService("choreboard","undo_completion",{chore_id:e.id}),this.showToast(`Undid completion of "${e.name}"`)}catch(e){console.error("Error undoing chore completion:",e),this.showToast("Failed to undo completion",!0)}}showToast(e,t=!1){const s=new CustomEvent("hass-notification",{detail:{message:e,duration:t?5e3:3e3},bubbles:!0,composed:!0});this.dispatchEvent(s)}getChoreStateClass(e){return"completed"===e.status?"state-completed":e.is_overdue?"state-overdue":"state-pending"}getChoreStateIcon(e){return"completed"===e.status?"mdi:check-circle":e.is_overdue?"mdi:alert-circle":"mdi:circle-outline"}getUsername(){if(!this.hass||!this.config.entity)return"";const e=this.hass.states[this.config.entity];if(!e)return"";return e.attributes.username||""}getPointsName(){if(!this.hass||!this.config.entity)return"points";const e=this.hass.states[this.config.entity];if(!e)return"points";return e.attributes.points_label||"points"}getUserPoints(){if(!this.hass||!this.config.entity)return{weekly:null,allTime:null};const e=this.getUsername();if(!e)return{weekly:null,allTime:null};const t=`sensor.${e}_weekly_points`,s=`sensor.${e}_all_time_points`,o=this.hass.states[t],i=this.hass.states[s];return{weekly:o?parseFloat(o.state):null,allTime:i?parseFloat(i.state):null}}isPoolChore(e){return"pool"===e.status||this.config.entity.endsWith("_chores")&&!this.config.entity.includes("_my_chores")}getUsers(){if(!this.hass)return[];if(this.hass.states["sensor.users"]){const e=this.hass.states["sensor.users"];if(e.attributes.users&&Array.isArray(e.attributes.users))return e.attributes.users}for(const e of Object.keys(this.hass.states))if(e.startsWith("sensor.choreboard_")){const t=this.hass.states[e];if(t.attributes.users&&Array.isArray(t.attributes.users))return t.attributes.users}return[]}async claimChore(e){if(!this.hass)return;const t=this.getUsers();if(0===t.length)return void this.showToast("Unable to load users list",!0);await Promise.resolve().then(function(){return xe});const s=document.createElement("claim-chore-dialog");s.users=t,s.chore=e,s.addEventListener("dialog-confirmed",async t=>{const o=t.detail.userId;try{await this.hass.callService("choreboard","claim_chore",{chore_id:e.id,assign_to_user_id:o}),this.showToast("Chore claimed successfully")}catch(e){console.error("Error claiming chore:",e),this.showToast("Failed to claim chore",!0)}finally{s.remove()}}),s.addEventListener("dialog-closed",()=>{s.remove()}),document.body.appendChild(s)}async completePoolChore(e){if(!this.hass)return;const t=this.getUsers();if(0===t.length)return void this.showToast("Unable to load users list",!0);await Promise.resolve().then(function(){return we});const s=document.createElement("complete-chore-dialog");s.users=t,s.chore=e,s.addEventListener("dialog-confirmed",async t=>{const o=t,i=o.detail.userId,r=o.detail.helperIds||[];try{await this.hass.callService("choreboard","mark_complete",{chore_id:e.id,completed_by_user_id:i,helpers:r}),this.showToast("Chore marked as complete")}catch(e){console.error("Error completing chore:",e),this.showToast("Failed to complete chore",!0)}finally{s.remove()}}),s.addEventListener("dialog-closed",()=>{s.remove()}),document.body.appendChild(s)}async startArcade(e){if(this.hass)if(this.arcadeSession&&"active"===this.arcadeSession.status)this.showToast("An arcade session is already in progress",!0);else try{await this.hass.callService("choreboard","start_arcade",{instance_id:e.id}),this.showToast(`Started arcade mode for "${e.name}"`),await this.fetchArcadeStatus()}catch(e){console.error("Error starting arcade mode:",e),this.showToast("Failed to start arcade mode",!0)}}async stopArcade(e){if(this.hass)try{await this.hass.callService("choreboard","stop_arcade",{session_id:e.id}),this.showToast("Arcade session stopped - awaiting judge approval"),await this.fetchArcadeStatus()}catch(e){console.error("Error stopping arcade mode:",e),this.showToast("Failed to stop arcade mode",!0)}}async cancelArcade(e){if(!this.hass)return;if(confirm(`Are you sure you want to cancel the arcade session for "${e.chore_name}"?`))try{await this.hass.callService("choreboard","cancel_arcade",{session_id:e.id}),this.showToast("Arcade session cancelled"),await this.fetchArcadeStatus()}catch(e){console.error("Error cancelling arcade mode:",e),this.showToast("Failed to cancel arcade mode",!0)}}async continueArcade(e){if(this.hass)try{await this.hass.callService("choreboard","continue_arcade",{session_id:e.id}),this.showToast("Arcade session resumed"),await this.fetchArcadeStatus()}catch(e){console.error("Error continuing arcade mode:",e),this.showToast("Failed to continue arcade mode",!0)}}async showJudgeDialog(e){if(!this.hass)return;const t=this.getUsers();await Promise.resolve().then(function(){return Ce});const s=document.createElement("arcade-judge-dialog");s.users=t,s.session=e,s.addEventListener("judge-approved",async t=>{const o=t,i=o.detail.judgeId,r=o.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","approve_arcade",t),this.showToast("Arcade session approved - points awarded!"),await this.fetchArcadeStatus()}catch(e){console.error("Error approving arcade session:",e),this.showToast("Failed to approve arcade session",!0)}finally{s.remove()}}),s.addEventListener("judge-denied",async t=>{const o=t,i=o.detail.judgeId,r=o.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","deny_arcade",t),this.showToast("Arcade session denied - user can continue"),await this.fetchArcadeStatus()}catch(e){console.error("Error denying arcade session:",e),this.showToast("Failed to deny arcade session",!0)}finally{s.remove()}}),s.addEventListener("dialog-closed",()=>{s.remove()}),document.body.appendChild(s)}formatTime(e){const t=Math.floor(e/3600),s=Math.floor(e%3600/60),o=Math.floor(e%60);return t>0?`${t}:${s.toString().padStart(2,"0")}:${o.toString().padStart(2,"0")}`:`${s}:${o.toString().padStart(2,"0")}`}getCurrentElapsedTime(e){const t=new Date(e.start_time).getTime(),s=Date.now()-t;return e.elapsed_seconds+Math.floor(s/1e3)}getLeaderboardForChore(e){if(!this.hass)return null;for(const t of Object.keys(this.hass.states))if(t.startsWith("sensor.choreboard_")){const s=this.hass.states[t].attributes.chore_leaderboards;if(Array.isArray(s)){const t=s.find(t=>t.chore_id===e);if(t)return t}}const t=`sensor.arcade_${e}`,s=this.hass.states[t];return s&&s.attributes.high_scores?{chore_id:e,chore_name:s.attributes.chore_name||"",high_scores:s.attributes.high_scores}:null}toggleLeaderboard(e){this.expandedLeaderboards.has(e)?this.expandedLeaderboards.delete(e):this.expandedLeaderboards.add(e),this.requestUpdate()}getCurrentUserId(){const e=this.getUsername();if(!e)return null;const t=this.getUsers().find(t=>t.username===e);return t?t.id:null}renderLeaderboard(e){if(!this.config.show_arcade_leaderboards)return R``;const t=this.getLeaderboardForChore(e.id);if(!t||0===t.high_scores.length)return R``;const s=this.expandedLeaderboards.has(e.id),o=s?t.high_scores:t.high_scores.slice(0,3),i=this.getCurrentUserId();return R`
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol, Iterator */
+
+
+function __decorate(decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+/**
+ * @license
+ * Copyright 2019 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t$2=globalThis,e$2=t$2.ShadowRoot&&(void 0===t$2.ShadyCSS||t$2.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s$2=Symbol(),o$4=new WeakMap;let n$3 = class n{constructor(t,e,o){if(this._$cssResult$=true,o!==s$2)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e;}get styleSheet(){let t=this.o;const s=this.t;if(e$2&&void 0===t){const e=void 0!==s&&1===s.length;e&&(t=o$4.get(s)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),e&&o$4.set(s,t));}return t}toString(){return this.cssText}};const r$4=t=>new n$3("string"==typeof t?t:t+"",void 0,s$2),i$3=(t,...e)=>{const o=1===t.length?t[0]:e.reduce(((e,s,o)=>e+(t=>{if(true===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+t[o+1]),t[0]);return new n$3(o,t,s$2)},S$1=(s,o)=>{if(e$2)s.adoptedStyleSheets=o.map((t=>t instanceof CSSStyleSheet?t:t.styleSheet));else for(const e of o){const o=document.createElement("style"),n=t$2.litNonce;void 0!==n&&o.setAttribute("nonce",n),o.textContent=e.cssText,s.appendChild(o);}},c$2=e$2?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return r$4(e)})(t):t;
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const{is:i$2,defineProperty:e$1,getOwnPropertyDescriptor:h$1,getOwnPropertyNames:r$3,getOwnPropertySymbols:o$3,getPrototypeOf:n$2}=Object,a$1=globalThis,c$1=a$1.trustedTypes,l$1=c$1?c$1.emptyScript:"",p$1=a$1.reactiveElementPolyfillSupport,d$1=(t,s)=>t,u$1={toAttribute(t,s){switch(s){case Boolean:t=t?l$1:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,s){let i=t;switch(s){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t);}catch(t){i=null;}}return i}},f$1=(t,s)=>!i$2(t,s),b={attribute:true,type:String,converter:u$1,reflect:false,useDefault:false,hasChanged:f$1};Symbol.metadata??=Symbol("metadata"),a$1.litPropertyMetadata??=new WeakMap;let y$1 = class y extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t);}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,s=b){if(s.state&&(s.attribute=false),this._$Ei(),this.prototype.hasOwnProperty(t)&&((s=Object.create(s)).wrapped=true),this.elementProperties.set(t,s),!s.noAccessor){const i=Symbol(),h=this.getPropertyDescriptor(t,i,s);void 0!==h&&e$1(this.prototype,t,h);}}static getPropertyDescriptor(t,s,i){const{get:e,set:r}=h$1(this.prototype,t)??{get(){return this[s]},set(t){this[s]=t;}};return {get:e,set(s){const h=e?.call(this);r?.call(this,s),this.requestUpdate(t,h,i);},configurable:true,enumerable:true}}static getPropertyOptions(t){return this.elementProperties.get(t)??b}static _$Ei(){if(this.hasOwnProperty(d$1("elementProperties")))return;const t=n$2(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties);}static finalize(){if(this.hasOwnProperty(d$1("finalized")))return;if(this.finalized=true,this._$Ei(),this.hasOwnProperty(d$1("properties"))){const t=this.properties,s=[...r$3(t),...o$3(t)];for(const i of s)this.createProperty(i,t[i]);}const t=this[Symbol.metadata];if(null!==t){const s=litPropertyMetadata.get(t);if(void 0!==s)for(const[t,i]of s)this.elementProperties.set(t,i);}this._$Eh=new Map;for(const[t,s]of this.elementProperties){const i=this._$Eu(t,s);void 0!==i&&this._$Eh.set(i,t);}this.elementStyles=this.finalizeStyles(this.styles);}static finalizeStyles(s){const i=[];if(Array.isArray(s)){const e=new Set(s.flat(1/0).reverse());for(const s of e)i.unshift(c$2(s));}else void 0!==s&&i.push(c$2(s));return i}static _$Eu(t,s){const i=s.attribute;return  false===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=false,this.hasUpdated=false,this._$Em=null,this._$Ev();}_$Ev(){this._$ES=new Promise((t=>this.enableUpdating=t)),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach((t=>t(this)));}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.();}removeController(t){this._$EO?.delete(t);}_$E_(){const t=new Map,s=this.constructor.elementProperties;for(const i of s.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t);}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return S$1(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(true),this._$EO?.forEach((t=>t.hostConnected?.()));}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach((t=>t.hostDisconnected?.()));}attributeChangedCallback(t,s,i){this._$AK(t,i);}_$ET(t,s){const i=this.constructor.elementProperties.get(t),e=this.constructor._$Eu(t,i);if(void 0!==e&&true===i.reflect){const h=(void 0!==i.converter?.toAttribute?i.converter:u$1).toAttribute(s,i.type);this._$Em=t,null==h?this.removeAttribute(e):this.setAttribute(e,h),this._$Em=null;}}_$AK(t,s){const i=this.constructor,e=i._$Eh.get(t);if(void 0!==e&&this._$Em!==e){const t=i.getPropertyOptions(e),h="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:u$1;this._$Em=e;const r=h.fromAttribute(s,t.type);this[e]=r??this._$Ej?.get(e)??r,this._$Em=null;}}requestUpdate(t,s,i){if(void 0!==t){const e=this.constructor,h=this[t];if(i??=e.getPropertyOptions(t),!((i.hasChanged??f$1)(h,s)||i.useDefault&&i.reflect&&h===this._$Ej?.get(t)&&!this.hasAttribute(e._$Eu(t,i))))return;this.C(t,s,i);} false===this.isUpdatePending&&(this._$ES=this._$EP());}C(t,s,{useDefault:i,reflect:e,wrapped:h},r){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,r??s??this[t]),true!==h||void 0!==r)||(this._$AL.has(t)||(this.hasUpdated||i||(s=void 0),this._$AL.set(t,s)),true===e&&this._$Em!==t&&(this._$Eq??=new Set).add(t));}async _$EP(){this.isUpdatePending=true;try{await this._$ES;}catch(t){Promise.reject(t);}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,s]of this._$Ep)this[t]=s;this._$Ep=void 0;}const t=this.constructor.elementProperties;if(t.size>0)for(const[s,i]of t){const{wrapped:t}=i,e=this[s];true!==t||this._$AL.has(s)||void 0===e||this.C(s,void 0,i,e);}}let t=false;const s=this._$AL;try{t=this.shouldUpdate(s),t?(this.willUpdate(s),this._$EO?.forEach((t=>t.hostUpdate?.())),this.update(s)):this._$EM();}catch(s){throw t=false,this._$EM(),s}t&&this._$AE(s);}willUpdate(t){}_$AE(t){this._$EO?.forEach((t=>t.hostUpdated?.())),this.hasUpdated||(this.hasUpdated=true,this.firstUpdated(t)),this.updated(t);}_$EM(){this._$AL=new Map,this.isUpdatePending=false;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return  true}update(t){this._$Eq&&=this._$Eq.forEach((t=>this._$ET(t,this[t]))),this._$EM();}updated(t){}firstUpdated(t){}};y$1.elementStyles=[],y$1.shadowRootOptions={mode:"open"},y$1[d$1("elementProperties")]=new Map,y$1[d$1("finalized")]=new Map,p$1?.({ReactiveElement:y$1}),(a$1.reactiveElementVersions??=[]).push("2.1.1");
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t$1=globalThis,i$1=t$1.trustedTypes,s$1=i$1?i$1.createPolicy("lit-html",{createHTML:t=>t}):void 0,e="$lit$",h=`lit$${Math.random().toFixed(9).slice(2)}$`,o$2="?"+h,n$1=`<${o$2}>`,r$2=document,l=()=>r$2.createComment(""),c=t=>null===t||"object"!=typeof t&&"function"!=typeof t,a=Array.isArray,u=t=>a(t)||"function"==typeof t?.[Symbol.iterator],d="[ \t\n\f\r]",f=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,v=/-->/g,_=/>/g,m=RegExp(`>|${d}(?:([^\\s"'>=/]+)(${d}*=${d}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),p=/'/g,g=/"/g,$=/^(?:script|style|textarea|title)$/i,y=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),x=y(1),T=Symbol.for("lit-noChange"),E=Symbol.for("lit-nothing"),A=new WeakMap,C=r$2.createTreeWalker(r$2,129);function P(t,i){if(!a(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==s$1?s$1.createHTML(i):i}const V=(t,i)=>{const s=t.length-1,o=[];let r,l=2===i?"<svg>":3===i?"<math>":"",c=f;for(let i=0;i<s;i++){const s=t[i];let a,u,d=-1,y=0;for(;y<s.length&&(c.lastIndex=y,u=c.exec(s),null!==u);)y=c.lastIndex,c===f?"!--"===u[1]?c=v:void 0!==u[1]?c=_:void 0!==u[2]?($.test(u[2])&&(r=RegExp("</"+u[2],"g")),c=m):void 0!==u[3]&&(c=m):c===m?">"===u[0]?(c=r??f,d=-1):void 0===u[1]?d=-2:(d=c.lastIndex-u[2].length,a=u[1],c=void 0===u[3]?m:'"'===u[3]?g:p):c===g||c===p?c=m:c===v||c===_?c=f:(c=m,r=void 0);const x=c===m&&t[i+1].startsWith("/>")?" ":"";l+=c===f?s+n$1:d>=0?(o.push(a),s.slice(0,d)+e+s.slice(d)+h+x):s+h+(-2===d?i:x);}return [P(t,l+(t[s]||"<?>")+(2===i?"</svg>":3===i?"</math>":"")),o]};class N{constructor({strings:t,_$litType$:s},n){let r;this.parts=[];let c=0,a=0;const u=t.length-1,d=this.parts,[f,v]=V(t,s);if(this.el=N.createElement(f,n),C.currentNode=this.el.content,2===s||3===s){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes);}for(;null!==(r=C.nextNode())&&d.length<u;){if(1===r.nodeType){if(r.hasAttributes())for(const t of r.getAttributeNames())if(t.endsWith(e)){const i=v[a++],s=r.getAttribute(t).split(h),e=/([.?@])?(.*)/.exec(i);d.push({type:1,index:c,name:e[2],strings:s,ctor:"."===e[1]?H:"?"===e[1]?I:"@"===e[1]?L:k}),r.removeAttribute(t);}else t.startsWith(h)&&(d.push({type:6,index:c}),r.removeAttribute(t));if($.test(r.tagName)){const t=r.textContent.split(h),s=t.length-1;if(s>0){r.textContent=i$1?i$1.emptyScript:"";for(let i=0;i<s;i++)r.append(t[i],l()),C.nextNode(),d.push({type:2,index:++c});r.append(t[s],l());}}}else if(8===r.nodeType)if(r.data===o$2)d.push({type:2,index:c});else {let t=-1;for(;-1!==(t=r.data.indexOf(h,t+1));)d.push({type:7,index:c}),t+=h.length-1;}c++;}}static createElement(t,i){const s=r$2.createElement("template");return s.innerHTML=t,s}}function S(t,i,s=t,e){if(i===T)return i;let h=void 0!==e?s._$Co?.[e]:s._$Cl;const o=c(i)?void 0:i._$litDirective$;return h?.constructor!==o&&(h?._$AO?.(false),void 0===o?h=void 0:(h=new o(t),h._$AT(t,s,e)),void 0!==e?(s._$Co??=[])[e]=h:s._$Cl=h),void 0!==h&&(i=S(t,h._$AS(t,i.values),h,e)),i}class M{constructor(t,i){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:i},parts:s}=this._$AD,e=(t?.creationScope??r$2).importNode(i,true);C.currentNode=e;let h=C.nextNode(),o=0,n=0,l=s[0];for(;void 0!==l;){if(o===l.index){let i;2===l.type?i=new R(h,h.nextSibling,this,t):1===l.type?i=new l.ctor(h,l.name,l.strings,this,t):6===l.type&&(i=new z(h,this,t)),this._$AV.push(i),l=s[++n];}o!==l?.index&&(h=C.nextNode(),o++);}return C.currentNode=r$2,e}p(t){let i=0;for(const s of this._$AV) void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class R{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,i,s,e){this.type=2,this._$AH=E,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cv=e?.isConnected??true;}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===t?.nodeType&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=S(this,t,i),c(t)?t===E||null==t||""===t?(this._$AH!==E&&this._$AR(),this._$AH=E):t!==this._$AH&&t!==T&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):u(t)?this.k(t):this._(t);}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t));}_(t){this._$AH!==E&&c(this._$AH)?this._$AA.nextSibling.data=t:this.T(r$2.createTextNode(t)),this._$AH=t;}$(t){const{values:i,_$litType$:s}=t,e="number"==typeof s?this._$AC(t):(void 0===s.el&&(s.el=N.createElement(P(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===e)this._$AH.p(i);else {const t=new M(e,this),s=t.u(this.options);t.p(i),this.T(s),this._$AH=t;}}_$AC(t){let i=A.get(t.strings);return void 0===i&&A.set(t.strings,i=new N(t)),i}k(t){a(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const h of t)e===i.length?i.push(s=new R(this.O(l()),this.O(l()),this,this.options)):s=i[e],s._$AI(h),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,i){for(this._$AP?.(false,true,i);t!==this._$AB;){const i=t.nextSibling;t.remove(),t=i;}}setConnected(t){ void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t));}}class k{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,i,s,e,h){this.type=1,this._$AH=E,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=h,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=E;}_$AI(t,i=this,s,e){const h=this.strings;let o=false;if(void 0===h)t=S(this,t,i,0),o=!c(t)||t!==this._$AH&&t!==T,o&&(this._$AH=t);else {const e=t;let n,r;for(t=h[0],n=0;n<h.length-1;n++)r=S(this,e[s+n],i,n),r===T&&(r=this._$AH[n]),o||=!c(r)||r!==this._$AH[n],r===E?t=E:t!==E&&(t+=(r??"")+h[n+1]),this._$AH[n]=r;}o&&!e&&this.j(t);}j(t){t===E?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"");}}class H extends k{constructor(){super(...arguments),this.type=3;}j(t){this.element[this.name]=t===E?void 0:t;}}class I extends k{constructor(){super(...arguments),this.type=4;}j(t){this.element.toggleAttribute(this.name,!!t&&t!==E);}}class L extends k{constructor(t,i,s,e,h){super(t,i,s,e,h),this.type=5;}_$AI(t,i=this){if((t=S(this,t,i,0)??E)===T)return;const s=this._$AH,e=t===E&&s!==E||t.capture!==s.capture||t.once!==s.once||t.passive!==s.passive,h=t!==E&&(s===E||e);e&&this.element.removeEventListener(this.name,this,s),h&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t);}}class z{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){S(this,t);}}const j=t$1.litHtmlPolyfillSupport;j?.(N,R),(t$1.litHtmlVersions??=[]).push("3.3.1");const B=(t,i,s)=>{const e=s?.renderBefore??i;let h=e._$litPart$;if(void 0===h){const t=s?.renderBefore??null;e._$litPart$=h=new R(i.insertBefore(l(),t),t,void 0,s??{});}return h._$AI(t),h};
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const s=globalThis;class i extends y$1{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0;}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const r=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=B(r,this.renderRoot,this.renderOptions);}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(true);}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(false);}render(){return T}}i._$litElement$=true,i["finalized"]=true,s.litElementHydrateSupport?.({LitElement:i});const o$1=s.litElementPolyfillSupport;o$1?.({LitElement:i});(s.litElementVersions??=[]).push("4.2.1");
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e);})):customElements.define(t,e);};
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const o={attribute:true,type:String,converter:u$1,reflect:false,hasChanged:f$1},r$1=(t=o,e,r)=>{const{kind:n,metadata:i}=r;let s=globalThis.litPropertyMetadata.get(i);if(void 0===s&&globalThis.litPropertyMetadata.set(i,s=new Map),"setter"===n&&((t=Object.create(t)).wrapped=true),s.set(r.name,t),"accessor"===n){const{name:o}=r;return {set(r){const n=e.get.call(this);e.set.call(this,r),this.requestUpdate(o,n,t);},init(e){return void 0!==e&&this.C(o,void 0,t,e),e}}}if("setter"===n){const{name:o}=r;return function(r){const n=this[o];e.call(this,r),this.requestUpdate(o,n,t);}}throw Error("Unsupported decorator location: "+n)};function n(t){return (e,o)=>"object"==typeof o?r$1(t,e,o):((t,e,o)=>{const r=e.hasOwnProperty(o);return e.constructor.createProperty(o,t),r?Object.getOwnPropertyDescriptor(e,o):void 0})(t,e,o)}
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */function r(r){return n({...r,state:true,attribute:false})}
+
+const CARD_VERSION = "1.4.0";
+const CARD_NAME = "ChoreBoard Card";
+
+let ChoreboardCard = class ChoreboardCard extends i {
+    constructor() {
+        super(...arguments);
+        this.arcadeSession = null;
+        this.expandedLeaderboards = new Set();
+        this.arcadeTimerInterval = null;
+    }
+    setConfig(config) {
+        if (!config) {
+            throw new Error("Invalid configuration");
+        }
+        if (!config.entity) {
+            throw new Error('You must specify an "entity" (e.g., sensor.choreboard_my_chores_ash). Please configure the ChoreBoard integration first.');
+        }
+        this.config = {
+            show_header: true,
+            show_points: true,
+            show_completed: true,
+            show_overdue_only: false,
+            show_undo: false,
+            show_user_points: false,
+            show_arcade: true,
+            show_arcade_leaderboards: true,
+            show_judge_controls: true,
+            arcade_poll_interval: 30,
+            ...config,
+        };
+    }
+    getCardSize() {
+        const chores = this.getChores();
+        return Math.max(2, Math.ceil(chores.length / 2) + 1);
+    }
+    static getStubConfig() {
+        return {
+            type: "custom:choreboard-card",
+            title: "My Chores",
+            entity: "sensor.choreboard_my_chores_ash",
+            show_header: true,
+            show_points: true,
+            show_completed: true,
+        };
+    }
+    static getConfigElement() {
+        return document.createElement("choreboard-card-editor");
+    }
+    connectedCallback() {
+        super.connectedCallback();
+        this.startArcadePolling();
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.stopArcadePolling();
+    }
+    startArcadePolling() {
+        if (!this.config?.show_arcade) {
+            return;
+        }
+        this.stopArcadePolling();
+        this.arcadeTimerInterval = window.setInterval(() => this.fetchArcadeStatus(), (this.config.arcade_poll_interval || 30) * 1000);
+        this.fetchArcadeStatus();
+    }
+    stopArcadePolling() {
+        if (this.arcadeTimerInterval !== null) {
+            clearInterval(this.arcadeTimerInterval);
+            this.arcadeTimerInterval = null;
+        }
+    }
+    async fetchArcadeStatus() {
+        if (!this.hass || !this.config.entity) {
+            return;
+        }
+        const configuredEntity = this.hass.states[this.config.entity];
+        if (configuredEntity && configuredEntity.attributes.arcade_session) {
+            this.arcadeSession = configuredEntity.attributes.arcade_session;
+            return;
+        }
+        for (const entityId of Object.keys(this.hass.states)) {
+            if (entityId.startsWith("sensor.choreboard_")) {
+                const state = this.hass.states[entityId];
+                if (state.attributes.arcade_session) {
+                    this.arcadeSession = state.attributes.arcade_session;
+                    return;
+                }
+            }
+        }
+        this.arcadeSession = null;
+    }
+    getChores() {
+        if (!this.hass || !this.config.entity) {
+            return [];
+        }
+        const stateObj = this.hass.states[this.config.entity];
+        if (!stateObj) {
+            console.warn(`ChoreBoard entity not found: ${this.config.entity}`);
+            return [];
+        }
+        const attributes = stateObj.attributes;
+        const chores = attributes.chores || [];
+        return chores.filter((chore) => {
+            if (!this.config.show_completed && chore.status === "completed") {
+                return false;
+            }
+            if (this.config.show_overdue_only && !chore.is_overdue) {
+                return false;
+            }
+            return true;
+        });
+    }
+    async completeChore(chore) {
+        if (!this.hass)
+            return;
+        if (chore.status === "completed") {
+            this.showToast("This chore is already marked as completed");
+            return;
+        }
+        const userId = this.getActorUserId();
+        if (!userId) {
+            this.showToast("Unable to determine user for completion. Please configure an actor in card settings.", true);
+            return;
+        }
+        try {
+            await this.hass.callService("choreboard", "mark_complete", {
+                chore_id: chore.id,
+                completed_by_user_id: userId,
+            });
+            const actorName = this.getActorDisplayName();
+            const message = actorName && this.isUsingCustomActor()
+                ? `Marked "${chore.name}" as complete (by ${actorName})`
+                : `Marked "${chore.name}" as complete`;
+            this.showToast(message);
+        }
+        catch (error) {
+            console.error("Error marking chore as complete:", error);
+            this.showToast("Failed to mark chore as complete", true);
+        }
+    }
+    async undoCompletion(chore) {
+        if (!this.hass)
+            return;
+        if (chore.status !== "completed") {
+            this.showToast("This chore is not marked as completed");
+            return;
+        }
+        const confirmed = confirm(`Are you sure you want to undo completion of "${chore.name}"?`);
+        if (!confirmed) {
+            return;
+        }
+        try {
+            await this.hass.callService("choreboard", "undo_completion", {
+                chore_id: chore.id,
+            });
+            this.showToast(`Undid completion of "${chore.name}"`);
+        }
+        catch (error) {
+            console.error("Error undoing chore completion:", error);
+            this.showToast("Failed to undo completion", true);
+        }
+    }
+    showToast(message, isError = false) {
+        const event = new CustomEvent("hass-notification", {
+            detail: {
+                message,
+                duration: isError ? 5000 : 3000,
+            },
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
+    getChoreStateClass(chore) {
+        if (chore.status === "completed") {
+            return "state-completed";
+        }
+        if (chore.is_overdue) {
+            return "state-overdue";
+        }
+        return "state-pending";
+    }
+    getChoreStateIcon(chore) {
+        if (chore.status === "completed") {
+            return "mdi:check-circle";
+        }
+        if (chore.is_overdue) {
+            return "mdi:alert-circle";
+        }
+        return "mdi:circle-outline";
+    }
+    getUsername() {
+        if (!this.hass || !this.config.entity) {
+            return "";
+        }
+        const stateObj = this.hass.states[this.config.entity];
+        if (!stateObj) {
+            return "";
+        }
+        const attributes = stateObj.attributes;
+        return attributes.username || "";
+    }
+    getPointsName() {
+        if (!this.hass || !this.config.entity) {
+            return "points";
+        }
+        const stateObj = this.hass.states[this.config.entity];
+        if (!stateObj) {
+            return "points";
+        }
+        const attributes = stateObj.attributes;
+        return attributes.points_label || "points";
+    }
+    getUserPoints() {
+        if (!this.hass || !this.config.entity) {
+            return { weekly: null, allTime: null };
+        }
+        const username = this.getUsername();
+        if (!username) {
+            return { weekly: null, allTime: null };
+        }
+        const weeklyEntity = `sensor.${username}_weekly_points`;
+        const allTimeEntity = `sensor.${username}_all_time_points`;
+        const weeklyState = this.hass.states[weeklyEntity];
+        const allTimeState = this.hass.states[allTimeEntity];
+        return {
+            weekly: weeklyState ? parseFloat(weeklyState.state) : null,
+            allTime: allTimeState ? parseFloat(allTimeState.state) : null,
+        };
+    }
+    isPoolChore(chore) {
+        return (chore.status === "pool" ||
+            (this.config.entity.endsWith("_chores") &&
+                !this.config.entity.includes("_my_chores")));
+    }
+    getUsers() {
+        if (!this.hass) {
+            return [];
+        }
+        if (this.hass.states["sensor.users"]) {
+            const state = this.hass.states["sensor.users"];
+            if (state.attributes.users && Array.isArray(state.attributes.users)) {
+                return state.attributes.users;
+            }
+        }
+        for (const entityId of Object.keys(this.hass.states)) {
+            if (entityId.startsWith("sensor.choreboard_")) {
+                const state = this.hass.states[entityId];
+                if (state.attributes.users && Array.isArray(state.attributes.users)) {
+                    return state.attributes.users;
+                }
+            }
+        }
+        return [];
+    }
+    async claimChore(chore) {
+        if (!this.hass)
+            return;
+        const users = this.getUsers();
+        if (users.length === 0) {
+            this.showToast("Unable to load users list", true);
+            return;
+        }
+        await Promise.resolve().then(function () { return claimDialog; });
+        const dialog = document.createElement("claim-chore-dialog");
+        dialog.users = users;
+        dialog.chore = chore;
+        dialog.addEventListener("dialog-confirmed", async (e) => {
+            const customEvent = e;
+            const userId = customEvent.detail.userId;
+            try {
+                await this.hass.callService("choreboard", "claim_chore", {
+                    chore_id: chore.id,
+                    assign_to_user_id: userId,
+                });
+                this.showToast(`Chore claimed successfully`);
+            }
+            catch (error) {
+                console.error("Error claiming chore:", error);
+                this.showToast("Failed to claim chore", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("dialog-closed", () => {
+            dialog.remove();
+        });
+        document.body.appendChild(dialog);
+    }
+    async completePoolChore(chore) {
+        if (!this.hass)
+            return;
+        const users = this.getUsers();
+        if (users.length === 0) {
+            this.showToast("Unable to load users list", true);
+            return;
+        }
+        await Promise.resolve().then(function () { return completeDialog; });
+        const dialog = document.createElement("complete-chore-dialog");
+        dialog.users = users;
+        dialog.chore = chore;
+        dialog.addEventListener("dialog-confirmed", async (e) => {
+            const customEvent = e;
+            const completedByUserId = customEvent.detail.userId;
+            const helperIds = customEvent.detail.helperIds || [];
+            try {
+                await this.hass.callService("choreboard", "mark_complete", {
+                    chore_id: chore.id,
+                    completed_by_user_id: completedByUserId,
+                    helpers: helperIds,
+                });
+                this.showToast(`Chore marked as complete`);
+            }
+            catch (error) {
+                console.error("Error completing chore:", error);
+                this.showToast("Failed to complete chore", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("dialog-closed", () => {
+            dialog.remove();
+        });
+        document.body.appendChild(dialog);
+    }
+    async startArcade(chore) {
+        if (!this.hass)
+            return;
+        if (this.arcadeSession && this.arcadeSession.status === "active") {
+            this.showToast("An arcade session is already in progress", true);
+            return;
+        }
+        try {
+            await this.hass.callService("choreboard", "start_arcade", {
+                instance_id: chore.id,
+            });
+            this.showToast(`Started arcade mode for "${chore.name}"`);
+            await this.fetchArcadeStatus();
+        }
+        catch (error) {
+            console.error("Error starting arcade mode:", error);
+            this.showToast("Failed to start arcade mode", true);
+        }
+    }
+    async stopArcade(session) {
+        if (!this.hass)
+            return;
+        try {
+            await this.hass.callService("choreboard", "stop_arcade", {
+                session_id: session.id,
+            });
+            this.showToast("Arcade session stopped - awaiting judge approval");
+            await this.fetchArcadeStatus();
+        }
+        catch (error) {
+            console.error("Error stopping arcade mode:", error);
+            this.showToast("Failed to stop arcade mode", true);
+        }
+    }
+    async cancelArcade(session) {
+        if (!this.hass)
+            return;
+        const confirmed = confirm(`Are you sure you want to cancel the arcade session for "${session.chore_name}"?`);
+        if (!confirmed) {
+            return;
+        }
+        try {
+            await this.hass.callService("choreboard", "cancel_arcade", {
+                session_id: session.id,
+            });
+            this.showToast("Arcade session cancelled");
+            await this.fetchArcadeStatus();
+        }
+        catch (error) {
+            console.error("Error cancelling arcade mode:", error);
+            this.showToast("Failed to cancel arcade mode", true);
+        }
+    }
+    async continueArcade(session) {
+        if (!this.hass)
+            return;
+        try {
+            await this.hass.callService("choreboard", "continue_arcade", {
+                session_id: session.id,
+            });
+            this.showToast("Arcade session resumed");
+            await this.fetchArcadeStatus();
+        }
+        catch (error) {
+            console.error("Error continuing arcade mode:", error);
+            this.showToast("Failed to continue arcade mode", true);
+        }
+    }
+    async showJudgeDialog(session) {
+        if (!this.hass)
+            return;
+        const users = this.getUsers();
+        await Promise.resolve().then(function () { return arcadeJudgeDialog; });
+        const dialog = document.createElement("arcade-judge-dialog");
+        dialog.users = users;
+        dialog.session = session;
+        dialog.addEventListener("judge-approved", async (e) => {
+            const customEvent = e;
+            const judgeId = customEvent.detail.judgeId;
+            const notes = customEvent.detail.notes;
+            try {
+                const serviceData = {
+                    session_id: session.id,
+                };
+                if (judgeId) {
+                    serviceData.judge_id = judgeId;
+                }
+                if (notes) {
+                    serviceData.notes = notes;
+                }
+                await this.hass.callService("choreboard", "approve_arcade", serviceData);
+                this.showToast("Arcade session approved - points awarded!");
+                await this.fetchArcadeStatus();
+            }
+            catch (error) {
+                console.error("Error approving arcade session:", error);
+                this.showToast("Failed to approve arcade session", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("judge-denied", async (e) => {
+            const customEvent = e;
+            const judgeId = customEvent.detail.judgeId;
+            const notes = customEvent.detail.notes;
+            try {
+                const serviceData = {
+                    session_id: session.id,
+                };
+                if (judgeId) {
+                    serviceData.judge_id = judgeId;
+                }
+                if (notes) {
+                    serviceData.notes = notes;
+                }
+                await this.hass.callService("choreboard", "deny_arcade", serviceData);
+                this.showToast("Arcade session denied - user can continue");
+                await this.fetchArcadeStatus();
+            }
+            catch (error) {
+                console.error("Error denying arcade session:", error);
+                this.showToast("Failed to deny arcade session", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("dialog-closed", () => {
+            dialog.remove();
+        });
+        document.body.appendChild(dialog);
+    }
+    formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        if (hours > 0) {
+            return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        }
+        return `${minutes}:${secs.toString().padStart(2, "0")}`;
+    }
+    getCurrentElapsedTime(session) {
+        const startTime = new Date(session.start_time).getTime();
+        const now = Date.now();
+        const elapsedMs = now - startTime;
+        return session.elapsed_seconds + Math.floor(elapsedMs / 1000);
+    }
+    getLeaderboardForChore(choreId) {
+        if (!this.hass)
+            return null;
+        for (const entityId of Object.keys(this.hass.states)) {
+            if (entityId.startsWith("sensor.choreboard_")) {
+                const state = this.hass.states[entityId];
+                const leaderboards = state.attributes.chore_leaderboards;
+                if (Array.isArray(leaderboards)) {
+                    const leaderboard = leaderboards.find((lb) => lb.chore_id === choreId);
+                    if (leaderboard) {
+                        return leaderboard;
+                    }
+                }
+            }
+        }
+        const leaderboardEntity = `sensor.arcade_${choreId}`;
+        const state = this.hass.states[leaderboardEntity];
+        if (state && state.attributes.high_scores) {
+            return {
+                chore_id: choreId,
+                chore_name: state.attributes.chore_name || "",
+                high_scores: state.attributes.high_scores,
+            };
+        }
+        return null;
+    }
+    toggleLeaderboard(choreId) {
+        if (this.expandedLeaderboards.has(choreId)) {
+            this.expandedLeaderboards.delete(choreId);
+        }
+        else {
+            this.expandedLeaderboards.add(choreId);
+        }
+        this.requestUpdate();
+    }
+    getCurrentUserId() {
+        const username = this.getUsername();
+        if (!username)
+            return null;
+        const users = this.getUsers();
+        const user = users.find((u) => u.username === username);
+        return user ? user.id : null;
+    }
+    getActorUserId() {
+        if (this.config.actor_user_id) {
+            const users = this.getUsers();
+            const actorExists = users.some((u) => u.id === this.config.actor_user_id);
+            if (!actorExists) {
+                console.warn(`Configured actor user ID ${this.config.actor_user_id} not found in users list. Falling back to sensor user.`);
+                return this.getCurrentUserId();
+            }
+            return this.config.actor_user_id;
+        }
+        return this.getCurrentUserId();
+    }
+    getActorDisplayName() {
+        if (!this.config.actor_user_id)
+            return null;
+        const users = this.getUsers();
+        const actor = users.find((u) => u.id === this.config.actor_user_id);
+        return actor ? actor.display_name : null;
+    }
+    isUsingCustomActor() {
+        if (!this.config.actor_user_id)
+            return false;
+        const sensorUserId = this.getCurrentUserId();
+        return sensorUserId !== null && this.config.actor_user_id !== sensorUserId;
+    }
+    renderLeaderboard(chore) {
+        if (!this.config.show_arcade_leaderboards) {
+            return x ``;
+        }
+        const leaderboard = this.getLeaderboardForChore(chore.id);
+        if (!leaderboard || leaderboard.high_scores.length === 0) {
+            return x ``;
+        }
+        const expanded = this.expandedLeaderboards.has(chore.id);
+        const displayScores = expanded
+            ? leaderboard.high_scores
+            : leaderboard.high_scores.slice(0, 3);
+        const currentUserId = this.getCurrentUserId();
+        return x `
       <div class="leaderboard-section">
         <div
           class="leaderboard-header"
-          @click=${()=>this.toggleLeaderboard(e.id)}
+          @click=${() => this.toggleLeaderboard(chore.id)}
         >
           <ha-icon icon="mdi:trophy"></ha-icon>
-          <span>High Scores (${t.high_scores.length})</span>
+          <span>High Scores (${leaderboard.high_scores.length})</span>
           <ha-icon
-            icon="${s?"mdi:chevron-up":"mdi:chevron-down"}"
+            icon="${expanded ? "mdi:chevron-up" : "mdi:chevron-down"}"
           ></ha-icon>
         </div>
-        ${s?R`
+        ${expanded
+            ? x `
               <div class="leaderboard-list">
-                ${o.map((e,t)=>R`
+                ${displayScores.map((score, idx) => x `
                     <div
-                      class="leaderboard-entry ${i===e.user_id?"current-user":""}"
+                      class="leaderboard-entry ${currentUserId === score.user_id
+                ? "current-user"
+                : ""}"
                     >
-                      <span class="rank">#${t+1}</span>
-                      <span class="user-name">${e.display_name}</span>
+                      <span class="rank">#${idx + 1}</span>
+                      <span class="user-name">${score.display_name}</span>
                       <span class="time"
-                        >${this.formatTime(e.time_seconds)}</span
+                        >${this.formatTime(score.time_seconds)}</span
                       >
                     </div>
                   `)}
-                ${t.high_scores.length>3&&!s?R`
+                ${leaderboard.high_scores.length > 3 && !expanded
+                ? x `
                       <div class="leaderboard-more">
-                        +${t.high_scores.length-3} more
+                        +${leaderboard.high_scores.length - 3} more
                       </div>
-                    `:""}
+                    `
+                : ""}
               </div>
-            `:""}
+            `
+            : ""}
       </div>
-    `}renderArcadeControls(e){if(!this.config.show_arcade)return R``;const t=this.arcadeSession,s=t&&t.chore_id===e.id;if("completed"===e.status&&!s)return R``;if(s&&t){const e=this.getUsername(),s=t.user_name===e,o=this.getCurrentElapsedTime(t);if("active"===t.status)return R`
+    `;
+    }
+    renderArcadeControls(chore) {
+        if (!this.config.show_arcade) {
+            return x ``;
+        }
+        const session = this.arcadeSession;
+        const isActiveForThisChore = session && session.chore_id === chore.id;
+        if (chore.status === "completed" && !isActiveForThisChore) {
+            return x ``;
+        }
+        if (isActiveForThisChore && session) {
+            const username = this.getUsername();
+            const isCurrentUserSession = session.user_name === username;
+            const elapsedSeconds = this.getCurrentElapsedTime(session);
+            if (session.status === "active") {
+                return x `
           <div class="arcade-controls active">
             <div class="arcade-timer">
               <ha-icon icon="mdi:timer"></ha-icon>
-              <span class="timer-text">${this.formatTime(o)}</span>
-              ${s?R`<span class="timer-label">(You)</span>`:R`<span class="timer-label">(${t.user_name})</span>`}
+              <span class="timer-text">${this.formatTime(elapsedSeconds)}</span>
+              ${isCurrentUserSession
+                    ? x `<span class="timer-label">(You)</span>`
+                    : x `<span class="timer-label">(${session.user_name})</span>`}
             </div>
-            ${s?R`
+            ${isCurrentUserSession
+                    ? x `
                   <div class="arcade-buttons">
                     <mwc-button
                       class="arcade-button stop"
-                      @click=${()=>this.stopArcade(t)}
+                      @click=${() => this.stopArcade(session)}
                     >
                       Stop
                     </mwc-button>
                     <mwc-button
                       class="arcade-button cancel"
-                      @click=${()=>this.cancelArcade(t)}
+                      @click=${() => this.cancelArcade(session)}
                     >
                       Cancel
                     </mwc-button>
                   </div>
-                `:R` <div class="arcade-status">Session in progress...</div> `}
+                `
+                    : x ` <div class="arcade-status">Session in progress...</div> `}
           </div>
-        `;if("stopped"===t.status||"judging"===t.status)return R`
+        `;
+            }
+            else if (session.status === "stopped" || session.status === "judging") {
+                return x `
           <div class="arcade-controls judging">
             <div class="arcade-status">
               <ha-icon icon="mdi:gavel"></ha-icon>
               <span>Awaiting judge approval</span>
             </div>
             <div class="arcade-timer">
-              Final time: ${this.formatTime(o)}
+              Final time: ${this.formatTime(elapsedSeconds)}
             </div>
-            ${this.config.show_judge_controls?R`
+            ${this.config.show_judge_controls
+                    ? x `
                   <mwc-button
                     class="arcade-button judge"
-                    @click=${()=>this.showJudgeDialog(t)}
+                    @click=${() => this.showJudgeDialog(session)}
                   >
                     <ha-icon icon="mdi:gavel"></ha-icon>
                     Judge
                   </mwc-button>
-                `:""}
+                `
+                    : ""}
           </div>
-        `;if("denied"===t.status)return R`
+        `;
+            }
+            else if (session.status === "denied") {
+                return x `
           <div class="arcade-controls denied">
             <div class="arcade-status">
               <ha-icon icon="mdi:close-circle"></ha-icon>
               <span>Judge denied - improvements needed</span>
             </div>
-            ${s?R`
+            ${isCurrentUserSession
+                    ? x `
                   <mwc-button
                     class="arcade-button continue"
-                    @click=${()=>this.continueArcade(t)}
+                    @click=${() => this.continueArcade(session)}
                   >
                     Continue Arcade
                   </mwc-button>
-                `:""}
+                `
+                    : ""}
           </div>
-        `}return R`
+        `;
+            }
+        }
+        return x `
       <div class="arcade-controls idle">
         <mwc-button
           class="arcade-button start"
-          @click=${()=>this.startArcade(e)}
+          @click=${() => this.startArcade(chore)}
         >
           <ha-icon icon="mdi:play-circle"></ha-icon>
           Start Arcade
         </mwc-button>
       </div>
-    `}render(){if(!this.config||!this.hass)return R``;const e=this.getUsername(),t=this.config.title||`${e}'s Chores`||"Chores",s=this.getChores();if(0===s.length)return R`
+    `;
+    }
+    render() {
+        if (!this.config || !this.hass) {
+            return x ``;
+        }
+        const username = this.getUsername();
+        const title = this.config.title || `${username}'s Chores` || "Chores";
+        const chores = this.getChores();
+        if (chores.length === 0) {
+            return x `
         <ha-card>
-          ${this.config.show_header?R`
+          ${this.config.show_header
+                ? x `
                 <div class="card-header">
-                  <div class="name">${t}</div>
+                  <div class="name">${title}</div>
                 </div>
-              `:""}
+              `
+                : ""}
           <div class="card-content">
             <div class="warning">
               <ha-icon icon="mdi:alert"></ha-icon>
               <div>
                 <strong>No chores found</strong>
                 <p>
-                  ${e?`${e} has no chores matching the current filters.`:"Please ensure the ChoreBoard integration is installed and configured."}
+                  ${username
+                ? `${username} has no chores matching the current filters.`
+                : "Please ensure the ChoreBoard integration is installed and configured."}
                   Visit the
                   <a
                     href="https://github.com/PhunkMaster/ChoreBoard-HA-Integration"
@@ -126,81 +808,112 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
             </div>
           </div>
         </ha-card>
-      `;const o=this.config.show_user_points?this.getUserPoints():{weekly:null,allTime:null};return R`
+      `;
+        }
+        const userPoints = this.config.show_user_points
+            ? this.getUserPoints()
+            : { weekly: null, allTime: null };
+        return x `
       <ha-card>
-        ${this.config.show_header?R`
+        ${this.config.show_header
+            ? x `
               <div class="card-header">
-                <div class="name">${t}</div>
+                <div class="name">${title}</div>
                 <div class="header-badges">
-                  <div class="badge">${s.length} chores</div>
-                  ${this.config.show_user_points&&null!==o.weekly?R`<div class="badge points-badge">
-                        ${o.weekly} ${this.getPointsName()} this week
-                      </div>`:""}
-                  ${this.config.show_user_points&&null!==o.allTime?R`<div class="badge points-badge">
-                        ${o.allTime} ${this.getPointsName()} total
-                      </div>`:""}
+                  <div class="badge">${chores.length} chores</div>
+                  ${this.config.show_user_points && userPoints.weekly !== null
+                ? x `<div class="badge points-badge">
+                        ${userPoints.weekly} ${this.getPointsName()} this week
+                      </div>`
+                : ""}
+                  ${this.config.show_user_points && userPoints.allTime !== null
+                ? x `<div class="badge points-badge">
+                        ${userPoints.allTime} ${this.getPointsName()} total
+                      </div>`
+                : ""}
+                  ${this.isUsingCustomActor()
+                ? x `<div class="badge actor-badge">
+                        <ha-icon icon="mdi:account-switch"></ha-icon>
+                        Acting as: ${this.getActorDisplayName()}
+                      </div>`
+                : ""}
                 </div>
               </div>
-            `:""}
+            `
+            : ""}
         <div class="card-content">
           <div class="chore-list">
-            ${s.map(e=>R`
-                <div class="chore-item ${this.getChoreStateClass(e)}">
+            ${chores.map((chore) => x `
+                <div class="chore-item ${this.getChoreStateClass(chore)}">
                   <div class="chore-status">
-                    <ha-icon icon="${this.getChoreStateIcon(e)}"></ha-icon>
+                    <ha-icon icon="${this.getChoreStateIcon(chore)}"></ha-icon>
                   </div>
                   <div class="chore-details">
                     <div class="chore-header">
-                      <div class="chore-name">${e.name}</div>
-                      ${this.config.show_points&&e.points?R`<div class="chore-points">
-                            ${"string"==typeof e.points?parseFloat(e.points):e.points}
+                      <div class="chore-name">${chore.name}</div>
+                      ${this.config.show_points && chore.points
+            ? x `<div class="chore-points">
+                            ${typeof chore.points === "string"
+                ? parseFloat(chore.points)
+                : chore.points}
                             ${this.getPointsName()}
-                          </div>`:""}
+                          </div>`
+            : ""}
                     </div>
                     <div class="chore-meta">
-                      ${e.due_date?R`<span class="meta-item"
+                      ${chore.due_date
+            ? x `<span class="meta-item"
                             ><ha-icon icon="mdi:calendar"></ha-icon
-                            >${e.due_date}</span
-                          >`:""}
-                      ${e.is_overdue?R`<span class="meta-item overdue"
+                            >${chore.due_date}</span
+                          >`
+            : ""}
+                      ${chore.is_overdue
+            ? x `<span class="meta-item overdue"
                             ><ha-icon icon="mdi:clock-alert"></ha-icon
                             >Overdue</span
-                          >`:""}
+                          >`
+            : ""}
                     </div>
-                    ${this.renderArcadeControls(e)}
-                    ${this.renderLeaderboard(e)}
+                    ${this.renderArcadeControls(chore)}
+                    ${this.renderLeaderboard(chore)}
                   </div>
                   <div class="chore-action">
-                    ${"completed"===e.status?R`
+                    ${chore.status === "completed"
+            ? x `
                           <div class="completed-actions">
                             <div class="completed-badge">✓ Done</div>
-                            ${this.config.show_undo?R`
+                            ${this.config.show_undo
+                ? x `
                                   <mwc-button
                                     class="undo-button"
-                                    @click=${()=>this.undoCompletion(e)}
+                                    @click=${() => this.undoCompletion(chore)}
                                   >
                                     Undo
                                   </mwc-button>
-                                `:""}
+                                `
+                : ""}
                           </div>
-                        `:this.isPoolChore(e)?R`
+                        `
+            : this.isPoolChore(chore)
+                ? x `
                             <div class="pool-actions">
                               <mwc-button
-                                @click=${()=>this.claimChore(e)}
+                                @click=${() => this.claimChore(chore)}
                               >
                                 <ha-icon icon="mdi:hand-extended"></ha-icon>
                                 Claim
                               </mwc-button>
                               <mwc-button
-                                @click=${()=>this.completePoolChore(e)}
+                                @click=${() => this.completePoolChore(chore)}
                               >
                                 <ha-icon icon="mdi:check-circle"></ha-icon>
                                 Complete
                               </mwc-button>
                             </div>
-                          `:R`
+                          `
+                : x `
                             <mwc-button
-                              @click=${()=>this.completeChore(e)}
+                              @click=${() => this.completeChore(chore)}
                             >
                               <ha-icon icon="mdi:check-circle"></ha-icon>
                               Complete
@@ -212,7 +925,10 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           </div>
         </div>
       </ha-card>
-    `}static get styles(){return a`
+    `;
+    }
+    static get styles() {
+        return i$3 `
       :host {
         display: block;
       }
@@ -251,6 +967,17 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
 
       .points-badge {
         background: var(--info-color, #2196f3);
+      }
+
+      .actor-badge {
+        background: var(--warning-color, #ff9800);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .actor-badge ha-icon {
+        --mdc-icon-size: 14px;
       }
 
       .card-content {
@@ -669,9 +1396,51 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
         border-top: 1px solid var(--divider-color);
         font-style: italic;
       }
-    `}};e([he({attribute:!1})],fe.prototype,"hass",void 0),e([pe()],fe.prototype,"config",void 0),e([pe()],fe.prototype,"arcadeSession",void 0),e([pe()],fe.prototype,"expandedLeaderboards",void 0),fe=e([ce("choreboard-card")],fe),console.info(`%c ${ge} %c ${ue} `,"color: white; background: #039be5; font-weight: 700;","color: #039be5; background: white; font-weight: 700;");let me=class extends ae{setConfig(e){this.config=e}getMyChoresSensors(){return this.hass?Object.keys(this.hass.states).filter(e=>e.startsWith("sensor.choreboard_my_chores_")||e.startsWith("sensor.choreboard_my_immediate_chores_")||"sensor.choreboard_outstanding_chores"===e||"sensor.choreboard_late_chores"===e||e.startsWith("sensor.")&&e.endsWith("_my_chores")||e.startsWith("sensor.")&&e.endsWith("_my_immediate_chores")||e.startsWith("sensor.")&&e.endsWith("_chores")):[]}render(){if(!this.hass||!this.config)return R``;const e=this.getMyChoresSensors();return R`
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
+], ChoreboardCard.prototype, "hass", void 0);
+__decorate([
+    r()
+], ChoreboardCard.prototype, "config", void 0);
+__decorate([
+    r()
+], ChoreboardCard.prototype, "arcadeSession", void 0);
+__decorate([
+    r()
+], ChoreboardCard.prototype, "expandedLeaderboards", void 0);
+ChoreboardCard = __decorate([
+    t("choreboard-card")
+], ChoreboardCard);
+console.info(`%c ${CARD_NAME} %c ${CARD_VERSION} `, "color: white; background: #039be5; font-weight: 700;", "color: #039be5; background: white; font-weight: 700;");
+
+let ChoreboardCardEditor = class ChoreboardCardEditor extends i {
+    setConfig(config) {
+        this.config = config;
+    }
+    getMyChoresSensors() {
+        if (!this.hass)
+            return [];
+        return Object.keys(this.hass.states).filter((entityId) => entityId.startsWith("sensor.choreboard_my_chores_") ||
+            entityId.startsWith("sensor.choreboard_my_immediate_chores_") ||
+            entityId === "sensor.choreboard_outstanding_chores" ||
+            entityId === "sensor.choreboard_late_chores" ||
+            (entityId.startsWith("sensor.") && entityId.endsWith("_my_chores")) ||
+            (entityId.startsWith("sensor.") &&
+                entityId.endsWith("_my_immediate_chores")) ||
+            (entityId.startsWith("sensor.") && entityId.endsWith("_chores")));
+    }
+    render() {
+        if (!this.hass || !this.config) {
+            return x ``;
+        }
+        const myChoresSensors = this.getMyChoresSensors();
+        return x `
       <div class="card-config">
-        ${0===e.length?R`
+        ${myChoresSensors.length === 0
+            ? x `
               <div class="warning">
                 <ha-icon icon="mdi:alert"></ha-icon>
                 <div>
@@ -688,14 +1457,15 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
                   </p>
                 </div>
               </div>
-            `:""}
+            `
+            : ""}
 
         <div class="option">
           <label for="title">Title:</label>
           <input
             id="title"
             type="text"
-            .value=${this.config.title||""}
+            .value=${this.config.title || ""}
             @input=${this.titleChanged}
             placeholder="My Chores"
           />
@@ -705,16 +1475,16 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label for="entity">ChoreBoard Sensor:</label>
           <select
             id="entity"
-            .value=${this.config.entity||""}
+            .value=${this.config.entity || ""}
             @change=${this.entityChanged}
           >
             <option value="">Select a sensor...</option>
-            ${e.map(e=>R`
+            ${myChoresSensors.map((entityId) => x `
                 <option
-                  value=${e}
-                  ?selected=${this.config.entity===e}
+                  value=${entityId}
+                  ?selected=${this.config.entity === entityId}
                 >
-                  ${this.getEntityDisplayName(e)}
+                  ${this.getEntityDisplayName(entityId)}
                 </option>
               `)}
           </select>
@@ -725,10 +1495,47 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
         </div>
 
         <div class="option">
+          <label for="actor">Who completes chores from this card?</label>
+          <select
+            id="actor"
+            .value=${this.config.actor_user_id?.toString() || ""}
+            @change=${this.actorChanged}
+          >
+            <option value="">Use sensor's user (auto-detect)</option>
+            ${this.getUsers().map((user) => x `
+                <option
+                  value=${user.id.toString()}
+                  ?selected=${this.config.actor_user_id === user.id}
+                >
+                  ${user.display_name} (@${user.username})
+                </option>
+              `)}
+          </select>
+          <p class="hint">
+            Select which ChoreBoard user will be recorded as completing chores when
+            you click the "Complete" button. Leave as "auto-detect" to use the
+            user from the selected sensor.
+          </p>
+          ${this.config.actor_user_id &&
+            this.getUsers().find((u) => u.id === this.config.actor_user_id) ===
+                undefined
+            ? x `
+                <div class="validation-warning">
+                  <ha-icon icon="mdi:alert"></ha-icon>
+                  <span
+                    >Warning: Selected user no longer exists. Please choose
+                    another or use auto-detect.</span
+                  >
+                </div>
+              `
+            : ""}
+        </div>
+
+        <div class="option">
           <label>
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_header}
+              ?checked=${this.config.show_header !== false}
               @change=${this.showHeaderChanged}
             />
             Show Header
@@ -739,7 +1546,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_points}
+              ?checked=${this.config.show_points !== false}
               @change=${this.showPointsChanged}
             />
             Show Points
@@ -750,7 +1557,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_completed}
+              ?checked=${this.config.show_completed !== false}
               @change=${this.showCompletedChanged}
             />
             Show Completed Chores
@@ -761,7 +1568,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!0===this.config.show_overdue_only}
+              ?checked=${this.config.show_overdue_only === true}
               @change=${this.showOverdueOnlyChanged}
             />
             Show Only Overdue Chores
@@ -772,7 +1579,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!0===this.config.show_undo}
+              ?checked=${this.config.show_undo === true}
               @change=${this.showUndoChanged}
             />
             Show Undo Button for Completed Chores
@@ -783,7 +1590,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!0===this.config.show_user_points}
+              ?checked=${this.config.show_user_points === true}
               @change=${this.showUserPointsChanged}
             />
             Show User Points in Header
@@ -799,7 +1606,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_arcade}
+              ?checked=${this.config.show_arcade !== false}
               @change=${this.showArcadeChanged}
             />
             Enable Arcade Mode Controls
@@ -813,7 +1620,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_arcade_leaderboards}
+              ?checked=${this.config.show_arcade_leaderboards !== false}
               @change=${this.showArcadeLeaderboardsChanged}
             />
             Show Arcade Leaderboards
@@ -825,7 +1632,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label>
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_judge_controls}
+              ?checked=${this.config.show_judge_controls !== false}
               @change=${this.showJudgeControlsChanged}
             />
             Show Judge Controls
@@ -844,7 +1651,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
             type="number"
             min="5"
             max="120"
-            .value=${this.config.arcade_poll_interval||30}
+            .value=${this.config.arcade_poll_interval || 30}
             @input=${this.arcadePollIntervalChanged}
           />
           <p class="hint">
@@ -862,13 +1669,178 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
               assigned chores.
             </p>
             <p>
-              Mark chores as complete directly from the card using the
-              "Complete" button.
+              Configure which ChoreBoard user will be recorded as completing chores
+              when you click the "Complete" button. By default, it uses the user
+              associated with the selected sensor.
+            </p>
+            <p>
+              Pool chores will always prompt you to select who is completing them,
+              regardless of this setting.
             </p>
           </div>
         </div>
       </div>
-    `}getEntityDisplayName(e){const t=this.hass?.states[e];if(t?.attributes?.friendly_name)return t.attributes.friendly_name;const s=e.split(".");if(2===s.length&&s[1].startsWith("choreboard_")){const e=s[1].replace("choreboard_","").replace(/_/g," ");return e.charAt(0).toUpperCase()+e.slice(1)}return e}entityChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,entity:t.value},this.configChanged())}titleChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,title:t.value},this.configChanged())}showHeaderChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_header:t.checked},this.configChanged())}showPointsChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_points:t.checked},this.configChanged())}showCompletedChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_completed:t.checked},this.configChanged())}showOverdueOnlyChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_overdue_only:t.checked},this.configChanged())}showUndoChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_undo:t.checked},this.configChanged())}showUserPointsChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_user_points:t.checked},this.configChanged())}showArcadeChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_arcade:t.checked},this.configChanged())}showArcadeLeaderboardsChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_arcade_leaderboards:t.checked},this.configChanged())}showJudgeControlsChanged(e){const t=e.target;this.config&&this.hass&&(this.config={...this.config,show_judge_controls:t.checked},this.configChanged())}arcadePollIntervalChanged(e){const t=e.target;if(!this.config||!this.hass)return;const s=parseInt(t.value,10);!isNaN(s)&&s>=5&&s<=120&&(this.config={...this.config,arcade_poll_interval:s},this.configChanged())}configChanged(){const e=new CustomEvent("config-changed",{detail:{config:this.config},bubbles:!0,composed:!0});this.dispatchEvent(e)}static get styles(){return a`
+    `;
+    }
+    getEntityDisplayName(entityId) {
+        const stateObj = this.hass?.states[entityId];
+        if (stateObj?.attributes?.friendly_name) {
+            return stateObj.attributes.friendly_name;
+        }
+        const parts = entityId.split(".");
+        if (parts.length === 2 && parts[1].startsWith("choreboard_")) {
+            const name = parts[1].replace("choreboard_", "").replace(/_/g, " ");
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        return entityId;
+    }
+    getUsers() {
+        if (!this.hass) {
+            return [];
+        }
+        if (this.hass.states["sensor.users"]) {
+            const state = this.hass.states["sensor.users"];
+            if (state.attributes.users && Array.isArray(state.attributes.users)) {
+                return state.attributes.users;
+            }
+        }
+        for (const entityId of Object.keys(this.hass.states)) {
+            if (entityId.startsWith("sensor.choreboard_")) {
+                const state = this.hass.states[entityId];
+                if (state.attributes.users && Array.isArray(state.attributes.users)) {
+                    return state.attributes.users;
+                }
+            }
+        }
+        return [];
+    }
+    entityChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, entity: target.value };
+        this.configChanged();
+    }
+    titleChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, title: target.value };
+        this.configChanged();
+    }
+    showHeaderChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_header: target.checked };
+        this.configChanged();
+    }
+    showPointsChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_points: target.checked };
+        this.configChanged();
+    }
+    showCompletedChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_completed: target.checked };
+        this.configChanged();
+    }
+    showOverdueOnlyChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_overdue_only: target.checked };
+        this.configChanged();
+    }
+    showUndoChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_undo: target.checked };
+        this.configChanged();
+    }
+    showUserPointsChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_user_points: target.checked };
+        this.configChanged();
+    }
+    showArcadeChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_arcade: target.checked };
+        this.configChanged();
+    }
+    showArcadeLeaderboardsChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_arcade_leaderboards: target.checked };
+        this.configChanged();
+    }
+    showJudgeControlsChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        this.config = { ...this.config, show_judge_controls: target.checked };
+        this.configChanged();
+    }
+    arcadePollIntervalChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        const value = parseInt(target.value, 10);
+        if (!isNaN(value) && value >= 5 && value <= 120) {
+            this.config = { ...this.config, arcade_poll_interval: value };
+            this.configChanged();
+        }
+    }
+    configChanged() {
+        const event = new CustomEvent("config-changed", {
+            detail: { config: this.config },
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
+    actorChanged(ev) {
+        const target = ev.target;
+        if (!this.config || !this.hass) {
+            return;
+        }
+        const value = target.value;
+        if (value === "") {
+            const { actor_user_id, ...rest } = this.config;
+            this.config = rest;
+        }
+        else {
+            const userId = parseInt(value, 10);
+            if (!isNaN(userId)) {
+                this.config = { ...this.config, actor_user_id: userId };
+            }
+        }
+        this.configChanged();
+    }
+    static get styles() {
+        return i$3 `
       .card-config {
         display: flex;
         flex-direction: column;
@@ -1000,14 +1972,264 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
         color: var(--text-primary-color, white);
         text-decoration: underline;
       }
-    `}};e([he({attribute:!1})],me.prototype,"hass",void 0),e([pe()],me.prototype,"config",void 0),me=e([ce("choreboard-card-editor")],me);let ve=class extends ae{setConfig(e){if(!e)throw new Error("Invalid configuration");if(!e.entity)throw new Error('You must specify an "entity" (e.g., sensor.pending_arcade_sessions)');this.config={show_header:!0,auto_refresh:!0,refresh_interval:30,judge_mode:"ask",...e}}getCardSize(){const e=this.getSessions();return Math.max(2,Math.ceil(e.length/2)+2)}static getStubConfig(){return{type:"custom:choreboard-arcade-judge-card",title:"Arcade Judge Panel",entity:"sensor.pending_arcade_sessions",show_header:!0}}static getConfigElement(){return document.createElement("choreboard-arcade-judge-card-editor")}getSessions(){if(!this.hass||!this.config.entity)return[];const e=this.hass.states[this.config.entity];if(!e)return console.warn(`ChoreBoard Pending Arcade entity not found: ${this.config.entity}. Make sure the ChoreBoard integration is installed and the pending arcade sensor exists.`),[];return e.attributes.sessions||[]}getUsers(){if(!this.hass)return[];if(this.hass.states["sensor.users"]){const e=this.hass.states["sensor.users"];if(e.attributes.users&&Array.isArray(e.attributes.users))return e.attributes.users}for(const e of Object.keys(this.hass.states))if(e.startsWith("sensor.choreboard_")||e.includes("pending_arcade")){const t=this.hass.states[e];if(t.attributes.users&&Array.isArray(t.attributes.users))return t.attributes.users}return[]}getCurrentJudgeId(){if(!this.hass||!this.hass.user)return null;const e=this.hass.user,t=e.name?.toLowerCase();if(!t)return null;const s=this.getUsers().find(e=>e.username.toLowerCase()===t);return s?(console.log(`Arcade Judge: Mapped HA user "${t}" to ChoreBoard user ID ${s.id}`),s.id):(console.warn(`Arcade Judge: Could not find ChoreBoard user matching HA username "${t}"`),null)}async showJudgeDialog(e){if(!this.hass)return;const t=this.getUsers();if(0===t.length)return void this.showToast("No users available. Make sure ChoreBoard integration is properly configured.",!0);if("auto"===this.config.judge_mode){const t=this.getCurrentJudgeId();if(t)return void await this.showQuickJudgeDialog(e,t);this.showToast("Cannot determine current user. Please select a judge manually.",!0)}await Promise.resolve().then(function(){return Ce});const s=document.createElement("arcade-judge-dialog");s.users=t,s.session=e,s.addEventListener("judge-approved",async t=>{const o=t,i=o.detail.judgeId,r=o.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","approve_arcade",t),this.showToast("Arcade session approved - points awarded!")}catch(e){console.error("Error approving arcade session:",e),this.showToast("Failed to approve arcade session",!0)}finally{s.remove()}}),s.addEventListener("judge-denied",async t=>{const o=t,i=o.detail.judgeId,r=o.detail.notes;try{const t={session_id:e.id};i&&(t.judge_id=i),r&&(t.notes=r),await this.hass.callService("choreboard","deny_arcade",t),this.showToast("Arcade session denied - user can continue")}catch(e){console.error("Error denying arcade session:",e),this.showToast("Failed to deny arcade session",!0)}finally{s.remove()}}),s.addEventListener("dialog-closed",()=>{s.remove()}),document.body.appendChild(s)}async showQuickJudgeDialog(e,t){if(!this.hass)return;const s=this.getUsers().find(e=>e.id===t),o=s?s.display_name||s.username:"Current User",i=confirm(`Judge arcade session for "${e.chore_name}" by ${e.user_display_name||e.user_name}?\n\nTime: ${this.formatTime(e.elapsed_seconds)}\nJudge: ${o}\n\nClick OK to APPROVE or Cancel to DENY.`);try{const s={session_id:e.id,judge_id:t};i?(await this.hass.callService("choreboard","approve_arcade",s),this.showToast("Arcade session approved - points awarded!")):(await this.hass.callService("choreboard","deny_arcade",s),this.showToast("Arcade session denied - user can continue"))}catch(e){console.error("Error judging arcade session:",e),this.showToast("Failed to judge arcade session",!0)}}showToast(e,t=!1){const s=new CustomEvent("hass-notification",{detail:{message:e,duration:t?5e3:3e3},bubbles:!0,composed:!0});this.dispatchEvent(s)}formatTime(e){const t=Math.floor(e/3600),s=Math.floor(e%3600/60),o=Math.floor(e%60);return t>0?`${t}:${s.toString().padStart(2,"0")}:${o.toString().padStart(2,"0")}`:`${s}:${o.toString().padStart(2,"0")}`}render(){if(!this.config||!this.hass)return R``;const e=this.config.title||"Arcade Judge Panel",t=this.getSessions();return 0===t.length?R`
+
+      .validation-warning {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: rgba(255, 152, 0, 0.1);
+        border-left: 3px solid var(--warning-color, #ff9800);
+        border-radius: 4px;
+        font-size: 13px;
+        color: var(--warning-color, #ff9800);
+        margin-top: 8px;
+      }
+
+      .validation-warning ha-icon {
+        --mdc-icon-size: 18px;
+        flex-shrink: 0;
+      }
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
+], ChoreboardCardEditor.prototype, "hass", void 0);
+__decorate([
+    r()
+], ChoreboardCardEditor.prototype, "config", void 0);
+ChoreboardCardEditor = __decorate([
+    t("choreboard-card-editor")
+], ChoreboardCardEditor);
+
+let ChoreboardArcadeJudgeCard = class ChoreboardArcadeJudgeCard extends i {
+    setConfig(config) {
+        if (!config) {
+            throw new Error("Invalid configuration");
+        }
+        if (!config.entity) {
+            throw new Error('You must specify an "entity" (e.g., sensor.pending_arcade_sessions)');
+        }
+        this.config = {
+            show_header: true,
+            auto_refresh: true,
+            refresh_interval: 30,
+            judge_mode: "ask",
+            ...config,
+        };
+    }
+    getCardSize() {
+        const sessions = this.getSessions();
+        return Math.max(2, Math.ceil(sessions.length / 2) + 2);
+    }
+    static getStubConfig() {
+        return {
+            type: "custom:choreboard-arcade-judge-card",
+            title: "Arcade Judge Panel",
+            entity: "sensor.pending_arcade_sessions",
+            show_header: true,
+        };
+    }
+    static getConfigElement() {
+        return document.createElement("choreboard-arcade-judge-card-editor");
+    }
+    getSessions() {
+        if (!this.hass || !this.config.entity) {
+            return [];
+        }
+        const stateObj = this.hass.states[this.config.entity];
+        if (!stateObj) {
+            console.warn(`ChoreBoard Pending Arcade entity not found: ${this.config.entity}. ` +
+                `Make sure the ChoreBoard integration is installed and the pending arcade sensor exists.`);
+            return [];
+        }
+        const attributes = stateObj.attributes;
+        return attributes.sessions || [];
+    }
+    getUsers() {
+        if (!this.hass) {
+            return [];
+        }
+        if (this.hass.states["sensor.users"]) {
+            const state = this.hass.states["sensor.users"];
+            if (state.attributes.users && Array.isArray(state.attributes.users)) {
+                return state.attributes.users;
+            }
+        }
+        for (const entityId of Object.keys(this.hass.states)) {
+            if (entityId.startsWith("sensor.choreboard_") || entityId.includes("pending_arcade")) {
+                const state = this.hass.states[entityId];
+                if (state.attributes.users && Array.isArray(state.attributes.users)) {
+                    return state.attributes.users;
+                }
+            }
+        }
+        return [];
+    }
+    getCurrentJudgeId() {
+        if (!this.hass || !this.hass.user) {
+            return null;
+        }
+        const haUser = this.hass.user;
+        const haUsername = haUser.name?.toLowerCase();
+        if (!haUsername) {
+            return null;
+        }
+        const users = this.getUsers();
+        const choregboardUser = users.find((u) => u.username.toLowerCase() === haUsername);
+        if (choregboardUser) {
+            console.log(`Arcade Judge: Mapped HA user "${haUsername}" to ChoreBoard user ID ${choregboardUser.id}`);
+            return choregboardUser.id;
+        }
+        console.warn(`Arcade Judge: Could not find ChoreBoard user matching HA username "${haUsername}"`);
+        return null;
+    }
+    async showJudgeDialog(session) {
+        if (!this.hass)
+            return;
+        const users = this.getUsers();
+        if (users.length === 0) {
+            this.showToast("No users available. Make sure ChoreBoard integration is properly configured.", true);
+            return;
+        }
+        if (this.config.judge_mode === "auto") {
+            const judgeId = this.getCurrentJudgeId();
+            if (!judgeId) {
+                this.showToast("Cannot determine current user. Please select a judge manually.", true);
+            }
+            else {
+                await this.showQuickJudgeDialog(session, judgeId);
+                return;
+            }
+        }
+        await Promise.resolve().then(function () { return arcadeJudgeDialog; });
+        const dialog = document.createElement("arcade-judge-dialog");
+        dialog.users = users;
+        dialog.session = session;
+        dialog.addEventListener("judge-approved", async (e) => {
+            const customEvent = e;
+            const judgeId = customEvent.detail.judgeId;
+            const notes = customEvent.detail.notes;
+            try {
+                const serviceData = {
+                    session_id: session.id,
+                };
+                if (judgeId) {
+                    serviceData.judge_id = judgeId;
+                }
+                if (notes) {
+                    serviceData.notes = notes;
+                }
+                await this.hass.callService("choreboard", "approve_arcade", serviceData);
+                this.showToast("Arcade session approved - points awarded!");
+            }
+            catch (error) {
+                console.error("Error approving arcade session:", error);
+                this.showToast("Failed to approve arcade session", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("judge-denied", async (e) => {
+            const customEvent = e;
+            const judgeId = customEvent.detail.judgeId;
+            const notes = customEvent.detail.notes;
+            try {
+                const serviceData = {
+                    session_id: session.id,
+                };
+                if (judgeId) {
+                    serviceData.judge_id = judgeId;
+                }
+                if (notes) {
+                    serviceData.notes = notes;
+                }
+                await this.hass.callService("choreboard", "deny_arcade", serviceData);
+                this.showToast("Arcade session denied - user can continue");
+            }
+            catch (error) {
+                console.error("Error denying arcade session:", error);
+                this.showToast("Failed to deny arcade session", true);
+            }
+            finally {
+                dialog.remove();
+            }
+        });
+        dialog.addEventListener("dialog-closed", () => {
+            dialog.remove();
+        });
+        document.body.appendChild(dialog);
+    }
+    async showQuickJudgeDialog(session, judgeId) {
+        if (!this.hass)
+            return;
+        const users = this.getUsers();
+        const judge = users.find((u) => u.id === judgeId);
+        const judgeName = judge
+            ? judge.display_name || judge.username
+            : "Current User";
+        const action = confirm(`Judge arcade session for "${session.chore_name}" by ${session.user_display_name || session.user_name}?\n\n` +
+            `Time: ${this.formatTime(session.elapsed_seconds)}\n` +
+            `Judge: ${judgeName}\n\n` +
+            `Click OK to APPROVE or Cancel to DENY.`);
+        try {
+            const serviceData = {
+                session_id: session.id,
+                judge_id: judgeId,
+            };
+            if (action) {
+                await this.hass.callService("choreboard", "approve_arcade", serviceData);
+                this.showToast("Arcade session approved - points awarded!");
+            }
+            else {
+                await this.hass.callService("choreboard", "deny_arcade", serviceData);
+                this.showToast("Arcade session denied - user can continue");
+            }
+        }
+        catch (error) {
+            console.error("Error judging arcade session:", error);
+            this.showToast("Failed to judge arcade session", true);
+        }
+    }
+    showToast(message, isError = false) {
+        const event = new CustomEvent("hass-notification", {
+            detail: {
+                message,
+                duration: isError ? 5000 : 3000,
+            },
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
+    formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        if (hours > 0) {
+            return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        }
+        return `${minutes}:${secs.toString().padStart(2, "0")}`;
+    }
+    render() {
+        if (!this.config || !this.hass) {
+            return x ``;
+        }
+        const title = this.config.title || "Arcade Judge Panel";
+        const sessions = this.getSessions();
+        if (sessions.length === 0) {
+            return x `
         <ha-card>
-          ${this.config.show_header?R`
+          ${this.config.show_header
+                ? x `
                 <div class="card-header">
-                  <div class="name">${e}</div>
+                  <div class="name">${title}</div>
                   <div class="badge success">All clear!</div>
                 </div>
-              `:""}
+              `
+                : ""}
           <div class="card-content">
             <div class="empty-state">
               <ha-icon icon="mdi:check-circle"></ha-icon>
@@ -1018,32 +2240,36 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
             </div>
           </div>
         </ha-card>
-      `:R`
+      `;
+        }
+        return x `
       <ha-card>
-        ${this.config.show_header?R`
+        ${this.config.show_header
+            ? x `
               <div class="card-header">
-                <div class="name">${e}</div>
-                <div class="badge">${t.length} pending</div>
+                <div class="name">${title}</div>
+                <div class="badge">${sessions.length} pending</div>
               </div>
-            `:""}
+            `
+            : ""}
         <div class="card-content">
           <div class="session-list">
-            ${t.map(e=>R`
+            ${sessions.map((session) => x `
                 <div class="session-item">
                   <div class="session-icon">
                     <ha-icon icon="mdi:gavel"></ha-icon>
                   </div>
                   <div class="session-details">
                     <div class="session-header">
-                      <div class="session-chore">${e.chore_name}</div>
+                      <div class="session-chore">${session.chore_name}</div>
                       <div class="session-time">
-                        ${this.formatTime(e.elapsed_seconds)}
+                        ${this.formatTime(session.elapsed_seconds)}
                       </div>
                     </div>
                     <div class="session-meta">
                       <span class="meta-item">
                         <ha-icon icon="mdi:account"></ha-icon>
-                        ${e.user_display_name||e.user_name}
+                        ${session.user_display_name || session.user_name}
                       </span>
                       <span class="meta-item status">
                         <ha-icon icon="mdi:clock-alert"></ha-icon>
@@ -1054,7 +2280,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
                   <div class="session-action">
                     <mwc-button
                       class="judge-button"
-                      @click=${()=>this.showJudgeDialog(e)}
+                      @click=${() => this.showJudgeDialog(session)}
                       raised
                     >
                       <ha-icon icon="mdi:gavel"></ha-icon>
@@ -1066,7 +2292,10 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           </div>
         </div>
       </ha-card>
-    `}static get styles(){return a`
+    `;
+    }
+    static get styles() {
+        return i$3 `
       :host {
         display: block;
       }
@@ -1222,29 +2451,112 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
         --mdc-icon-size: 20px;
         margin-right: 8px;
       }
-    `}};e([he({attribute:!1})],ve.prototype,"hass",void 0),e([pe()],ve.prototype,"config",void 0),ve=e([ce("choreboard-arcade-judge-card")],ve),console.info(`%c ${ge} - Arcade Judge %c ${ue} `,"color: white; background: #ff9800; font-weight: 700;","color: #ff9800; background: white; font-weight: 700;");let be=class extends ae{setConfig(e){this.config=e}entityChanged(e){const t=e.target;this.config={...this.config,entity:t.value},this.configChanged()}titleChanged(e){const t=e.target;this.config={...this.config,title:t.value},this.configChanged()}showHeaderChanged(e){const t=e.target;this.config={...this.config,show_header:t.checked},this.configChanged()}autoRefreshChanged(e){const t=e.target;this.config={...this.config,auto_refresh:t.checked},this.configChanged()}refreshIntervalChanged(e){const t=e.target,s=parseInt(t.value);s>0&&(this.config={...this.config,refresh_interval:s},this.configChanged())}judgeModeChanged(e){const t=e.target;this.config={...this.config,judge_mode:t.value},this.configChanged()}configChanged(){const e=new CustomEvent("config-changed",{detail:{config:this.config},bubbles:!0,composed:!0});this.dispatchEvent(e)}getAvailableEntities(){if(!this.hass)return console.warn("ChoreBoard Arcade Judge Editor: hass not available yet"),[];const e=[];for(const t of Object.keys(this.hass.states))("sensor.pending_arcade_sessions"===t||"sensor.choreboard_pending_arcade"===t||t.startsWith("sensor.choreboard_pending_arcade")||t.includes("pending_arcade"))&&(console.log("ChoreBoard Arcade Judge Editor: Found pending arcade sensor:",t),e.push(t));return 0===e.length&&console.warn("ChoreBoard Arcade Judge Editor: No pending arcade sensors found in",Object.keys(this.hass.states).length,"entities"),e}render(){if(!this.hass||!this.config)return R``;const e=this.getAvailableEntities();return R`
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
+], ChoreboardArcadeJudgeCard.prototype, "hass", void 0);
+__decorate([
+    r()
+], ChoreboardArcadeJudgeCard.prototype, "config", void 0);
+ChoreboardArcadeJudgeCard = __decorate([
+    t("choreboard-arcade-judge-card")
+], ChoreboardArcadeJudgeCard);
+console.info(`%c ${CARD_NAME} - Arcade Judge %c ${CARD_VERSION} `, "color: white; background: #ff9800; font-weight: 700;", "color: #ff9800; background: white; font-weight: 700;");
+
+let ChoreboardArcadeJudgeCardEditor = class ChoreboardArcadeJudgeCardEditor extends i {
+    setConfig(config) {
+        this.config = config;
+    }
+    entityChanged(ev) {
+        const target = ev.target;
+        this.config = { ...this.config, entity: target.value };
+        this.configChanged();
+    }
+    titleChanged(ev) {
+        const target = ev.target;
+        this.config = { ...this.config, title: target.value };
+        this.configChanged();
+    }
+    showHeaderChanged(ev) {
+        const target = ev.target;
+        this.config = { ...this.config, show_header: target.checked };
+        this.configChanged();
+    }
+    autoRefreshChanged(ev) {
+        const target = ev.target;
+        this.config = { ...this.config, auto_refresh: target.checked };
+        this.configChanged();
+    }
+    refreshIntervalChanged(ev) {
+        const target = ev.target;
+        const value = parseInt(target.value);
+        if (value > 0) {
+            this.config = { ...this.config, refresh_interval: value };
+            this.configChanged();
+        }
+    }
+    judgeModeChanged(ev) {
+        const target = ev.target;
+        this.config = { ...this.config, judge_mode: target.value };
+        this.configChanged();
+    }
+    configChanged() {
+        const event = new CustomEvent("config-changed", {
+            detail: { config: this.config },
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
+    getAvailableEntities() {
+        if (!this.hass) {
+            console.warn("ChoreBoard Arcade Judge Editor: hass not available yet");
+            return [];
+        }
+        const entities = [];
+        for (const entityId of Object.keys(this.hass.states)) {
+            if (entityId === "sensor.pending_arcade_sessions" ||
+                entityId === "sensor.choreboard_pending_arcade" ||
+                entityId.startsWith("sensor.choreboard_pending_arcade") ||
+                entityId.includes("pending_arcade")) {
+                console.log("ChoreBoard Arcade Judge Editor: Found pending arcade sensor:", entityId);
+                entities.push(entityId);
+            }
+        }
+        if (entities.length === 0) {
+            console.warn("ChoreBoard Arcade Judge Editor: No pending arcade sensors found in", Object.keys(this.hass.states).length, "entities");
+        }
+        return entities;
+    }
+    render() {
+        if (!this.hass || !this.config) {
+            return x ``;
+        }
+        const entities = this.getAvailableEntities();
+        return x `
       <div class="card-config">
         <div class="option">
           <label for="entity">Pending Arcade Sensor (Required)</label>
-          ${e.length>0?R`
+          ${entities.length > 0
+            ? x `
                 <select id="entity" @change=${this.entityChanged}>
                   <option value="" ?selected=${!this.config.entity}>
                     Select a sensor...
                   </option>
-                  ${e.map(e=>R`
-                      <option
-                        value="${e}"
-                        ?selected=${this.config.entity===e}
-                      >
-                        ${e}
+                  ${entities.map((entity) => x `
+                      <option value="${entity}" ?selected=${this.config.entity === entity}>
+                        ${entity}
                       </option>
                     `)}
                 </select>
-              `:R`
+              `
+            : x `
                 <input
                   type="text"
                   id="entity"
-                  .value=${this.config.entity||""}
+                  .value=${this.config.entity || ""}
                   @input=${this.entityChanged}
                   placeholder="sensor.pending_arcade_sessions"
                 />
@@ -1252,8 +2564,8 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
                   <ha-icon icon="mdi:information"></ha-icon>
                   <span>
                     Enter the entity ID manually. The sensor should be named
-                    <code>sensor.pending_arcade_sessions</code> if the
-                    ChoreBoard integration is properly installed.
+                    <code>sensor.pending_arcade_sessions</code> if the ChoreBoard
+                    integration is properly installed.
                   </span>
                 </div>
               `}
@@ -1264,7 +2576,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <input
             type="text"
             id="title"
-            .value=${this.config.title||""}
+            .value=${this.config.title || ""}
             @input=${this.titleChanged}
             placeholder="Arcade Judge Panel"
           />
@@ -1274,7 +2586,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label class="checkbox-label">
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.show_header}
+              ?checked=${this.config.show_header !== false}
               @change=${this.showHeaderChanged}
             />
             <span>Show card header</span>
@@ -1285,14 +2597,15 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <label class="checkbox-label">
             <input
               type="checkbox"
-              ?checked=${!1!==this.config.auto_refresh}
+              ?checked=${this.config.auto_refresh !== false}
               @change=${this.autoRefreshChanged}
             />
             <span>Auto-refresh pending sessions</span>
           </label>
         </div>
 
-        ${!1!==this.config.auto_refresh?R`
+        ${this.config.auto_refresh !== false
+            ? x `
               <div class="option">
                 <label for="refresh_interval">Refresh Interval (seconds)</label>
                 <input
@@ -1300,34 +2613,34 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
                   id="refresh_interval"
                   min="10"
                   max="300"
-                  .value=${(this.config.refresh_interval||30).toString()}
+                  .value=${(this.config.refresh_interval || 30).toString()}
                   @input=${this.refreshIntervalChanged}
                 />
               </div>
-            `:""}
+            `
+            : ""}
 
         <div class="option">
           <label for="judge_mode">Judge Selection Mode</label>
           <select id="judge_mode" @change=${this.judgeModeChanged}>
-            <option
-              value="ask"
-              ?selected=${"ask"===(this.config.judge_mode||"ask")}
-            >
+            <option value="ask" ?selected=${(this.config.judge_mode || "ask") === "ask"}>
               Ask who is judging (Show user selector)
             </option>
-            <option value="auto" ?selected=${"auto"===this.config.judge_mode}>
+            <option value="auto" ?selected=${this.config.judge_mode === "auto"}>
               Use logged-in Home Assistant user
             </option>
           </select>
           <div class="help-text">
             <strong>Ask mode:</strong> Shows user selector dialog when judging.
             <br />
-            <strong>Auto mode:</strong> Automatically uses the currently
-            logged-in Home Assistant user as the judge.
+            <strong>Auto mode:</strong> Automatically uses the currently logged-in Home Assistant user as the judge.
           </div>
         </div>
       </div>
-    `}static get styles(){return a`
+    `;
+    }
+    static get styles() {
+        return i$3 `
       .card-config {
         display: flex;
         flex-direction: column;
@@ -1431,7 +2744,57 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
       .help-text strong {
         color: var(--primary-text-color);
       }
-    `}};e([he({attribute:!1})],be.prototype,"hass",void 0),e([pe()],be.prototype,"config",void 0),be=e([ce("choreboard-arcade-judge-card-editor")],be),window.customCards=window.customCards||[],window.customCards.push({type:"choreboard-card",name:"ChoreBoard Card",description:"A custom card for managing and tracking chores in Home Assistant",preview:!0,documentationURL:"https://github.com/yourusername/choreboard-ha-card"}),window.customCards.push({type:"choreboard-arcade-judge-card",name:"ChoreBoard Arcade Judge Card",description:"A custom card for judging pending arcade sessions in ChoreBoard",preview:!0,documentationURL:"https://github.com/yourusername/choreboard-ha-card"}),customElements.get("choreboard-card")||customElements.define("choreboard-card",fe),customElements.get("choreboard-card-editor")||customElements.define("choreboard-card-editor",me),customElements.get("choreboard-arcade-judge-card")||customElements.define("choreboard-arcade-judge-card",ve),customElements.get("choreboard-arcade-judge-card-editor")||customElements.define("choreboard-arcade-judge-card-editor",be),console.info("ChoreBoard Card has been loaded"),console.info("ChoreBoard Arcade Judge Card has been loaded");let ye=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedUserId=null}render(){return R`
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
+], ChoreboardArcadeJudgeCardEditor.prototype, "hass", void 0);
+__decorate([
+    r()
+], ChoreboardArcadeJudgeCardEditor.prototype, "config", void 0);
+ChoreboardArcadeJudgeCardEditor = __decorate([
+    t("choreboard-arcade-judge-card-editor")
+], ChoreboardArcadeJudgeCardEditor);
+
+window.customCards = window.customCards || [];
+window.customCards.push({
+    type: "choreboard-card",
+    name: "ChoreBoard Card",
+    description: "A custom card for managing and tracking chores in Home Assistant",
+    preview: true,
+    documentationURL: "https://github.com/yourusername/choreboard-ha-card",
+});
+window.customCards.push({
+    type: "choreboard-arcade-judge-card",
+    name: "ChoreBoard Arcade Judge Card",
+    description: "A custom card for judging pending arcade sessions in ChoreBoard",
+    preview: true,
+    documentationURL: "https://github.com/yourusername/choreboard-ha-card",
+});
+if (!customElements.get("choreboard-card")) {
+    customElements.define("choreboard-card", ChoreboardCard);
+}
+if (!customElements.get("choreboard-card-editor")) {
+    customElements.define("choreboard-card-editor", ChoreboardCardEditor);
+}
+if (!customElements.get("choreboard-arcade-judge-card")) {
+    customElements.define("choreboard-arcade-judge-card", ChoreboardArcadeJudgeCard);
+}
+if (!customElements.get("choreboard-arcade-judge-card-editor")) {
+    customElements.define("choreboard-arcade-judge-card-editor", ChoreboardArcadeJudgeCardEditor);
+}
+console.info("ChoreBoard Card has been loaded");
+console.info("ChoreBoard Arcade Judge Card has been loaded");
+
+let ClaimChoreDialog = class ClaimChoreDialog extends i {
+    constructor() {
+        super(...arguments);
+        this.users = [];
+        this.selectedUserId = null;
+    }
+    render() {
+        return x `
       <ha-dialog open @closed=${this._handleClosed}>
         <div slot="heading">Claim: ${this.chore.name}</div>
 
@@ -1439,17 +2802,21 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <div class="section">
             <h3>Who is claiming this chore?</h3>
             <div class="user-list">
-              ${this.users.map(e=>R`
+              ${this.users.map((user) => x `
                   <div
-                    class="user-option ${this.selectedUserId===e.id?"selected":""}"
-                    @click=${()=>this._selectUser(e.id)}
+                    class="user-option ${this.selectedUserId === user.id
+            ? "selected"
+            : ""}"
+                    @click=${() => this._selectUser(user.id)}
                   >
                     <ha-icon icon="mdi:account"></ha-icon>
-                    <span>${e.display_name}</span>
-                    ${this.selectedUserId===e.id?R`<ha-icon
+                    <span>${user.display_name}</span>
+                    ${this.selectedUserId === user.id
+            ? x `<ha-icon
                           icon="mdi:check"
                           class="check-icon"
-                        ></ha-icon>`:""}
+                        ></ha-icon>`
+            : ""}
                   </div>
                 `)}
             </div>
@@ -1467,7 +2834,29 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           Claim
         </mwc-button>
       </ha-dialog>
-    `}_selectUser(e){this.selectedUserId=e}_handleClosed(){this._cancel()}_cancel(){this.dispatchEvent(new CustomEvent("dialog-closed"))}_confirm(){this.selectedUserId&&this.dispatchEvent(new CustomEvent("dialog-confirmed",{detail:{userId:this.selectedUserId}}))}static get styles(){return a`
+    `;
+    }
+    _selectUser(userId) {
+        this.selectedUserId = userId;
+    }
+    _handleClosed() {
+        this._cancel();
+    }
+    _cancel() {
+        this.dispatchEvent(new CustomEvent("dialog-closed"));
+    }
+    _confirm() {
+        if (!this.selectedUserId) {
+            return;
+        }
+        this.dispatchEvent(new CustomEvent("dialog-confirmed", {
+            detail: {
+                userId: this.selectedUserId,
+            },
+        }));
+    }
+    static get styles() {
+        return i$3 `
       .dialog-content {
         padding: 16px 24px;
       }
@@ -1530,7 +2919,37 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
         font-size: 16px;
         font-weight: 500;
       }
-    `}};e([he({type:Array})],ye.prototype,"users",void 0),e([he({type:Object})],ye.prototype,"chore",void 0),e([pe()],ye.prototype,"selectedUserId",void 0),ye=e([ce("claim-chore-dialog")],ye);var xe=Object.freeze({__proto__:null,get ClaimChoreDialog(){return ye}});let _e=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedUserId=null,this.selectedHelperIds=[]}render(){const e=this.users.filter(e=>e.id!==this.selectedUserId);return R`
+    `;
+    }
+};
+__decorate([
+    n({ type: Array })
+], ClaimChoreDialog.prototype, "users", void 0);
+__decorate([
+    n({ type: Object })
+], ClaimChoreDialog.prototype, "chore", void 0);
+__decorate([
+    r()
+], ClaimChoreDialog.prototype, "selectedUserId", void 0);
+ClaimChoreDialog = __decorate([
+    t("claim-chore-dialog")
+], ClaimChoreDialog);
+
+var claimDialog = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    get ClaimChoreDialog () { return ClaimChoreDialog; }
+});
+
+let CompleteChoreDialog = class CompleteChoreDialog extends i {
+    constructor() {
+        super(...arguments);
+        this.users = [];
+        this.selectedUserId = null;
+        this.selectedHelperIds = [];
+    }
+    render() {
+        const availableHelpers = this.users.filter((user) => user.id !== this.selectedUserId);
+        return x `
       <ha-dialog open @closed=${this._handleClosed}>
         <div slot="heading">Complete: ${this.chore.name}</div>
 
@@ -1539,39 +2958,45 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <div class="section">
             <h3>Who completed this chore? <span class="required">*</span></h3>
             <div class="user-list">
-              ${this.users.map(e=>R`
+              ${this.users.map((user) => x `
                   <div
-                    class="user-option ${this.selectedUserId===e.id?"selected":""}"
-                    @click=${()=>this._selectUser(e.id)}
+                    class="user-option ${this.selectedUserId === user.id
+            ? "selected"
+            : ""}"
+                    @click=${() => this._selectUser(user.id)}
                   >
                     <ha-icon icon="mdi:account"></ha-icon>
-                    <span>${e.display_name}</span>
-                    ${this.selectedUserId===e.id?R`<ha-icon
+                    <span>${user.display_name}</span>
+                    ${this.selectedUserId === user.id
+            ? x `<ha-icon
                           icon="mdi:check"
                           class="check-icon"
-                        ></ha-icon>`:""}
+                        ></ha-icon>`
+            : ""}
                   </div>
                 `)}
             </div>
           </div>
 
           <!-- Helpers section -->
-          ${this.selectedUserId&&e.length>0?R`
+          ${this.selectedUserId && availableHelpers.length > 0
+            ? x `
                 <div class="section">
                   <h3>Who helped? <span class="optional">(optional)</span></h3>
                   <div class="helper-list">
-                    ${e.map(e=>R`
+                    ${availableHelpers.map((user) => x `
                         <label class="helper-option">
                           <ha-checkbox
-                            .checked=${this.selectedHelperIds.includes(e.id)}
-                            @change=${t=>this._toggleHelper(e.id,t.target.checked)}
+                            .checked=${this.selectedHelperIds.includes(user.id)}
+                            @change=${(e) => this._toggleHelper(user.id, e.target.checked)}
                           ></ha-checkbox>
-                          <span>${e.display_name}</span>
+                          <span>${user.display_name}</span>
                         </label>
                       `)}
                   </div>
                 </div>
-              `:""}
+              `
+            : ""}
         </div>
 
         <mwc-button slot="secondaryAction" @click=${this._cancel}>
@@ -1585,7 +3010,43 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           Complete
         </mwc-button>
       </ha-dialog>
-    `}_selectUser(e){this.selectedUserId!==e&&(this.selectedHelperIds=this.selectedHelperIds.filter(t=>t!==e)),this.selectedUserId=e}_toggleHelper(e,t){t?this.selectedHelperIds.includes(e)||(this.selectedHelperIds=[...this.selectedHelperIds,e]):this.selectedHelperIds=this.selectedHelperIds.filter(t=>t!==e)}_handleClosed(){this._cancel()}_cancel(){this.dispatchEvent(new CustomEvent("dialog-closed"))}_confirm(){this.selectedUserId&&this.dispatchEvent(new CustomEvent("dialog-confirmed",{detail:{userId:this.selectedUserId,helperIds:this.selectedHelperIds}}))}static get styles(){return a`
+    `;
+    }
+    _selectUser(userId) {
+        if (this.selectedUserId !== userId) {
+            this.selectedHelperIds = this.selectedHelperIds.filter((id) => id !== userId);
+        }
+        this.selectedUserId = userId;
+    }
+    _toggleHelper(userId, checked) {
+        if (checked) {
+            if (!this.selectedHelperIds.includes(userId)) {
+                this.selectedHelperIds = [...this.selectedHelperIds, userId];
+            }
+        }
+        else {
+            this.selectedHelperIds = this.selectedHelperIds.filter((id) => id !== userId);
+        }
+    }
+    _handleClosed() {
+        this._cancel();
+    }
+    _cancel() {
+        this.dispatchEvent(new CustomEvent("dialog-closed"));
+    }
+    _confirm() {
+        if (!this.selectedUserId) {
+            return;
+        }
+        this.dispatchEvent(new CustomEvent("dialog-confirmed", {
+            detail: {
+                userId: this.selectedUserId,
+                helperIds: this.selectedHelperIds,
+            },
+        }));
+    }
+    static get styles() {
+        return i$3 `
       .dialog-content {
         padding: 16px 24px;
         max-height: 60vh;
@@ -1692,7 +3153,41 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
       ha-checkbox {
         --mdc-checkbox-size: 20px;
       }
-    `}};e([he({type:Array})],_e.prototype,"users",void 0),e([he({type:Object})],_e.prototype,"chore",void 0),e([pe()],_e.prototype,"selectedUserId",void 0),e([pe()],_e.prototype,"selectedHelperIds",void 0),_e=e([ce("complete-chore-dialog")],_e);var we=Object.freeze({__proto__:null,get CompleteChoreDialog(){return _e}});let $e=class extends ae{constructor(){super(...arguments),this.users=[],this.selectedJudgeId=null,this.notes="",this.action=null}render(){const e=this.formatTime(this.session.elapsed_seconds);return R`
+    `;
+    }
+};
+__decorate([
+    n({ type: Array })
+], CompleteChoreDialog.prototype, "users", void 0);
+__decorate([
+    n({ type: Object })
+], CompleteChoreDialog.prototype, "chore", void 0);
+__decorate([
+    r()
+], CompleteChoreDialog.prototype, "selectedUserId", void 0);
+__decorate([
+    r()
+], CompleteChoreDialog.prototype, "selectedHelperIds", void 0);
+CompleteChoreDialog = __decorate([
+    t("complete-chore-dialog")
+], CompleteChoreDialog);
+
+var completeDialog = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    get CompleteChoreDialog () { return CompleteChoreDialog; }
+});
+
+let ArcadeJudgeDialog = class ArcadeJudgeDialog extends i {
+    constructor() {
+        super(...arguments);
+        this.users = [];
+        this.selectedJudgeId = null;
+        this.notes = "";
+        this.action = null;
+    }
+    render() {
+        const elapsedTime = this.formatTime(this.session.elapsed_seconds);
+        return x `
       <ha-dialog open @closed=${this._handleClosed}>
         <div slot="heading">Judge Arcade Session</div>
 
@@ -1710,7 +3205,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
             </div>
             <div class="info-row">
               <span class="label">Time:</span>
-              <span class="value time">${e}</span>
+              <span class="value time">${elapsedTime}</span>
             </div>
           </div>
 
@@ -1718,17 +3213,21 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <div class="section">
             <h3>Who is judging? <span class="required">*</span></h3>
             <div class="user-list">
-              ${this.users.map(e=>R`
+              ${this.users.map((user) => x `
                   <div
-                    class="user-option ${this.selectedJudgeId===e.id?"selected":""}"
-                    @click=${()=>this._selectJudge(e.id)}
+                    class="user-option ${this.selectedJudgeId === user.id
+            ? "selected"
+            : ""}"
+                    @click=${() => this._selectJudge(user.id)}
                   >
                     <ha-icon icon="mdi:account"></ha-icon>
-                    <span>${e.display_name}</span>
-                    ${this.selectedJudgeId===e.id?R`<ha-icon
+                    <span>${user.display_name}</span>
+                    ${this.selectedJudgeId === user.id
+            ? x `<ha-icon
                           icon="mdi:check"
                           class="check-icon"
-                        ></ha-icon>`:""}
+                        ></ha-icon>`
+            : ""}
                   </div>
                 `)}
             </div>
@@ -1750,7 +3249,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           <div class="action-section">
             <mwc-button
               class="approve-button"
-              @click=${()=>this._setAction("approve")}
+              @click=${() => this._setAction("approve")}
               ?disabled=${!this.selectedJudgeId}
               raised
             >
@@ -1759,7 +3258,7 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
             </mwc-button>
             <mwc-button
               class="deny-button"
-              @click=${()=>this._setAction("deny")}
+              @click=${() => this._setAction("deny")}
               ?disabled=${!this.selectedJudgeId}
               raised
             >
@@ -1773,7 +3272,47 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
           Cancel
         </mwc-button>
       </ha-dialog>
-    `}formatTime(e){const t=Math.floor(e/3600),s=Math.floor(e%3600/60),o=Math.floor(e%60);return t>0?`${t}:${s.toString().padStart(2,"0")}:${o.toString().padStart(2,"0")}`:`${s}:${o.toString().padStart(2,"0")}`}_selectJudge(e){this.selectedJudgeId=e}_notesChanged(e){this.notes=e.target.value}_setAction(e){this.action=e,this._confirm()}_handleClosed(){this._cancel()}_cancel(){this.dispatchEvent(new CustomEvent("dialog-closed"))}_confirm(){if(!this.action)return;const e="approve"===this.action?"judge-approved":"judge-denied";this.dispatchEvent(new CustomEvent(e,{detail:{judgeId:this.selectedJudgeId,notes:this.notes||void 0}}))}static get styles(){return a`
+    `;
+    }
+    formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        if (hours > 0) {
+            return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        }
+        return `${minutes}:${secs.toString().padStart(2, "0")}`;
+    }
+    _selectJudge(userId) {
+        this.selectedJudgeId = userId;
+    }
+    _notesChanged(e) {
+        this.notes = e.target.value;
+    }
+    _setAction(action) {
+        this.action = action;
+        this._confirm();
+    }
+    _handleClosed() {
+        this._cancel();
+    }
+    _cancel() {
+        this.dispatchEvent(new CustomEvent("dialog-closed"));
+    }
+    _confirm() {
+        if (!this.action) {
+            return;
+        }
+        const eventName = this.action === "approve" ? "judge-approved" : "judge-denied";
+        this.dispatchEvent(new CustomEvent(eventName, {
+            detail: {
+                judgeId: this.selectedJudgeId,
+                notes: this.notes || undefined,
+            },
+        }));
+    }
+    static get styles() {
+        return i$3 `
       .dialog-content {
         padding: 16px 24px;
         max-height: 70vh;
@@ -1945,5 +3484,30 @@ function e(e,t,s,o){var i,r=arguments.length,a=r<3?t:null===o?o=Object.getOwnPro
         --mdc-icon-size: 20px;
         margin-right: 8px;
       }
-    `}};e([he({type:Array})],$e.prototype,"users",void 0),e([he({type:Object})],$e.prototype,"session",void 0),e([pe()],$e.prototype,"selectedJudgeId",void 0),e([pe()],$e.prototype,"notes",void 0),e([pe()],$e.prototype,"action",void 0),$e=e([ce("arcade-judge-dialog")],$e);var Ce=Object.freeze({__proto__:null,get ArcadeJudgeDialog(){return $e}});
+    `;
+    }
+};
+__decorate([
+    n({ type: Array })
+], ArcadeJudgeDialog.prototype, "users", void 0);
+__decorate([
+    n({ type: Object })
+], ArcadeJudgeDialog.prototype, "session", void 0);
+__decorate([
+    r()
+], ArcadeJudgeDialog.prototype, "selectedJudgeId", void 0);
+__decorate([
+    r()
+], ArcadeJudgeDialog.prototype, "notes", void 0);
+__decorate([
+    r()
+], ArcadeJudgeDialog.prototype, "action", void 0);
+ArcadeJudgeDialog = __decorate([
+    t("arcade-judge-dialog")
+], ArcadeJudgeDialog);
+
+var arcadeJudgeDialog = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    get ArcadeJudgeDialog () { return ArcadeJudgeDialog; }
+});
 //# sourceMappingURL=choreboard-ha-card.js.map

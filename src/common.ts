@@ -18,6 +18,7 @@ export interface ChoreboardCardConfig {
   show_arcade_leaderboards?: boolean; // Show expandable leaderboards (default: true)
   show_judge_controls?: boolean; // Show judge approval controls (default: true)
   arcade_poll_interval?: number; // Timer update interval in seconds (default: 30)
+  actor_user_id?: number; // ChoreBoard user ID who completes chores (optional, falls back to sensor's username)
 }
 
 export interface ChoreboardArcadeJudgeCardConfig {

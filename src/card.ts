@@ -169,10 +169,10 @@ export class ChoreboardCard extends LitElement {
       return;
     }
 
-    // Get the user ID of whose chore list this is (not the HA logged-in user)
-    const userId = this.getCurrentUserId();
+    // Use configured actor_user_id if available, otherwise fall back to current user
+    const userId = this.getActorUserId();
     if (!userId) {
-      this.showToast("Unable to determine user for completion", true);
+      this.showToast("Unable to determine user for completion. Please configure an actor in card settings.", true);
       return;
     }
 
@@ -181,7 +181,14 @@ export class ChoreboardCard extends LitElement {
         chore_id: chore.id,
         completed_by_user_id: userId,
       });
-      this.showToast(`Marked "${chore.name}" as complete`);
+
+      // Enhanced feedback message showing actor name if using custom actor
+      const actorName = this.getActorDisplayName();
+      const message = actorName && this.isUsingCustomActor()
+        ? `Marked "${chore.name}" as complete (by ${actorName})`
+        : `Marked "${chore.name}" as complete`;
+
+      this.showToast(message);
     } catch (error) {
       console.error("Error marking chore as complete:", error);
       this.showToast("Failed to mark chore as complete", true);
@@ -660,6 +667,42 @@ export class ChoreboardCard extends LitElement {
     return user ? user.id : null;
   }
 
+  private getActorUserId(): number | null {
+    // If actor is explicitly configured, use that
+    if (this.config.actor_user_id) {
+      // Validate that the configured actor still exists
+      const users = this.getUsers();
+      const actorExists = users.some((u) => u.id === this.config.actor_user_id);
+
+      if (!actorExists) {
+        console.warn(
+          `Configured actor user ID ${this.config.actor_user_id} not found in users list. Falling back to sensor user.`
+        );
+        return this.getCurrentUserId();
+      }
+
+      return this.config.actor_user_id;
+    }
+
+    // Fall back to sensor's username (backwards compatibility)
+    return this.getCurrentUserId();
+  }
+
+  private getActorDisplayName(): string | null {
+    if (!this.config.actor_user_id) return null;
+
+    const users = this.getUsers();
+    const actor = users.find((u) => u.id === this.config.actor_user_id);
+    return actor ? actor.display_name : null;
+  }
+
+  private isUsingCustomActor(): boolean {
+    if (!this.config.actor_user_id) return false;
+
+    const sensorUserId = this.getCurrentUserId();
+    return sensorUserId !== null && this.config.actor_user_id !== sensorUserId;
+  }
+
   private renderLeaderboard(chore: Chore): TemplateResult {
     if (!this.config.show_arcade_leaderboards) {
       return html``;
@@ -894,6 +937,12 @@ export class ChoreboardCard extends LitElement {
                         ${userPoints.allTime} ${this.getPointsName()} total
                       </div>`
                     : ""}
+                  ${this.isUsingCustomActor()
+                    ? html`<div class="badge actor-badge">
+                        <ha-icon icon="mdi:account-switch"></ha-icon>
+                        Acting as: ${this.getActorDisplayName()}
+                      </div>`
+                    : ""}
                 </div>
               </div>
             `
@@ -1027,6 +1076,17 @@ export class ChoreboardCard extends LitElement {
 
       .points-badge {
         background: var(--info-color, #2196f3);
+      }
+
+      .actor-badge {
+        background: var(--warning-color, #ff9800);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .actor-badge ha-icon {
+        --mdc-icon-size: 14px;
       }
 
       .card-content {
